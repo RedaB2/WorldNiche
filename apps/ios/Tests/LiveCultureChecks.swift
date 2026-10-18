@@ -123,6 +123,8 @@ struct LiveCultureChecks {
             try await cacheAndForcedRefresh()
             try await cancellation()
             try await nonRepeatingHistory()
+            try await historyErasureDuringRead()
+            try await historyErasureDuringRateLimit()
             try await attributedImages()
             try await redirectDeduplication()
             try await CultureDiscoveryChecks.run()
@@ -263,6 +265,57 @@ struct LiveCultureChecks {
         let afterRestart = await relaunched.fetch(for: country)
         try require(afterRestart.reading == nil && afterRestart.message?.contains("end of") == true, "Persistent history was lost across service instances.")
         print("PASS: stable selection, view-reopen nonrepeat, honest exhaustion, and persistent history")
+    }
+
+    static func historyErasureDuringRead() async throws {
+        MockCultureURLProtocol.transport.reset([
+            .init(data: try summary(excerpt: "Before erasure.")),
+            .init(data: try summary(title: "Kpanlogo", excerpt: "An abandoned refresh."), delayNanoseconds: 100_000_000),
+            .init(data: try summary(excerpt: "After erasure."))
+        ])
+        let session = makeSession(); defer { session.invalidateAndCancel() }
+        let suite = "WorldNiche.CultureErasureChecks." + UUID().uuidString
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        defaults.set(["Another country's reading"], forKey: "worldniche.culture.history.JP")
+        defaults.set("Keep this", forKey: "unrelated.preference")
+        let service = LiveCultureService(session: session, topics: topics, persistsHistory: true, historySuiteName: suite)
+        _ = await service.fetch(for: country)
+        let pending = Task { await service.fetch(for: country, forceRefresh: true) }
+        try await waitUntil("The old refresh did not start.") { MockCultureURLProtocol.transport.snapshot().requests.count == 2 }
+        await service.clearHistory()
+        try require(!defaults.dictionaryRepresentation().keys.contains { $0.hasPrefix("worldniche.culture.history.") }, "Erasure left persisted cultural history, including countries not loaded into memory.")
+        try require(defaults.string(forKey: "unrelated.preference") == "Keep this", "History erasure removed unrelated preferences.")
+        let fresh = await service.fetch(for: country)
+        try require(fresh.reading?.excerpt == "After erasure.", "Erasure retained an old cached reading or consumed-topic selection.")
+        let abandoned = await pending.value
+        try require(abandoned.reading == nil && abandoned.message == nil, "A read started before erasure returned abandoned content.")
+        try require(defaults.stringArray(forKey: "worldniche.culture.history.GH") == ["Azonto"], "A late read repopulated erased history.")
+        let repeated = await service.fetch(for: country)
+        try require(repeated.reading?.excerpt == "After erasure." && MockCultureURLProtocol.transport.snapshot().requests.count == 3, "A late read altered the new selection or cache.")
+        await service.clearHistory()
+        let relaunched = LiveCultureService(session: session, topics: topics, persistsHistory: true, historySuiteName: suite)
+        MockCultureURLProtocol.transport.reset([.init(data: try summary(excerpt: "After restart."))])
+        let restarted = await relaunched.fetch(for: country)
+        try require(restarted.reading?.excerpt == "After restart.", "Erased history returned after creating a new service.")
+        print("PASS: cultural history erasure clears disk and memory, preserves other preferences and invalidates suspended reads")
+    }
+
+    static func historyErasureDuringRateLimit() async throws {
+        MockCultureURLProtocol.transport.reset([
+            .init(status: 429, headers: ["Retry-After": "3600"], data: Data(), delayNanoseconds: 100_000_000),
+            .init(data: try summary(excerpt: "A fresh request after erasure."))
+        ])
+        let session = makeSession(); defer { session.invalidateAndCancel() }
+        let service = LiveCultureService(session: session, topics: topics)
+        let pending = Task { await service.fetch(for: country) }
+        try await waitUntil("The delayed rate-limited request did not start.") { MockCultureURLProtocol.transport.snapshot().requests.count == 1 }
+        await service.clearHistory()
+        let abandoned = await pending.value
+        try require(abandoned.reading == nil && abandoned.message == nil, "A response from before erasure became a new error state.")
+        let fresh = await service.fetch(for: country)
+        try require(fresh.reading?.excerpt == "A fresh request after erasure.", "A late response restored old backoff after erasure.")
+        print("PASS: late rate-limit responses cannot restore an erased cultural session")
     }
 
     static func redirectDeduplication() async throws {

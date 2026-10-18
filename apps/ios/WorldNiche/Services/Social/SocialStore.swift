@@ -24,6 +24,7 @@ final class SocialStore {
     private let defaults: UserDefaults
     private let photoDirectory: URL?
     private let journal: DiscoveryJournal
+    private let culture: LiveCultureService
     private let appleCredentialIsAuthorized: @Sendable (String) async -> Bool?
     private var pendingToken: String?
     private var generation = UUID()
@@ -67,13 +68,15 @@ final class SocialStore {
     var isConfigured: Bool { configuration != nil }
     var isAppleSignInAvailable: Bool { configuration?.appleSignInEnabled == true }
     var emailCodeResendAvailableAt: Date? { lastCodeSent?.addingTimeInterval(60) }
-    var privacyPolicyURL: URL? { configuration?.privacyPolicyURL }
-    var supportURL: URL? { configuration?.supportURL }
+    var privacyPolicyURL: URL? { URL(string: "https://worldniche.app/privacy") }
+    var supportURL: URL? { URL(string: "https://worldniche.app/support") }
 
     init(journal: DiscoveryJournal, defaults: UserDefaults = .standard, photoDirectory: URL? = nil,
          configuration: SocialConfiguration? = .load(), api: SocialAPI? = nil,
+         culture: LiveCultureService = .shared,
          appleCredentialIsAuthorized: @escaping @Sendable (String) async -> Bool? = { _ in nil }) {
         self.journal = journal
+        self.culture = culture
         self.defaults = defaults
         self.photoDirectory = photoDirectory
         self.configuration = configuration
@@ -522,7 +525,7 @@ final class SocialStore {
         isBusy = true
         generation = UUID()
         defer { isBusy = false }
-        do { try await api?.forgetSession(); clearLocalState() }
+        do { try await api?.forgetSession(); await clearLocalState() }
         catch { record(error) }
     }
 
@@ -559,7 +562,7 @@ final class SocialStore {
         do {
             let result = try await api.deleteAccount(appleAuthorizationCode: appleAuthorizationCode, appleNonce: appleNonce, appleManualRevocation: appleManualRevocation)
             let manualRevocation = result.appleRevocation == "manual_required" || defaults.bool(forKey: "niche.deletionManualAppleRevocation")
-            clearLocalState()
+            await clearLocalState()
             if manualRevocation {
                 appleRevocationNeedsManualAction = true
                 defaults.set(true, forKey: "niche.appleRevocationNeedsManualAction")
@@ -673,8 +676,9 @@ final class SocialStore {
         try? FileManager.default.removeItem(at: exportDirectory)
     }
 
-    private func clearLocalState() {
+    private func clearLocalState() async {
         generation = UUID()
+        await culture.clearHistory()
         profile = nil
         friends = []
         isSignedIn = false

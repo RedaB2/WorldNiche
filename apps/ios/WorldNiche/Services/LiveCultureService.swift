@@ -46,7 +46,7 @@ struct CultureReadingResult: Sendable {
 actor LiveCultureService {
     static let shared = LiveCultureService(persistsHistory: true)
     private let session: URLSession
-    private let discovery: CultureTopicDiscovery
+    private var discovery: CultureTopicDiscovery
     private let allowsDiscovery: Bool
     private let allowsGeneration: Bool
     private let historyDefaults: UserDefaults?
@@ -57,6 +57,7 @@ actor LiveCultureService {
     private var rejected: [String: Set<String>] = [:]
     private var cache: [String: CultureReading] = [:]
     private var backoffUntil: Date?
+    private var historyGeneration = UUID()
     private let topics: [String: [String]]
 
     init(session: URLSession = .shared, topics: [String: [String]]? = nil,
@@ -74,8 +75,32 @@ actor LiveCultureService {
         } else { self.topics = [:] }
     }
 
+    func clearHistory() {
+        // Invalidate suspended reads before clearing both persisted and live state.
+        historyGeneration = UUID()
+        history.removeAll()
+        selections.removeAll()
+        lastReadings.removeAll()
+        lastSelectionDays.removeAll()
+        rejected.removeAll()
+        cache.removeAll()
+        backoffUntil = nil
+        discovery = CultureTopicDiscovery(session: session)
+        if let historyDefaults {
+            for key in historyDefaults.dictionaryRepresentation().keys where key.hasPrefix("worldniche.culture.history.") {
+                historyDefaults.removeObject(forKey: key)
+            }
+        }
+    }
+
+    private func checkCurrentHistory(_ generation: UUID) throws {
+        try Task.checkCancellation()
+        guard generation == historyGeneration else { throw CancellationError() }
+    }
+
     func fetch(for country: Country, rotation: Int = 0, forceRefresh: Bool = false, now: Date = Date(), discoverySessionID: UUID? = nil) async -> CultureReadingResult {
         guard !Task.isCancelled else { return CultureReadingResult(reading: nil, message: nil) }
+        let generation = historyGeneration
         let day = Calendar.current.ordinality(of: .day, in: .era, for: now) ?? 0
         let selectionKey = "\(country.id)|\(day)|\(discoverySessionID?.uuidString ?? "shared")|\(rotation)"
         // A new detail view starts on the current reading. Its subsequent button
@@ -97,14 +122,14 @@ actor LiveCultureService {
         var attempted = Set<String>()
         for _ in 0..<3 {
             do {
-                try Task.checkCancellation()
+                try checkCurrentHistory(generation)
                 let title: String
                 if let selected = selections[selectionKey], !attempted.contains(selected) {
                     title = selected
                 } else {
                     let excluded = Set(history[country.id, default: []]).union(rejected[country.id, default: []]).union(attempted)
                     var candidates = allowsDiscovery ? await discovery.topics(for: country, excluding: excluded) : []
-                    try Task.checkCancellation()
+                    try checkCurrentHistory(generation)
                     let normalizedExcluded = Set(excluded.map(CultureTopicDiscovery.normalized))
                     if candidates.isEmpty {
                         candidates = topics[country.id, default: []].filter { !normalizedExcluded.contains(CultureTopicDiscovery.normalized($0)) }
@@ -116,9 +141,10 @@ actor LiveCultureService {
                     selections[selectionKey] = title
                 }
                 attempted.insert(title)
-                let summary = try await loadSummary(title: title, forceRefresh: forceRefresh)
-                try Task.checkCancellation()
+                let summary = try await loadSummary(title: title, forceRefresh: forceRefresh, generation: generation)
+                try checkCurrentHistory(generation)
                 let countryContext = allowsDiscovery ? await discovery.hasCountryContext(title: title, country: country) : true
+                try checkCurrentHistory(generation)
                 guard summary.type == "standard", !summary.extract.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                       let source = URL(string: summary.content_urls.desktop.page),
                       source.scheme == "https", source.host == "en.wikipedia.org",
@@ -142,7 +168,7 @@ actor LiveCultureService {
                 async let image = loadImage(summary.originalimage?.source)
                 async let generated = allowsGeneration ? Self.generateFact(title: canonical, sourceText: excerpt, country: country.name) : nil
                 let (sourceImage, fact) = await (image, generated)
-                try Task.checkCancellation()
+                try checkCurrentHistory(generation)
                 let reading = CultureReading(title: canonical, excerpt: excerpt, sourceURL: source,
                                              fetchedAt: Date(), revisionDate: summary.timestamp,
                                              image: sourceImage, generatedFact: fact)
@@ -154,6 +180,7 @@ actor LiveCultureService {
                 if canonical != title { remember(canonical, countryID: country.id) }
                 return CultureReadingResult(reading: reading, message: nil)
             } catch {
+                guard generation == historyGeneration else { return CultureReadingResult(reading: nil, message: nil) }
                 if Task.isCancelled { selections.removeValue(forKey: selectionKey); return CultureReadingResult(reading: nil, message: nil) }
                 if case ReadingError.rateLimited = error {
                     return fallback(country, message: "Wikipedia is limiting requests. Your last discovery is still here; try again shortly.")
@@ -180,7 +207,7 @@ actor LiveCultureService {
         CultureReadingResult(reading: lastReadings[country.id], message: message)
     }
 
-    private func loadSummary(title: String, forceRefresh: Bool) async throws -> WikiSummary {
+    private func loadSummary(title: String, forceRefresh: Bool, generation: UUID) async throws -> WikiSummary {
         let root = URL(string: "https://en.wikipedia.org/api/rest_v1/page/summary/")!
         let url = root.appendingPathComponent(title.replacingOccurrences(of: " ", with: "_"))
         var request = URLRequest(url: url)
@@ -189,7 +216,7 @@ actor LiveCultureService {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         if forceRefresh { request.cachePolicy = .reloadIgnoringLocalCacheData }
         let (data, response) = try await session.data(for: request)
-        try Task.checkCancellation()
+        try checkCurrentHistory(generation)
         guard let http = response as? HTTPURLResponse else { throw ReadingError.invalidResponse }
         if http.statusCode == 429 {
             let retry = Double(http.value(forHTTPHeaderField: "Retry-After") ?? "") ?? 60

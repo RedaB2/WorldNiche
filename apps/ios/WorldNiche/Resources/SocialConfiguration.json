@@ -2,7 +2,7 @@
   "serviceURL": "",
   "publicAPIKey": "",
   "invitationHost": "worldniche.app",
-  "privacyPolicyURL": "",
-  "supportURL": "",
+  "privacyPolicyURL": "https://worldniche.app/privacy",
+  "supportURL": "https://worldniche.app/support",
   "appleSignInEnabled": false
 }

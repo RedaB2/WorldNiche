@@ -176,7 +176,7 @@ final class CompanionService {
             // The person is asking about the article on screen, not the bundled
             // country seed. Keep invisible editorial notes out of the answer.
             culturalNotes = """
-            Displayed source: Wikipedia — \(reading.title.prefix(120)).
+            Displayed source: Wikipedia: \(reading.title.prefix(120)).
             Source snapshot retrieved: \(reading.fetchedAt.ISO8601Format()).
             Article revision timestamp: \(reading.revisionDate.map { String($0.prefix(40)) } ?? "Not supplied").
             Displayed excerpt: \(reading.excerpt.prefix(1_100))
@@ -191,7 +191,7 @@ final class CompanionService {
             culturalNotes = "No cultural reading is available for this place yet."
         }
         let tracks = feed?.tracks.prefix(3).enumerated().map {
-            "Storefront position \($0.offset + 1): \($0.element.title.prefix(100)) — \($0.element.artist.prefix(100))"
+            "Storefront position \($0.offset + 1): \($0.element.title.prefix(100)): \($0.element.artist.prefix(100))"
         }.joined(separator: "\n") ?? "No music chart was loaded."
         let stories = feed?.stories.prefix(3).map {
             "Headline from \($0.source.prefix(80)), published \($0.publishedAt?.ISO8601Format() ?? "date unavailable"): \($0.title.prefix(180))"
