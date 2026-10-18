@@ -23,6 +23,8 @@ trap finish EXIT HUP INT TERM
   -f "$project_root/supabase/migrations/202610170001_social.sql" \
   -f "$project_root/supabase/migrations/202610180003_profile_photos.sql" \
   -f "$project_root/tests/social_security.sql" \
-  -f "$project_root/tests/avatar_security.sql"
+  -f "$project_root/tests/avatar_security.sql" \
+  -f "$project_root/supabase/migrations/202610180004_profile_moderation.sql" \
+  -f "$project_root/tests/moderation_security.sql"
 PGUSER=wn_test python3 "$project_root/tests/consent_race.py" --psql "$pg_bin/psql" --socket "$scratch"
 PGUSER=wn_test python3 "$project_root/tests/invitation_race.py" --psql "$pg_bin/psql" --socket "$scratch"

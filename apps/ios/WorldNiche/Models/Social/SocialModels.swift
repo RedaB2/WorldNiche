@@ -7,6 +7,27 @@ struct ExplorerProfile: Codable, Sendable {
     var shareExploration: Bool
     var avatarPath: String? = nil
     var localAvatarID: String? = nil
+    var pendingDisplayName: String? = nil
+    var pendingAvatarPath: String? = nil
+    var nameModerationStatus: ProfileModerationStatus? = nil
+    var photoModerationStatus: ProfileModerationStatus? = nil
+    var nameModerationNote: String? = nil
+    var photoModerationNote: String? = nil
+    var communityRestricted: Bool? = nil
+    var communityRestrictionNote: String? = nil
+
+    var editableDisplayName: String { pendingDisplayName ?? displayName }
+    var editableAvatarPath: String? { pendingAvatarPath ?? avatarPath }
+    var hasModerationNotice: Bool {
+        communityRestricted == true || nameModerationStatus == .pending || nameModerationStatus == .rejected
+            || photoModerationStatus == .pending || photoModerationStatus == .rejected
+    }
+
+    func referencesPhoto(_ path: String) -> Bool { avatarPath == path || pendingAvatarPath == path }
+}
+
+enum ProfileModerationStatus: String, Codable, Sendable {
+    case pending, approved, rejected
 }
 
 struct ExplorerFriend: Codable, Identifiable, Sendable {
@@ -108,11 +129,13 @@ enum InvitationLink {
 
 enum ProfileReportReason: String, CaseIterable, Sendable {
     case inappropriateName = "inappropriate_name"
+    case inappropriatePhoto = "inappropriate_photo"
     case harassment, spam, other
 
     var title: String {
         switch self {
-        case .inappropriateName: "Inappropriate name or profile"
+        case .inappropriateName: "Inappropriate name"
+        case .inappropriatePhoto: "Inappropriate photo"
         case .harassment: "Harassment"
         case .spam: "Spam"
         case .other: "Something else"

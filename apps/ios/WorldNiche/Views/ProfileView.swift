@@ -20,6 +20,10 @@ struct ProfileView: View {
                 VStack(alignment: .leading, spacing: 30) {
                     if let profile = social.profile {
                         profileHeader(name: profile.displayName, avatar: profile.avatar)
+                        if social.isSignedIn, profile.hasModerationNotice {
+                            ProfileModerationNotice(profile: profile)
+                                .editorialCard()
+                        }
                         explorationSummary
                     } else {
                         welcome
@@ -157,7 +161,7 @@ struct ProfileView: View {
                         .frame(maxWidth: .infinity, minHeight: 32)
                 }
                 .buttonStyle(.glassProminent).tint(Palette.forest).controlSize(.large)
-                .disabled(social.isBusy || social.deletionPending)
+                .disabled(social.isBusy || social.deletionPending || social.profile?.communityRestricted == true)
                 .accessibilityIdentifier("inviteFriend")
                 Text("Send a private invitation link. Your friend opens it in WorldNiche to connect with you.")
                     .font(.footnote).foregroundStyle(Palette.muted)
@@ -197,6 +201,41 @@ struct ProfileView: View {
     }
 }
 
+private struct ProfileModerationNotice: View {
+    let profile: ExplorerProfile
+    @Environment(SocialStore.self) private var social
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if profile.communityRestricted == true {
+                Label("Sharing is paused", systemImage: "person.crop.circle.badge.exclamationmark")
+                    .font(.headline)
+                Text(profile.communityRestrictionNote ?? "Sharing and invitations are paused. Contact support if you think this is a mistake.")
+                if let url = social.supportURL { Link("Contact support", destination: url) }
+            }
+            reviewStatus("Name", status: profile.nameModerationStatus, note: profile.nameModerationNote)
+            reviewStatus("Photo", status: profile.photoModerationStatus, note: profile.photoModerationNote)
+            Link("Community guidelines", destination: social.communityURL)
+        }
+        .font(.subheadline)
+        .foregroundStyle(Palette.muted)
+        .accessibilityIdentifier("profileModerationNotice")
+    }
+
+    @ViewBuilder
+    private func reviewStatus(_ label: String, status: ProfileModerationStatus?, note: String?) -> some View {
+        if status == .pending {
+            Label("\(label) in review", systemImage: "clock")
+                .font(.headline).foregroundStyle(Palette.pine)
+            Text(note ?? "Your change stays private until it is reviewed. Friends continue to see your approved profile.")
+        } else if status == .rejected {
+            Label("Choose another \(label.lowercased())", systemImage: "exclamationmark.circle")
+                .font(.headline).foregroundStyle(Palette.pine)
+            Text(note ?? "This change was not approved. Edit your profile to choose something that follows our community guidelines.")
+        }
+    }
+}
+
 struct ExplorerAvatar: View {
     let avatar: String
     var size: CGFloat = 44
@@ -228,12 +267,15 @@ private struct ProfileEditorView: View {
 
     private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
     private var hasPhoto: Bool {
-        selectedPhotoData != nil || (!removePhoto && (social.profile?.avatarPath != nil || social.profile?.localAvatarID != nil))
+        selectedPhotoData != nil || (!removePhoto && (social.profile?.editableAvatarPath != nil || social.profile?.localAvatarID != nil))
     }
 
     var body: some View {
         NavigationStack {
             Form {
+                if social.isSignedIn, let profile = social.profile, profile.hasModerationNotice {
+                    Section { ProfileModerationNotice(profile: profile) }
+                }
                 Section {
                     TextField("Your name", text: $name)
                         .textContentType(.nickname)
@@ -247,13 +289,13 @@ private struct ProfileEditorView: View {
                 } header: {
                     Text("What should we call you?")
                 } footer: {
-                    Text("A first name or nickname is enough. This is the name friends will see.")
+                    Text(social.isSignedIn ? "A first name or nickname is enough. New names are reviewed before friends can see them." : "A first name or nickname is enough. Your name stays on this device until you sign in.")
                 }
                 Section {
                     HStack {
                         Spacer()
                         ProfilePhotoAvatar(symbol: avatar,
-                                           path: removePhoto ? nil : social.profile?.avatarPath,
+                                           path: removePhoto ? nil : social.profile?.editableAvatarPath,
                                            localID: removePhoto ? nil : social.profile?.localAvatarID,
                                            previewData: selectedPhotoData, size: 96)
                         Spacer()
@@ -278,7 +320,7 @@ private struct ProfileEditorView: View {
                 } header: {
                     Text("Your photo")
                 } footer: {
-                    Text(social.isSignedIn ? "Only you and your friends can see your photo. We save a small version without location or camera metadata." : "Your photo stays on this device. We save a small version without location or camera metadata.")
+                    Text(social.isSignedIn ? "New photos stay private while our team reviews them. Friends keep seeing your approved photo or symbol. We save a small version without location or camera metadata." : "Your photo stays on this device. We save a small version without location or camera metadata.")
                 }
                 Section("Or choose a symbol") {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 72))], spacing: 16) {
@@ -304,9 +346,16 @@ private struct ProfileEditorView: View {
                 Section {
                     Toggle("Share explored countries with friends", isOn: $sharing)
                         .accessibilityIdentifier("profileSharingToggle")
-                        .disabled(!social.isSignedIn)
+                        .disabled(!social.isSignedIn || social.profile?.communityRestricted == true)
                 } footer: {
                     Text(social.isSignedIn ? "Only your friends can see this list. It records what you discover in the app, never your physical location. Saved countries stay private." : "Your profile starts privately on this device. Sign in later to choose what you share with friends.")
+                }
+                if social.isSignedIn {
+                    Section {
+                        Link("Community guidelines", destination: social.communityURL)
+                    } footer: {
+                        Text("Keep names and photos respectful. Sexual content, hate, threats, harassment, impersonation and spam are not allowed. Saving a name or photo submits it to our team for review.")
+                    }
                 }
                 if attemptedSave, let message = social.errorMessage {
                     Section { ProfileStatusMessage(message: message) }
@@ -352,7 +401,7 @@ private struct ProfileEditorView: View {
                 guard !initialized else { return }
                 initialized = true
                 if let profile = social.profile {
-                    name = profile.displayName
+                    name = profile.editableDisplayName
                     avatar = profile.avatar
                     sharing = profile.shareExploration
                 }
@@ -399,10 +448,10 @@ struct ProfileSettingsView: View {
                         get: { social.profile?.shareExploration ?? false },
                         set: { value in
                             guard let profile = social.profile else { return }
-                            Task { await social.saveProfile(name: profile.displayName, avatar: profile.avatar, sharing: value) }
+                            Task { await social.saveProfile(name: profile.editableDisplayName, avatar: profile.avatar, sharing: value) }
                         }
                     ))
-                    .disabled(!social.isSignedIn || social.profile == nil || social.isBusy || social.deletionPending)
+                    .disabled(!social.isSignedIn || social.profile == nil || social.isBusy || social.deletionPending || social.profile?.communityRestricted == true)
                     .accessibilityIdentifier("settingsSharingToggle")
                     if social.isSignedIn {
                         Button("Revoke invitation links") { showRevokeConfirmation = true }
@@ -419,6 +468,7 @@ struct ProfileSettingsView: View {
                     if let url = social.supportURL {
                         Link("Contact support", destination: url)
                     }
+                    Link("Community guidelines", destination: social.communityURL)
                     Button("Export my data", systemImage: "square.and.arrow.up") {
                         Task {
                             if let url = await social.exportData() { sharedItem = ProfileSharedItem(url: url) }
@@ -860,6 +910,7 @@ private struct ProfileReportView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var reason = ProfileReportReason.inappropriateName
     @State private var submitted = false
+    @State private var details = ""
 
     var body: some View {
         NavigationStack {
@@ -870,7 +921,17 @@ private struct ProfileReportView: View {
                     }
                     .pickerStyle(.inline)
                 } header: { Text("Report \(friend.displayName)") } footer: {
-                    Text("Your report includes this profile’s account identifier and the reason you choose. The other person won’t see who reported them. You can also block them from their profile.")
+                    Text("Your report includes this profile’s account identifier, the reason you choose and any details you add. The other person won’t see who reported them. You can also block them from their profile.")
+                }
+                Section {
+                    TextField("Anything else we should know?", text: $details, axis: .vertical)
+                        .lineLimit(3...6)
+                        .accessibilityIdentifier("reportDetails")
+                        .onChange(of: details) { _, value in
+                            if value.count > 500 { details = String(value.prefix(500)) }
+                        }
+                } header: { Text("Details, optional") } footer: {
+                    Text("Please leave out passwords, private contact details and other sensitive information.")
                 }
                 if let message = social.errorMessage { Section { ProfileStatusMessage(message: message) } }
             }
@@ -879,11 +940,11 @@ private struct ProfileReportView: View {
             .navigationTitle("Report profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(social.isBusy) }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Submit") {
                         Task {
-                            await social.reportFriend(id: friend.id, reason: reason.rawValue)
+                            await social.reportFriend(id: friend.id, reason: reason.rawValue, details: details)
                             if social.errorMessage == nil { submitted = true }
                         }
                     }.disabled(social.isBusy)
@@ -892,8 +953,9 @@ private struct ProfileReportView: View {
             .alert("Report sent", isPresented: $submitted) {
                 Button("Done") { dismiss() }
             } message: {
-                Text("Thank you for helping keep WorldNiche welcoming.")
+                Text("Your report is saved for our team to review. The other person will not be notified. You can block them from their profile at any time.")
             }
+            .interactiveDismissDisabled(social.isBusy)
         }
     }
 }
@@ -907,7 +969,7 @@ private struct ProfilePrivacyView: View {
                 Text("Your profile, explored countries and saved countries are stored on this device. WorldNiche doesn’t request your physical location or contacts. The system photo picker shares only the photo you choose, without giving WorldNiche access to your photo library.")
             }
             Section("When you connect") {
-                Text("An optional account uses Sign in with Apple or an email code to sign you in. Apple can keep your personal email hidden. Your profile name, chosen symbol or photo, friends, invitations and sharing preference are stored online. Photos are private to you and your current friends, and saved without their original camera or location metadata. Your email isn’t shown to friends.")
+                Text("An optional account uses Sign in with Apple or an email code to sign you in. Apple can keep your personal email hidden. Your profile name, chosen symbol or photo, friends, invitations and sharing preference are stored online. New names and photos are reviewed by our team before they become visible to friends. Photos are saved without their original camera or location metadata. Your email isn’t shown to friends.")
                 Text("Exploration sharing is off by default. If you turn it on, friends can see the countries you explore in WorldNiche. This is app activity, not a record of travel. Saved countries stay private.")
                 Text("The account service also stores invitation links, blocks and reports used to protect the community. A first name or nickname is enough; you don’t need to share your real name.")
             }

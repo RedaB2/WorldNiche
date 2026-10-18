@@ -52,6 +52,7 @@ private struct ObservedRequest: Sendable {
     let method: String?
     let authorization: String?
     let apiKey: String?
+    let cacheControl: String?
     let body: Data
     func json() -> [String: Any] { (try? JSONSerialization.jsonObject(with: body)) as? [String: Any] ?? [:] }
 }
@@ -70,12 +71,22 @@ private final class SocialFixture: @unchecked Sendable {
     private var deletionAcknowledged = true
     private var overrides: [String: Data] = [:]
     private var appleAccount = false
+    private var moderatingPhotos = false
+    private var approvedPhoto: String?
+    private var pendingPhoto: String?
+    private var losePhotoCommitResponse = false
 
     func reset(user: UUID = userA, profile: Bool = true, sharing: Bool = false) {
         lock.lock(); defer { lock.unlock() }
         requests = []; failures = [:]; failureCodes = [:]; account = user; hasProfile = profile
         self.sharing = sharing; name = user == userA ? "Mira" : "Noah"
         syncedIDs = ["JP"]; deletionAcknowledged = true; overrides = [:]; appleAccount = false
+        moderatingPhotos = false; approvedPhoto = nil; pendingPhoto = nil; losePhotoCommitResponse = false
+    }
+    func reviewPhotos(approved: String?, pending: String? = nil, loseCommitResponse: Bool = false) {
+        lock.lock(); defer { lock.unlock() }
+        moderatingPhotos = true; approvedPhoto = approved; pendingPhoto = pending
+        losePhotoCommitResponse = loseCommitResponse
     }
     func fail(_ path: String, statuses: [Int], code: String? = nil) {
         lock.lock(); defer { lock.unlock() }
@@ -104,7 +115,7 @@ private final class SocialFixture: @unchecked Sendable {
         let observed = ObservedRequest(path: request.url!.path, query: request.url!.query,
                                        method: request.httpMethod,
                                        authorization: request.value(forHTTPHeaderField: "Authorization"),
-                                       apiKey: request.value(forHTTPHeaderField: "apikey"), body: Self.body(request))
+                                       apiKey: request.value(forHTTPHeaderField: "apikey"), cacheControl: request.value(forHTTPHeaderField: "Cache-Control"), body: Self.body(request))
         lock.lock(); defer { lock.unlock() }
         requests.append(observed)
         guard request.url!.host == "social.example.test" else {
@@ -138,6 +149,14 @@ private final class SocialFixture: @unchecked Sendable {
             sharing = body["p_share_exploration"] as? Bool ?? false
             hasProfile = true
             value = profileJSON(avatar: body["p_avatar"] as? String ?? "globe")
+        case "/rest/v1/rpc/set_profile_avatar" where moderatingPhotos:
+            pendingPhoto = body["p_path"] as? String
+            if pendingPhoto == nil { approvedPhoto = nil }
+            if losePhotoCommitResponse {
+                losePhotoCommitResponse = false
+                return (503, Data(#"{"error":"lost response after commit"}"#.utf8))
+            }
+            value = profileJSON()
         case "/rest/v1/rpc/list_friends":
             value = [["id": friendA.uuidString, "display_name": "Jun", "avatar": "wave",
                       "share_exploration": true, "country_ids": ["FR"], "explored_count": 1],
@@ -155,13 +174,21 @@ private final class SocialFixture: @unchecked Sendable {
         case "/functions/v1/delete-account": value = ["deleted": deletionAcknowledged]
         case "/rest/v1/rpc/revoke_invites", "/rest/v1/rpc/remove_friend", "/rest/v1/rpc/block_user", "/rest/v1/rpc/report_user":
             value = ["ok": true]
+        case let path where moderatingPhotos && path.hasPrefix("/storage/v1/object/profile-photos"):
+            value = ["ok": true]
         default: return (404, Data(#"{"error":"unhandled fixture route"}"#.utf8))
         }
         return (200, try! JSONSerialization.data(withJSONObject: value, options: [.fragmentsAllowed]))
     }
 
     private func profileJSON(avatar: String = "globe") -> [String: Any] {
-        ["id": account.uuidString, "display_name": name, "avatar": avatar, "share_exploration": sharing]
+        var value: [String: Any] = ["id": account.uuidString, "display_name": name, "avatar": avatar, "share_exploration": sharing]
+        if moderatingPhotos {
+            value["avatar_path"] = approvedPhoto as Any? ?? NSNull()
+            value["pending_avatar_path"] = pendingPhoto as Any? ?? NSNull()
+            value["photo_moderation_status"] = pendingPhoto == nil ? "approved" : "pending"
+        }
+        return value
     }
     private static func body(_ request: URLRequest) -> Data {
         if let data = request.httpBody { return data }
@@ -850,7 +877,7 @@ private final class CheckSuite {
     func reportContract() async {
         fixture.reset()
         let service = api(vault: MemoryVault(savedSession()))
-        let acceptedReasons: Set<String> = ["inappropriate_name", "harassment", "spam", "other"]
+        let acceptedReasons: Set<String> = ["inappropriate_name", "inappropriate_photo", "harassment", "spam", "other"]
         check(Set(ProfileReportReason.allCases.map(\.rawValue)) == acceptedReasons,
               "Report choices must exactly cover the server's constrained reason codes")
         for reason in ProfileReportReason.allCases {
@@ -1110,6 +1137,31 @@ private final class CheckSuite {
         }
     }
 
+    func profileModeration() async {
+        let approved = "\(userA.uuidString.lowercased())/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg"
+        let oldPending = "\(userA.uuidString.lowercased())/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.jpg"
+        let jpeg = Data([0xff, 0xd8, 0x10, 0x20, 0xff, 0xd9])
+        for lostResponse in [false, true] {
+            fixture.reset()
+            fixture.reviewPhotos(approved: approved, pending: oldPending, loseCommitResponse: lostResponse)
+            let service = api(vault: MemoryVault(savedSession()))
+            do {
+                let updated = try await service.updateProfilePhoto(jpeg)
+                check(updated.avatarPath == approved && updated.pendingAvatarPath != nil,
+                      "Pending photo retains the prior approved photo, including a lost submission response")
+                let uploads = fixture.observed().filter { $0.path.hasSuffix(".jpg") && $0.method == "POST" }
+                check(uploads.last?.cacheControl == "max-age=0, no-store", "Uploads use valid HTTP cache directives")
+                let deletions = fixture.observed("/storage/v1/object/profile-photos").filter { $0.method == "DELETE" }
+                check(deletions.count == 1 && (deletions[0].json()["prefixes"] as? [String]) == [oldPending],
+                      "Photo cleanup erases only the superseded pending image")
+                check(updated.hasModerationNotice, "Pending content has a visible review notice")
+                let cleared = try await service.updateProfilePhoto(nil)
+                check(cleared.avatarPath == nil && cleared.pendingAvatarPath == nil,
+                      "Choosing a symbol removes both pending and approved photo selections")
+            } catch { check(false, "Photo moderation fixture failed: \(error)") }
+        }
+    }
+
     func profilePhotosAndPrivacy() async {
         fixture.reset()
         let defaults = isolatedDefaults()
@@ -1159,6 +1211,9 @@ private final class CheckSuite {
         await signed.blockFriend(id: friendA)
         responseGate.release()
         let downloaded = await photo.value
+        let reads = fixture.observed(route)
+        check(reads.last?.query?.hasPrefix("cacheNonce=") == true,
+              "Each photo read bypasses earlier CDN authorization results")
         check(downloaded == nil && !signed.friends.contains { $0.id == friendA }, "An in-flight photo is discarded if that friend is blocked before download completes")
     }
 
@@ -1349,6 +1404,7 @@ private final class CheckSuite {
         await suite.invitationAuthenticationPersistence()
         await suite.invitationFailuresAndReplay()
         await suite.invitationRecoveryAndExpiry()
+        await suite.profileModeration()
         await suite.profilePhotosAndPrivacy()
         await suite.invitationRaces()
         await suite.authenticationRaces()

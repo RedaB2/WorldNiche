@@ -135,12 +135,12 @@ actor SocialAPI {
         try await rpc("update_my_profile", body: ["p_display_name": name, "p_avatar": avatar, "p_share_exploration": sharing])
     }
 
-    /// Uploads a new immutable object, then atomically selects it for the profile.
+    /// Uploads a new immutable object, then submits it for profile review.
     /// A lost commit response is reconciled before deleting any uploaded object.
     func updateProfilePhoto(_ data: Data?) async throws -> ExplorerProfile {
         guard let userID = session?.user.id else { throw SocialError.signInRequired }
         let requestGeneration = generation
-        let previous = try await profile()?.avatarPath
+        let previous = try await profile()
         guard generation == requestGeneration, session?.user.id == userID else { throw CancellationError() }
         let path: String?
         if let data {
@@ -157,23 +157,34 @@ actor SocialAPI {
             guard generation == requestGeneration, session?.user.id == userID else { throw CancellationError() }
             if let verified = try? await profile() {
                 guard generation == requestGeneration, session?.user.id == userID else { throw CancellationError() }
-                if verified.avatarPath == path {
-                    if let previous, previous != path { try? await removePhotoObject(previous) }
+                if photoSubmissionMatches(verified, path: path) {
+                    await removeUnreferencedPhotos(from: previous, after: verified)
                     return verified
                 }
-                if let path { try? await removePhotoObject(path) }
+                if let path, !verified.referencesPhoto(path) { try? await removePhotoObject(path) }
             }
             throw error
         }
         guard generation == requestGeneration, session?.user.id == userID else { throw CancellationError() }
-        guard updated.id == userID, updated.avatarPath == path else { throw SocialError.invalidResponse }
-        if let previous, previous != path { try? await removePhotoObject(previous) }
+        guard updated.id == userID, photoSubmissionMatches(updated, path: path) else { throw SocialError.invalidResponse }
+        await removeUnreferencedPhotos(from: previous, after: updated)
         return updated
+    }
+
+    private func photoSubmissionMatches(_ profile: ExplorerProfile, path: String?) -> Bool {
+        if let path { return profile.referencesPhoto(path) }
+        return profile.avatarPath == nil && profile.pendingAvatarPath == nil
+    }
+
+    private func removeUnreferencedPhotos(from previous: ExplorerProfile?, after updated: ExplorerProfile) async {
+        let paths = Set([previous?.avatarPath, previous?.pendingAvatarPath].compactMap { $0 })
+        for path in paths where !updated.referencesPhoto(path) { try? await removePhotoObject(path) }
     }
 
     func avatarData(path: String) async throws -> Data {
         guard AvatarPhotoReference.isValidPath(path) else { throw SocialError.invalidPhoto }
-        let data = try await authenticated(path: "storage/v1/object/authenticated/\(AvatarPhotoReference.bucket)/\(path)", body: [:], method: "GET")
+        // A fresh URL also bypasses legacy CDN entries made before cache control was corrected.
+        let data = try await authenticated(path: "storage/v1/object/authenticated/\(AvatarPhotoReference.bucket)/\(path)", query: "cacheNonce=\(UUID().uuidString)", body: [:], method: "GET")
         guard AvatarPhotoReference.isValidJPEG(data) else { throw SocialError.invalidPhoto }
         return data
     }
@@ -218,8 +229,10 @@ actor SocialAPI {
         let result: Acknowledgement = try await rpc(block ? "block_user" : "remove_friend", body: ["p_user_id": id.uuidString])
         guard result.ok else { throw SocialError.rejected }
     }
-    func report(_ id: UUID, reason: String) async throws {
-        let result: Acknowledgement = try await rpc("report_user", body: ["p_user_id": id.uuidString, "p_reason": reason, "p_details": ""])
+    func report(_ id: UUID, reason: String, details: String = "") async throws {
+        let details = details.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard ProfileReportReason(rawValue: reason) != nil, details.count <= 500 else { throw SocialError.rejected }
+        let result: Acknowledgement = try await rpc("report_user", body: ["p_user_id": id.uuidString, "p_reason": reason, "p_details": details])
         guard result.ok else { throw SocialError.rejected }
     }
 
@@ -413,7 +426,7 @@ actor SocialAPI {
         request.setValue("no-store", forHTTPHeaderField: "Cache-Control")
         if rawData != nil {
             request.setValue("false", forHTTPHeaderField: "x-upsert")
-            request.setValue("0", forHTTPHeaderField: "cache-control")
+            request.setValue("max-age=0, no-store", forHTTPHeaderField: "cache-control")
         }
         if method != "GET" { request.httpBody = try rawData ?? JSONSerialization.data(withJSONObject: body) }
         try Task.checkCancellation()

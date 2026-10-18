@@ -70,6 +70,7 @@ final class SocialStore {
     var emailCodeResendAvailableAt: Date? { lastCodeSent?.addingTimeInterval(60) }
     var privacyPolicyURL: URL? { URL(string: "https://worldniche.app/privacy") }
     var supportURL: URL? { URL(string: "https://worldniche.app/support") }
+    var communityURL: URL { URL(string: "https://worldniche.app/community")! }
 
     init(journal: DiscoveryJournal, defaults: UserDefaults = .standard, photoDirectory: URL? = nil,
          configuration: SocialConfiguration? = .load(), api: SocialAPI? = nil,
@@ -194,7 +195,7 @@ final class SocialStore {
 
     func avatarData(path: String) async -> Data? {
         func isVisible() -> Bool {
-            isSignedIn && !deletionPending && (profile?.avatarPath == path || friends.contains { $0.avatarPath == path })
+            isSignedIn && !deletionPending && (profile?.referencesPhoto(path) == true || friends.contains { $0.avatarPath == path })
         }
         guard let api, isVisible() else { return nil }
         let current = generation
@@ -490,11 +491,11 @@ final class SocialStore {
         } catch { record(error) }
     }
 
-    func reportFriend(id: UUID, reason: String) async {
+    func reportFriend(id: UUID, reason: String, details: String = "") async {
         guard beginMutation() else { return }
         defer { isBusy = false }
         guard let api, isSignedIn else { record(SocialError.signInRequired); return }
-        do { try await api.report(id, reason: reason) }
+        do { try await api.report(id, reason: reason, details: details) }
         catch { record(error) }
     }
 
@@ -600,6 +601,9 @@ final class SocialStore {
                 document["profile_photo_jpeg_base64"] = data.base64EncodedString()
             } else if let path = profile?.avatarPath, let api, isSignedIn {
                 document["profile_photo_jpeg_base64"] = try await api.avatarData(path: path).base64EncodedString()
+            }
+            if let path = profile?.pendingAvatarPath, let api, isSignedIn {
+                document["pending_profile_photo_jpeg_base64"] = try await api.avatarData(path: path).base64EncodedString()
             }
             if isSignedIn, let api {
                 let accountData = try await api.exportData()

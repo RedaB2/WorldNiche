@@ -22,12 +22,14 @@ const appleID = 'verified-apple-user';
 const clientID = 'io.worldniche.app';
 const teamID = 'TEAMTEST01';
 const keyID = 'KEYTEST001';
-const defaults = () => ({exists:true, deletes:0, adminCalls:0, failRead:false, allowed:true, loseResponse:false,
+const defaults = () => ({exists:true, deletes:0, adminCalls:0, failRead:false, failConfirmation:false,
+  staleConfirmation:false, allowed:true, authorizationStatus:null, loseResponse:false,
   apple:false, appleExchanges:0, appleRevokes:0, exchangeStatus:200, revokeStatus:200,
   exchangeError:'invalid_grant', malformedExchangeError:false,
   appleSubject:appleID, appleNonce:createHash('sha256').update(nonce).digest('hex'), appleIssuer:null,
   appleAudience:clientID, appleExpiry:'5m', badAppleSignature:false, missingAppleClaims:false,
-  missingAppleSubject:false, failDelete:false, storageObjects:[], failStorage:false, storageDeletes:0, events:[]});
+  missingAppleSubject:false, failDelete:false, storageObjects:[], failStorage:false,
+  failStorageDelete:false, malformedStorage:false, storagePageSize:1000, storageDeletes:0, events:[]});
 let state = defaults();
 let fixtureError;
 const server = createServer(async (req, res) => {
@@ -66,7 +68,10 @@ const server = createServer(async (req, res) => {
     }
     if (req.url === '/rest/v1/rpc/authorize_deletion') {
       state.events.push('authorize');
-      return send(state.allowed?200:401,{allowed:state.allowed});
+      assert.equal(req.method,'POST');
+      assert.equal(req.headers.apikey,'test-public-key');
+      assert.notEqual(req.headers.authorization,'Bearer test-service-key','Authorization must use the requesting user session');
+      return send(state.authorizationStatus??(state.allowed?200:401),{allowed:state.allowed});
     }
     assert.equal(req.headers.apikey,'test-service-key');
     assert.equal(req.headers.authorization,'Bearer test-service-key');
@@ -75,20 +80,26 @@ const server = createServer(async (req, res) => {
       const chunks=[]; for await(const chunk of req) chunks.push(chunk);
       const input=JSON.parse(Buffer.concat(chunks).toString());
       assert.equal(input.prefix, `${userID}/`);
+      assert.equal(input.offset,0,'Cleanup always checks the remaining first page');
+      assert.equal(input.limit,1000);
       if(state.failStorage) return send(503,{error:'temporary'});
-      return send(200,state.storageObjects.map(name=>({name,id:name})));
+      if(state.malformedStorage) return send(200,{objects:state.storageObjects});
+      return send(200,state.storageObjects.slice(0,state.storagePageSize).map(name=>({name,id:name})));
     }
     if (req.url === '/storage/v1/object/profile-photos') {
       assert.equal(req.method, 'DELETE');
       const chunks=[]; for await(const chunk of req) chunks.push(chunk);
       const input=JSON.parse(Buffer.concat(chunks).toString());
-      assert.deepEqual(input.prefixes,state.storageObjects.map(name=>`${userID}/${name}`));
-      state.storageDeletes+=input.prefixes.length; state.storageObjects=[];
+      assert.deepEqual(input.prefixes,state.storageObjects.slice(0,state.storagePageSize).map(name=>`${userID}/${name}`));
+      if(state.failStorageDelete) return send(503,{error:'temporary'});
+      state.storageDeletes+=input.prefixes.length; state.storageObjects=state.storageObjects.slice(input.prefixes.length);
       return send(200,[]);
     }
     assert.equal(req.url,`/auth/v1/admin/users/${userID}`);
     state.adminCalls++;
     if(req.method==='DELETE'){
+      const chunks=[]; for await(const chunk of req) chunks.push(chunk);
+      assert.deepEqual(JSON.parse(Buffer.concat(chunks).toString()),{should_soft_delete:false});
       state.events.push('delete');
       if(state.failDelete)return send(503,{error:'temporary'});
       assert.equal(state.storageObjects.length,0,'Photos must be erased before Auth deletion');
@@ -96,6 +107,8 @@ const server = createServer(async (req, res) => {
       if(state.loseResponse){state.loseResponse=false;req.socket.destroy();return;}
       return send(200,{});
     }
+    if(state.deletes>0 && state.failConfirmation)return send(503,{error:'temporary'});
+    if(state.deletes>0 && state.staleConfirmation)return send(200,{id:userID,identities:[]});
     if(state.failRead)return send(500,{error:'temporary'});
     return send(state.exists?200:404,state.exists?{id:userID,identities:state.apple?
       [{provider:'apple',identity_data:state.missingAppleSubject?{}:{sub:appleID}}]:[{provider:'email'}]}:{error:'not_found'});
@@ -113,8 +126,8 @@ const source=(await readFile(path.join(root,'supabase/functions/delete-account/i
 const scratch=path.join(root,'work/social-edge-tests');await mkdir(scratch,{recursive:true});
 const file=path.join(scratch,'delete-account-under-test.mts');await writeFile(file,source);
 await import(pathToFileURL(file).href);
-const token=async(overrides={})=>new SignJWT({session_id:sessionID}).setProtectedHeader({alg:'ES256',kid:'integration'})
-  .setSubject(userID).setIssuer(overrides.issuer??`${base}/auth/v1`).setAudience(overrides.audience??'authenticated')
+const token=async(overrides={})=>new SignJWT({session_id:sessionID,...overrides.claims}).setProtectedHeader({alg:'ES256',kid:'integration'})
+  .setSubject(overrides.subject??userID).setIssuer(overrides.issuer??`${base}/auth/v1`).setAudience(overrides.audience??'authenticated')
   .setExpirationTime(overrides.expiry??'5m').sign(privateKey);
 const invoke=async(value,body={})=>{
   const response=await handler(new Request(`${base}/functions/v1/delete-account`,{method:'POST',
@@ -142,6 +155,23 @@ try{
     assert.equal((await invoke(valid)).status,503);assert.equal(state.deletes,0);assert.equal(state.exists,true);
     state.failStorage=false;assert.equal((await invoke(valid)).status,200);assert.equal(state.storageDeletes,1);
   });
+  await test('photo delete failure does not erase Auth or claim completion',async()=>{
+    state.storageObjects=['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg'];state.failStorageDelete=true;
+    assert.equal((await invoke(valid)).status,503);assert.equal(state.deletes,0);assert.equal(state.exists,true);
+    assert.equal(state.storageDeletes,0);assert.equal(state.storageObjects.length,1);
+    state.failStorageDelete=false;assert.equal((await invoke(valid)).status,200);assert.equal(state.storageDeletes,1);
+  });
+  await test('every remaining photo page is erased before Auth deletion',async()=>{
+    state.storagePageSize=1;
+    state.storageObjects=['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg','bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.jpg'];
+    assert.equal((await invoke(valid)).status,200);assert.equal(state.storageDeletes,2);assert.equal(state.deletes,1);
+  });
+  await test('unexpected photo listing and paths cannot broaden deletion',async()=>{
+    state.malformedStorage=true;
+    assert.equal((await invoke(valid)).status,503);assert.equal(state.deletes,0);
+    state.malformedStorage=false;state.storageObjects=['../another-account/photo.jpg'];
+    assert.equal((await invoke(valid)).status,503);assert.equal(state.storageDeletes,0);assert.equal(state.deletes,0);
+  });
   await test('lost response retries also remove orphaned profile photos',async()=>{
     state.exists=false;state.storageObjects=['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg'];
     assert.equal((await invoke(valid)).status,200);assert.equal(state.storageDeletes,1);assert.equal(state.deletes,0);
@@ -151,6 +181,9 @@ try{
     assert.equal((await invoke(await token({issuer:'https://attacker.invalid/auth/v1'}))).status,401);
     assert.equal((await invoke(await token({audience:'service_role'}))).status,401);
     assert.equal((await invoke(await token({expiry:'-1m'}))).status,401);
+    assert.equal((await invoke(await token({subject:'not-a-user-id'}))).status,401);
+    assert.equal((await invoke(await token({claims:{session_id:null}}))).status,401);
+    assert.equal((await invoke(await token({claims:{session_id:'not-a-session-id'}}))).status,401);
     const other=await generateKeyPair('ES256');
     const forged=await new SignJWT({session_id:sessionID}).setProtectedHeader({alg:'ES256',kid:'integration'})
       .setSubject(userID).setIssuer(`${base}/auth/v1`).setAudience('authenticated').setExpirationTime('5m').sign(other.privateKey);
@@ -159,6 +192,28 @@ try{
   await test('unavailable identity and revoked session never delete',async()=>{
     state.failRead=true;assert.equal((await invoke(valid)).status,503);
     state.failRead=false;state.allowed=false;assert.equal((await invoke(valid)).status,401);assert.equal(state.deletes,0);
+  });
+  await test('authorization throttling preserves the account and photos',async()=>{
+    state.authorizationStatus=429;state.storageObjects=['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg'];
+    const response=await invoke(valid);assert.equal(response.status,429);
+    assert.deepEqual(await response.json(),{error:'deletion_not_authorized_retry_later'});
+    assert.equal(state.deletes,0);assert.equal(state.storageDeletes,0);
+  });
+  await test('failed Auth delete remains retryable after photo cleanup',async()=>{
+    state.failDelete=true;state.storageObjects=['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg'];
+    const response=await invoke(valid);assert.equal(response.status,503);
+    assert.deepEqual(await response.json(),{error:'deletion_failed_retry'});
+    assert.equal(state.exists,true);assert.equal(state.storageDeletes,1);
+    state.failDelete=false;assert.equal((await invoke(valid)).status,200);assert.equal(state.deletes,1);
+  });
+  await test('unavailable or stale final identity check never claims deletion success',async()=>{
+    for(const field of ['failConfirmation','staleConfirmation']){
+      state=defaults();state[field]=true;
+      const response=await invoke(valid);assert.equal(response.status,503);
+      assert.deepEqual(await response.json(),{error:'deletion_confirmation_unavailable'});
+      assert.equal(state.deletes,1);state[field]=false;
+      assert.equal((await invoke(valid)).status,200);assert.equal(state.deletes,1);
+    }
   });
   await test('lost deletion response safely confirms on retry',async()=>{
     state.loseResponse=true;assert.equal((await invoke(valid)).status,503);assert.equal(state.exists,false);
