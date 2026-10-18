@@ -1,0 +1,13 @@
+// Tests.xcconfig
+// Test configuration for iOS projects - minimal overrides only
+
+#include "Shared.xcconfig"
+
+// ==========================================
+// Test Target Settings (Customizable by scaffold tool)
+// ==========================================
+PRODUCT_BUNDLE_IDENTIFIER = io.worldniche.app.UITests
+TEST_TARGET_NAME = WorldNiche
+
+// Fix duplicate module name issue
+PRODUCT_MODULE_NAME = $(PRODUCT_NAME)UITests

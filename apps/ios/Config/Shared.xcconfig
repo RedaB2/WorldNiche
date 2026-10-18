@@ -1,0 +1,39 @@
+// Shared.xcconfig
+// Shared configuration for all app targets
+// All other settings use Xcode project defaults
+
+// ==========================================
+// Project Identity
+// ==========================================
+PRODUCT_NAME = WorldNiche
+PRODUCT_DISPLAY_NAME = WorldNiche
+PRODUCT_BUNDLE_IDENTIFIER = io.worldniche.app
+MARKETING_VERSION = 1.0
+CURRENT_PROJECT_VERSION = 1
+DEVELOPMENT_TEAM =
+CODE_SIGN_STYLE = Automatic
+
+// ==========================================
+// Platform Configuration
+// ==========================================
+IPHONEOS_DEPLOYMENT_TARGET = 26.0
+
+// (1 == iPhone, 2 == iPad)
+TARGETED_DEVICE_FAMILY = 1,2
+
+// ==========================================
+// Info PLIST
+// ==========================================
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_FILE = Config/AppInfo.plist
+INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationPortrait
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown
+
+// ==========================================
+// Entitlements
+// ==========================================
+// App capabilities are declared in Config/WorldNiche.entitlements
+CODE_SIGN_ENTITLEMENTS = Config/WorldNiche.entitlements
+
+// Signing belongs to the local checkout, never the public repository.
+#include? "Signing.local.xcconfig"

@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "TEAMIDHERE.io.worldniche.app"
+        ],
+        "components": [
+          {
+            "/": "/invite/*",
+            "comment": "WorldNiche friend invitations only"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+project_id = "worldniche"
+
+[auth]
+# Local development defaults. Mirror these choices in hosted Auth settings.
+site_url = "http://127.0.0.1:3000"
+jwt_expiry = 3600
+enable_signup = true
+enable_anonymous_sign_ins = false
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+# No session timebox, inactivity timeout, or single-session enforcement: the
+# native Keychain session refreshes silently until explicit/security revocation.
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+double_confirm_changes = true
+max_frequency = "1m"
+otp_length = 6
+otp_expiry = 600
+
+[auth.email.template.magic_link]
+subject = "Your WorldNiche sign-in code"
+content_path = "./supabase/templates/email-code.html"
+
+[auth.email.template.confirmation]
+subject = "Your WorldNiche sign-in code"
+content_path = "./supabase/templates/email-code.html"
+
+[functions.delete-account]
+# Auth is verified inside the function using project JWKS + a live-session check.
+verify_jwt = false

@@ -1,0 +1,11 @@
+{
+  "name": "worldniche-invite-hosting",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node scripts/validate-artifact.mjs",
+    "prebuild": "node scripts/import-content.mjs --landing ../landing-site --invites ../invite-site"
+  }
+}

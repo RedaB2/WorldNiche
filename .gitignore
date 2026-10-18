@@ -1,0 +1,40 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.local.*
+*.pem
+*.p8
+*.p12
+*.pfx
+*.key
+*.mobileprovision
+*.provisionprofile
+credentials*.json
+service-account*.json
+
+# Build products and tooling state
+.DS_Store
+DerivedData/
+build/
+dist/
+node_modules/
+.openai/
+.agents/
+.codex/
+.supabase/
+.temp/
+xcuserdata/
+*.xcuserstate
+*.xcresult
+*.ipa
+*.dSYM/
+__pycache__/
+*.pyc
+
+# Generated site sources and local diagnostics
+apps/web/invite-hosting/content/
+outputs/
+work/
+*.log
+*.ips

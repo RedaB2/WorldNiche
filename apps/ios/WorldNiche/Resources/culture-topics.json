@@ -1,0 +1,587 @@
+{
+  "AD": [
+    "Escudella"
+  ],
+  "AE": [
+    "Arabic coffee"
+  ],
+  "AF": [
+    "Kabuli pulao"
+  ],
+  "AG": [
+    "Antigua and Barbuda cuisine"
+  ],
+  "AL": [
+    "Tavë kosi"
+  ],
+  "AM": [
+    "Lavash"
+  ],
+  "AO": [
+    "Moambe chicken"
+  ],
+  "AR": [
+    "Mate (drink)"
+  ],
+  "AT": [
+    "Wiener Melange"
+  ],
+  "AU": [
+    "Flat white"
+  ],
+  "AZ": [
+    "Azerbaijani tea culture"
+  ],
+  "BA": [
+    "Bosnia and Herzegovina cuisine"
+  ],
+  "BB": [
+    "Cou-cou"
+  ],
+  "BD": [
+    "Panta bhat"
+  ],
+  "BE": [
+    "Beer in Belgium"
+  ],
+  "BF": [
+    "Burkinabe cuisine"
+  ],
+  "BG": [
+    "Banitsa"
+  ],
+  "BH": [
+    "Kabsa"
+  ],
+  "BI": [
+    "Banana beer"
+  ],
+  "BJ": [
+    "Cuisine of Benin"
+  ],
+  "BN": [
+    "Ambuyat"
+  ],
+  "BO": [
+    "Salteña"
+  ],
+  "BR": [
+    "Pão de queijo"
+  ],
+  "BS": [
+    "Bahamian cuisine"
+  ],
+  "BT": [
+    "Ema datshi"
+  ],
+  "BW": [
+    "Seswaa"
+  ],
+  "BY": [
+    "Potato pancake"
+  ],
+  "BZ": [
+    "Belizean cuisine"
+  ],
+  "CA": [
+    "Poutine"
+  ],
+  "CD": [
+    "Soukous"
+  ],
+  "CF": [
+    "Cuisine of the Central African Republic"
+  ],
+  "CG": [
+    "Congolese rumba"
+  ],
+  "CH": [
+    "Raclette"
+  ],
+  "CI": [
+    "Acheke"
+  ],
+  "CL": [
+    "Elevenses"
+  ],
+  "CM": [
+    "Ndolé"
+  ],
+  "CN": [
+    "Yum cha"
+  ],
+  "CO": [
+    "Arepa"
+  ],
+  "CR": [
+    "Gallo pinto"
+  ],
+  "CU": [
+    "Cuban rumba"
+  ],
+  "CV": [
+    "Cachupa"
+  ],
+  "CY": [
+    "Halloumi"
+  ],
+  "CZ": [
+    "Chlebíček"
+  ],
+  "DE": [
+    "Schultüte"
+  ],
+  "DJ": [
+    "Lahoh"
+  ],
+  "DK": [
+    "Smørrebrød"
+  ],
+  "DM": [
+    "Bouyon music"
+  ],
+  "DO": [
+    "Merengue music"
+  ],
+  "DZ": [
+    "Raï"
+  ],
+  "EC": [
+    "Encebollado"
+  ],
+  "EE": [
+    "Kama (food)"
+  ],
+  "EG": [
+    "Koshary"
+  ],
+  "ER": [
+    "Coffee ceremony of Ethiopia and Eritrea"
+  ],
+  "ES": [
+    "Sobremesa"
+  ],
+  "ET": [
+    "Coffee ceremony of Ethiopia and Eritrea"
+  ],
+  "FI": [
+    "Finnish sauna"
+  ],
+  "FJ": [
+    "Kava"
+  ],
+  "FM": [
+    "Kava"
+  ],
+  "FR": [
+    "Fête de la Musique"
+  ],
+  "GA": [
+    "Moambe chicken"
+  ],
+  "GB": [
+    "Builder's tea"
+  ],
+  "GD": [
+    "Oil down"
+  ],
+  "GE": [
+    "Khachapuri"
+  ],
+  "GH": [
+    "Azonto"
+  ],
+  "GM": [
+    "Senegalese tea culture"
+  ],
+  "GN": [
+    "Balafon"
+  ],
+  "GQ": [
+    "Cuisine of Equatorial Guinea"
+  ],
+  "GR": [
+    "Rebetiko"
+  ],
+  "GT": [
+    "Marimba"
+  ],
+  "GW": [
+    "Gumbe"
+  ],
+  "GY": [
+    "Guyanese pepperpot"
+  ],
+  "HN": [
+    "Baleada"
+  ],
+  "HR": [
+    "Klapa"
+  ],
+  "HT": [
+    "Soup joumou"
+  ],
+  "HU": [
+    "Táncház"
+  ],
+  "ID": [
+    "Angklung"
+  ],
+  "IE": [
+    "Irish traditional music session"
+  ],
+  "IL": [
+    "Israeli breakfast"
+  ],
+  "IN": [
+    "Dabbawala"
+  ],
+  "IQ": [
+    "Iraqi maqam"
+  ],
+  "IR": [
+    "Taarof"
+  ],
+  "IS": [
+    "Icelandic Christmas book flood"
+  ],
+  "IT": [
+    "Apéritif and digestif"
+  ],
+  "JM": [
+    "Dub music"
+  ],
+  "JO": [
+    "Mansaf"
+  ],
+  "JP": [
+    "Kissaten"
+  ],
+  "KE": [
+    "Nyama choma"
+  ],
+  "KG": [
+    "Shyrdak"
+  ],
+  "KH": [
+    "Num banhchok"
+  ],
+  "KI": [
+    "Dance in Kiribati"
+  ],
+  "KM": [
+    "Comorian cuisine"
+  ],
+  "KN": [
+    "Culture of Saint Kitts and Nevis"
+  ],
+  "KP": [
+    "Naengmyeon"
+  ],
+  "KR": [
+    "Gimjang"
+  ],
+  "KW": [
+    "Dewaniya"
+  ],
+  "KZ": [
+    "Dombra"
+  ],
+  "LA": [
+    "Lao cuisine"
+  ],
+  "LB": [
+    "Manakish"
+  ],
+  "LC": [
+    "Green fig and saltfish"
+  ],
+  "LI": [
+    "Käsespätzle"
+  ],
+  "LK": [
+    "Kottu"
+  ],
+  "LR": [
+    "Palaver sauce"
+  ],
+  "LS": [
+    "Mokorotlo"
+  ],
+  "LT": [
+    "Cold beet soup"
+  ],
+  "LU": [
+    "Emaischen"
+  ],
+  "LV": [
+    "Jāņi"
+  ],
+  "LY": [
+    "Bazin (bread)"
+  ],
+  "MA": [
+    "Maghrebi mint tea"
+  ],
+  "MC": [
+    "Barbajuan"
+  ],
+  "MD": [
+    "Mărțișor"
+  ],
+  "ME": [
+    "Kačamak"
+  ],
+  "MG": [
+    "Hiragasy"
+  ],
+  "MH": [
+    "Marshall Islands stick chart"
+  ],
+  "MK": [
+    "Ajvar"
+  ],
+  "ML": [
+    "Bògòlanfini"
+  ],
+  "MM": [
+    "Lahpet"
+  ],
+  "MN": [
+    "Morin khuur"
+  ],
+  "MR": [
+    "Couscous"
+  ],
+  "MT": [
+    "Ftira"
+  ],
+  "MU": [
+    "Sega (genre)"
+  ],
+  "MV": [
+    "Boduberu"
+  ],
+  "MW": [
+    "Ugali"
+  ],
+  "MX": [
+    "Son jarocho"
+  ],
+  "MY": [
+    "Kopitiam"
+  ],
+  "MZ": [
+    "Marrabenta"
+  ],
+  "NA": [
+    "Kapana (grilled meat)"
+  ],
+  "NE": [
+    "Dambou"
+  ],
+  "NG": [
+    "Suya"
+  ],
+  "NI": [
+    "Gallo pinto"
+  ],
+  "NL": [
+    "Hagelslag"
+  ],
+  "NO": [
+    "Waffle"
+  ],
+  "NP": [
+    "Momo (food)"
+  ],
+  "NR": [
+    "Nauruan cuisine"
+  ],
+  "NZ": [
+    "Hāngī"
+  ],
+  "OM": [
+    "Arabic coffee"
+  ],
+  "PA": [
+    "Carimañola"
+  ],
+  "PE": [
+    "Ceviche"
+  ],
+  "PG": [
+    "Papua New Guinean cuisine"
+  ],
+  "PH": [
+    "Merienda"
+  ],
+  "PK": [
+    "Truck art in South Asia"
+  ],
+  "PL": [
+    "Fat Thursday"
+  ],
+  "PS": [
+    "Dabke"
+  ],
+  "PT": [
+    "Fado"
+  ],
+  "PW": [
+    "Palauan cuisine"
+  ],
+  "PY": [
+    "Tereré"
+  ],
+  "QA": [
+    "Arabic coffee"
+  ],
+  "RO": [
+    "Mărțișor"
+  ],
+  "RS": [
+    "Slava"
+  ],
+  "RU": [
+    "Blini"
+  ],
+  "RW": [
+    "Rwandan cuisine"
+  ],
+  "SA": [
+    "Arabic coffee"
+  ],
+  "SB": [
+    "Music of Solomon Islands"
+  ],
+  "SC": [
+    "Moutya"
+  ],
+  "SD": [
+    "Shahan ful"
+  ],
+  "SE": [
+    "Coffee in Sweden"
+  ],
+  "SG": [
+    "Hawker centre"
+  ],
+  "SI": [
+    "Slovenian potica"
+  ],
+  "SK": [
+    "Bryndzové halušky"
+  ],
+  "SL": [
+    "Sierra Leonean cuisine"
+  ],
+  "SM": [
+    "Torta Tre Monti"
+  ],
+  "SN": [
+    "Thieboudienne"
+  ],
+  "SO": [
+    "Somali cuisine"
+  ],
+  "SR": [
+    "Pom (dish)"
+  ],
+  "SS": [
+    "South Sudanese cuisine"
+  ],
+  "ST": [
+    "Tchiloli"
+  ],
+  "SV": [
+    "Pupusa"
+  ],
+  "SY": [
+    "Qudud Halabiya"
+  ],
+  "SZ": [
+    "Cuisine of Eswatini"
+  ],
+  "TD": [
+    "Chadian cuisine"
+  ],
+  "TG": [
+    "Togolese cuisine"
+  ],
+  "TH": [
+    "Mango sticky rice"
+  ],
+  "TJ": [
+    "Pilaf"
+  ],
+  "TL": [
+    "Tais"
+  ],
+  "TM": [
+    "Dutar"
+  ],
+  "TN": [
+    "Harissa"
+  ],
+  "TO": [
+    "Taro"
+  ],
+  "TR": [
+    "Turkish coffee"
+  ],
+  "TT": [
+    "Doubles (food)"
+  ],
+  "TV": [
+    "Fatele"
+  ],
+  "TZ": [
+    "Chipsi mayai"
+  ],
+  "UA": [
+    "Borscht"
+  ],
+  "UG": [
+    "Rolex (food)"
+  ],
+  "US": [
+    "Potluck"
+  ],
+  "UY": [
+    "Candombe"
+  ],
+  "UZ": [
+    "Pilaf"
+  ],
+  "VA": [
+    "Angelus"
+  ],
+  "VC": [
+    "Breadfruit"
+  ],
+  "VE": [
+    "Arepa"
+  ],
+  "VN": [
+    "Egg coffee"
+  ],
+  "VU": [
+    "Sand drawing"
+  ],
+  "WS": [
+    "Earth oven"
+  ],
+  "YE": [
+    "Music of Yemen"
+  ],
+  "ZA": [
+    "Bunny chow"
+  ],
+  "ZM": [
+    "Nshima"
+  ],
+  "ZW": [
+    "Mbira"
+  ]
+}

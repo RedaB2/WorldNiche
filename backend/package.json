@@ -1,0 +1,16 @@
+{
+  "name": "worldniche-backend",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test:edge": "node tests/delete_account.mjs",
+    "test:database": "sh tests/run_database.sh",
+    "test:invites": "python3 tests/invite_site.py"
+  },
+  "devDependencies": {
+    "jose": "6.1.3"
+  }
+}

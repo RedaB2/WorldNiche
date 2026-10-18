@@ -1,0 +1,9 @@
+{
+  "name": "worldniche-web",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix invite-hosting run build",
+    "test": "npm --prefix invite-hosting test",
+    "validate": "npm --prefix invite-hosting run validate"
+  }
+}

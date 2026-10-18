@@ -1,0 +1,2008 @@
+{
+  "AD": [
+    {
+      "id": "ad-everyday",
+      "title": "A winter dish with a lot going on.",
+      "body": "Andorran escudella is a warming soup with meat, sausage, vegetables and ingredients such as noodles, rice and chickpeas. It belongs to a wider Catalan-speaking food tradition, with local versions and preferences.",
+      "conversationStarter": "What would you order after a cold day in the mountains?",
+      "sourceName": "Visit Andorra · Gastronomy",
+      "sourceURL": "https://visitandorra.com/en/gastronomy/andorran-recipes/escudella-catalan-style-stew/"
+    }
+  ],
+  "AE": [
+    {
+      "id": "ae-coffee",
+      "title": "A small cup, a generous welcome.",
+      "body": "In Arabic coffee hospitality, a small shake of the cup can signal that you have finished. UNESCO documents this custom across the UAE, Saudi Arabia, Oman, Qatar and Jordan; practice varies between people and communities.",
+      "conversationStarter": "How do you like your coffee prepared, and when do you usually share it?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/arabic-coffee-a-symbol-of-generosity-02111"
+    }
+  ],
+  "AF": [
+    {
+      "id": "af-everyday",
+      "title": "The rice is only the beginning.",
+      "body": "Kabuli pulao combines rice with meat, caramelized carrots and raisins; almonds or pistachios can finish the dish. Versions cross borders into Central Asia, so a family recipe can tell you more than a single national label.",
+      "conversationStarter": "What makes a really good palaw for you?",
+      "sourceName": "Wikipedia · Kabuli pulao",
+      "sourceURL": "https://en.wikipedia.org/wiki/Kabuli_palaw"
+    }
+  ],
+  "AG": [
+    {
+      "id": "ag-everyday",
+      "title": "Cornmeal has a Caribbean counterpart.",
+      "body": "Fungee is a cornmeal preparation central to Antigua and Barbuda’s cuisine and often paired with pepperpot. The texture invites comparison with polenta, but the local accompaniments make it its own meal.",
+      "conversationStarter": "Would you start a visitor with fungee and pepperpot or ducana?",
+      "sourceName": "Wikipedia · Antigua and Barbuda cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Antigua_and_Barbuda_cuisine"
+    }
+  ],
+  "AL": [
+    {
+      "id": "al-everyday",
+      "title": "Yogurt goes into the oven.",
+      "body": "Tavë kosi is an Albanian casserole in which meat and rice bake beneath a yogurt-and-egg mixture. It is associated with Elbasan, and the name tavë Elbasani points to that connection.",
+      "conversationStarter": "Would you recommend trying tavë kosi at home or at a restaurant?",
+      "sourceName": "Wikipedia · Tavë kosi",
+      "sourceURL": "https://en.wikipedia.org/wiki/Tav%C3%AB_kosi"
+    }
+  ],
+  "AM": [
+    {
+      "id": "am-everyday",
+      "title": "Bread can become the plate’s wrapper.",
+      "body": "Lavash is a thin flatbread closely associated with Armenian cooking. It can be used to wrap foods, and its flexible fresh form differs from the crisp texture it develops when dried.",
+      "conversationStarter": "What would you wrap in fresh lavash?",
+      "sourceName": "Wikipedia · Lavash",
+      "sourceURL": "https://en.wikipedia.org/wiki/Lavash"
+    }
+  ],
+  "AO": [
+    {
+      "id": "ao-everyday",
+      "title": "Palm fruit gives the sauce its character.",
+      "body": "Moamba de galinha is an Angolan chicken preparation associated with palm-fruit sauce. Related moambe dishes appear elsewhere in Central Africa too, so the name can introduce a conversation about different home recipes.",
+      "conversationStarter": "What do you like to serve alongside moamba?",
+      "sourceName": "Wikipedia · Moambe chicken",
+      "sourceURL": "https://en.wikipedia.org/wiki/Moambe_chicken"
+    }
+  ],
+  "AR": [
+    {
+      "id": "ar-everyday",
+      "title": "The straw has a name.",
+      "body": "Mate is an infusion of yerba mate, traditionally drunk through a metal bombilla from a gourd or other vessel. It is strongly associated with Argentina and several neighboring countries, with different ways of preparing and sharing it.",
+      "conversationStarter": "Do you prefer your mate bitter or sweet?",
+      "sourceName": "Wikipedia · Mate (drink)",
+      "sourceURL": "https://en.wikipedia.org/wiki/Mate_%28drink%29"
+    }
+  ],
+  "AT": [
+    {
+      "id": "at-everyday",
+      "title": "A coffeehouse word worth knowing.",
+      "body": "Wiener Melange is a Viennese coffee order built around coffee, steamed milk or cream, and foam. Recipes vary between cafés, so it is worth looking at the house description instead of assuming every Melange is identical.",
+      "conversationStarter": "Do you have a favorite Viennese coffeehouse order?",
+      "sourceName": "Wikipedia · Wiener Melange",
+      "sourceURL": "https://en.wikipedia.org/wiki/Wiener_Melange"
+    }
+  ],
+  "AU": [
+    {
+      "id": "au-everyday",
+      "title": "A coffee order with a friendly debate.",
+      "body": "A flat white combines espresso with steamed milk and a thin layer of microfoam. Australia and New Zealand both have claims to its development, and the exact cup size and recipe vary between cafés.",
+      "conversationStarter": "Where would you send someone for a great flat white?",
+      "sourceName": "Wikipedia · Flat white",
+      "sourceURL": "https://en.wikipedia.org/wiki/Flat_white"
+    }
+  ],
+  "AZ": [
+    {
+      "id": "az-everyday",
+      "title": "The tea glass has a silhouette.",
+      "body": "Azerbaijani tea is often served in an armudu, a pear-shaped glass. Hot tea, sweets and an unhurried conversation are part of the hospitality tradition described around it.",
+      "conversationStarter": "What do you like to have alongside tea?",
+      "sourceName": "Wikipedia · Azerbaijani tea culture",
+      "sourceURL": "https://en.wikipedia.org/wiki/Azerbaijani_tea_culture"
+    }
+  ],
+  "BA": [
+    {
+      "id": "ba-everyday",
+      "title": "The filling changes the pie’s name.",
+      "body": "Bosnian cooking includes several related filled pastries: zeljanica uses spinach, while sirnica is a cheese pie. Recognizing those names makes a bakery counter much easier to navigate.",
+      "conversationStarter": "Which savory pie would you choose from a bakery?",
+      "sourceName": "Wikipedia · Bosnia and Herzegovina cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Bosnian_cuisine"
+    }
+  ],
+  "BB": [
+    {
+      "id": "bb-everyday",
+      "title": "A dish with its own stirring tool.",
+      "body": "Barbadian cou-cou combines cornmeal and okra. A flat wooden cou-cou stick helps stir the mixture as it thickens, and flying fish is a well-known accompaniment.",
+      "conversationStarter": "Who makes the best cou-cou you have tried?",
+      "sourceName": "Wikipedia · Cou-cou",
+      "sourceURL": "https://en.wikipedia.org/wiki/Cou-cou"
+    }
+  ],
+  "BD": [
+    {
+      "id": "bd-everyday",
+      "title": "Rice returns as breakfast.",
+      "body": "Panta bhat starts with cooked rice soaked in water, often overnight. In Bangladesh it is associated with Bengali New Year as well as everyday food traditions, and accompaniments can include onion, chili and mashed potato.",
+      "conversationStarter": "What would you serve with panta bhat?",
+      "sourceName": "Wikipedia · Panta bhat",
+      "sourceURL": "https://en.wikipedia.org/wiki/Panta_bhat"
+    }
+  ],
+  "BE": [
+    {
+      "id": "be-everyday",
+      "title": "The glass is part of the order.",
+      "body": "Belgian beer culture includes distinctive serving glasses matched to particular beers, alongside a wide range of styles. Even without memorizing brands, noticing the glass can lead into a conversation about local brewing.",
+      "conversationStarter": "Is there a local beer style you would suggest trying?",
+      "sourceName": "Wikipedia · Beer in Belgium",
+      "sourceURL": "https://en.wikipedia.org/wiki/Beer_in_Belgium"
+    }
+  ],
+  "BF": [
+    {
+      "id": "bf-everyday",
+      "title": "The sauce completes the tô.",
+      "body": "Tô is a firm cereal preparation found in Burkina Faso, made from grains such as millet, sorghum or maize. It is eaten with sauces rather than being a complete dish by itself.",
+      "conversationStarter": "What sauce would you choose to go with tô?",
+      "sourceName": "Wikipedia · Burkinabe cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Burkinab%C3%A9_cuisine"
+    }
+  ],
+  "BG": [
+    {
+      "id": "bg-everyday",
+      "title": "A pastry can hold a New Year wish.",
+      "body": "Banitsa layers pastry with ingredients such as eggs, yogurt and white brined cheese. In a Bulgarian New Year tradition, portions can contain written wishes or symbolic lucky charms.",
+      "conversationStarter": "Does your family put wishes into a New Year banitsa?",
+      "sourceName": "Wikipedia · Banitsa",
+      "sourceURL": "https://en.wikipedia.org/wiki/Banitsa"
+    }
+  ],
+  "BH": [
+    {
+      "id": "bh-everyday",
+      "title": "A rice dish with regional relatives.",
+      "body": "Machboos belongs to the family of spiced rice-and-meat dishes found across the Gulf. In Bahrain, the dish is part of local cuisine, while its seasonings and the choice of meat or fish leave room for different versions.",
+      "conversationStarter": "What is your favorite version of machboos?",
+      "sourceName": "Wikipedia · Kabsa",
+      "sourceURL": "https://en.wikipedia.org/wiki/Kabsa"
+    }
+  ],
+  "BI": [
+    {
+      "id": "bi-everyday",
+      "title": "Bananas can become a shared drink.",
+      "body": "Urwagwa is a banana beer found in Burundi and Rwanda. Fermented banana juice and grain ingredients are part of its preparation, connecting it to a wider family of Great Lakes drinks with different local names.",
+      "conversationStarter": "Is there a local drink you would introduce a visitor to?",
+      "sourceName": "Wikipedia · Banana beer",
+      "sourceURL": "https://en.wikipedia.org/wiki/Banana_beer"
+    }
+  ],
+  "BJ": [
+    {
+      "id": "bj-everyday",
+      "title": "The starch changes with the region.",
+      "body": "In southern Benin, corn dough commonly accompanies sauces based on ingredients such as tomato or peanuts. Yams have a larger role in northern food traditions—a useful reminder to ask about someone’s region as well as their country.",
+      "conversationStarter": "Which local dish would you introduce a visitor to first?",
+      "sourceName": "Wikipedia · Cuisine of Benin",
+      "sourceURL": "https://en.wikipedia.org/wiki/Beninese_cuisine"
+    }
+  ],
+  "BN": [
+    {
+      "id": "bn-everyday",
+      "title": "Twist, dip, taste.",
+      "body": "Brunei’s ambuyat is made from sago starch. Linked bamboo utensils called chandas are used to wind up the sticky mixture before dipping it into a sauce, which supplies much of the flavor.",
+      "conversationStarter": "Which sauce would you recommend with ambuyat?",
+      "sourceName": "Wikipedia · Ambuyat",
+      "sourceURL": "https://en.wikipedia.org/wiki/Ambuyat"
+    }
+  ],
+  "BO": [
+    {
+      "id": "bo-everyday",
+      "title": "The pastry hides a little stew.",
+      "body": "A Bolivian salteña is a baked pastry with a juicy, stew-like filling. The filling sets before baking and becomes liquid again inside the pastry, making the first bite something to approach carefully.",
+      "conversationStarter": "What is your trick for eating a salteña without spilling?",
+      "sourceName": "Wikipedia · Salteña",
+      "sourceURL": "https://en.wikipedia.org/wiki/Salte%C3%B1a"
+    }
+  ],
+  "BR": [
+    {
+      "id": "br-everyday",
+      "title": "Chewy inside, crisp outside.",
+      "body": "Pão de queijo is a Brazilian cheese bread associated with Minas Gerais. Cassava flour gives the small baked rolls their characteristic elastic interior, making them a familiar breakfast or snack option.",
+      "conversationStarter": "Do you like pão de queijo with coffee, or on its own?",
+      "sourceName": "Wikipedia · Pão de queijo",
+      "sourceURL": "https://en.wikipedia.org/wiki/P%C3%A3o_de_queijo"
+    }
+  ],
+  "BS": [
+    {
+      "id": "bs-everyday",
+      "title": "Conch is more than a shell souvenir.",
+      "body": "Conch appears in Bahamian cooking in several forms, including salads and fritters. That makes the preparation a better conversation starter than simply asking whether someone likes seafood.",
+      "conversationStarter": "Would you choose conch salad or conch fritters?",
+      "sourceName": "Wikipedia · Bahamian cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Bahamian_cuisine"
+    }
+  ],
+  "BT": [
+    {
+      "id": "bt-everyday",
+      "title": "Chilies are a main ingredient.",
+      "body": "Ema datshi is a Bhutanese stew built around chilies and cheese. The chilies can be fresh or dried, and different types produce different versions; they are a substantial part of the dish.",
+      "conversationStarter": "Which version of ema datshi do you like best?",
+      "sourceName": "Wikipedia · Ema datshi",
+      "sourceURL": "https://en.wikipedia.org/wiki/Ema_datshi"
+    }
+  ],
+  "BW": [
+    {
+      "id": "bw-everyday",
+      "title": "The texture comes from pounding.",
+      "body": "Seswaa is a Botswana meat dish made by slowly cooking beef or goat until tender and then pounding it. It is often prepared for gatherings and served with a starch such as pap or sorghum.",
+      "conversationStarter": "What do you like to eat alongside seswaa?",
+      "sourceName": "Wikipedia · Seswaa",
+      "sourceURL": "https://en.wikipedia.org/wiki/Seswaa"
+    }
+  ],
+  "BY": [
+    {
+      "id": "by-everyday",
+      "title": "The local name is draniki.",
+      "body": "In Belarus, grated-potato pancakes are known as draniki. Potato pancakes have relatives across Europe, but learning the local name opens a more specific conversation about toppings and family recipes.",
+      "conversationStarter": "How do you like your draniki served?",
+      "sourceName": "Wikipedia · Potato pancake",
+      "sourceURL": "https://en.wikipedia.org/wiki/Potato_pancake"
+    }
+  ],
+  "BZ": [
+    {
+      "id": "bz-everyday",
+      "title": "Breakfast can start with fry jacks.",
+      "body": "Fry jacks are fried dough served as part of Belizean breakfasts, with accompaniments such as beans, eggs or cheese. They sit within a cuisine shaped by the country’s many communities.",
+      "conversationStarter": "What would be on your ideal Belizean breakfast plate?",
+      "sourceName": "Wikipedia · Belizean cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Belizean_cuisine"
+    }
+  ],
+  "CA": [
+    {
+      "id": "ca-everyday",
+      "title": "The cheese should keep its character.",
+      "body": "Québec’s poutine brings together fries, cheese curds and gravy. The curds are a defining ingredient, which helps explain why a plate of fries with any melted cheese is not quite the same thing.",
+      "conversationStarter": "Where would you take someone for a really good poutine?",
+      "sourceName": "Wikipedia · Poutine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Poutine"
+    }
+  ],
+  "CD": [
+    {
+      "id": "cd-everyday",
+      "title": "Follow the guitar into soukous.",
+      "body": "Soukous developed from Congolese rumba into a faster dance sound with bright, intricate guitar lines. It connects music scenes in both Congos and far beyond, making the guitar a useful first thing to listen for.",
+      "conversationStarter": "Which soukous guitarist or band should I start with?",
+      "sourceName": "Wikipedia · Soukous",
+      "sourceURL": "https://en.wikipedia.org/wiki/Soukous"
+    }
+  ],
+  "CF": [
+    {
+      "id": "cf-everyday",
+      "title": "A street snack to learn by name.",
+      "body": "Makara is a fried bread sold among the roadside foods of the Central African Republic. Alongside sandwiches and grilled foods, it is one small entry point into the country’s everyday snack culture.",
+      "conversationStarter": "What street snack would you recommend to a visitor?",
+      "sourceName": "Wikipedia · Cuisine of the Central African Republic",
+      "sourceURL": "https://en.wikipedia.org/wiki/Central_African_cuisine"
+    }
+  ],
+  "CG": [
+    {
+      "id": "cg-everyday",
+      "title": "A rhythm shared across the river.",
+      "body": "Congolese rumba belongs to the musical life of both the Republic of the Congo and the Democratic Republic of the Congo. Learning an artist or song is a good way into this shared tradition without treating the two countries as interchangeable.",
+      "conversationStarter": "Which Congolese rumba recording should I listen to first?",
+      "sourceName": "Wikipedia · Congolese rumba",
+      "sourceURL": "https://en.wikipedia.org/wiki/Congolese_rumba"
+    }
+  ],
+  "CH": [
+    {
+      "id": "ch-raclette",
+      "title": "The melted edge is the main event",
+      "body": "Swiss raclette can mean watching the exposed face of a half-wheel of cheese warm beside a fire, then having the melted layer scraped onto a plate. Tabletop raclette ovens are another familiar approach. Potatoes and small pickled cucumbers are classic companions, and the tradition is particularly associated with Valais.",
+      "conversationStarter": "Do you prefer raclette scraped from a wheel or made at the table?",
+      "sourceName": "Switzerland Tourism · Raclette",
+      "sourceURL": "https://www.myswitzerland.com/en-ch/accommodations/best-of-swiss-hotels/crispy-crusty-cheese-the-best-raclette-restaurants/"
+    }
+  ],
+  "CI": [
+    {
+      "id": "ci-everyday-culture",
+      "title": "It looks like couscous, but it is cassava.",
+      "body": "Attiéké is made from fermented, grated cassava, with a grainy texture that can resemble couscous. It has deep roots among southern Côte d’Ivoire’s lagoon communities and is often paired with fish, onions and pepper.",
+      "conversationStarter": "What is your favorite way to eat attiéké?",
+      "sourceName": "Wikipedia · Acheke",
+      "sourceURL": "https://en.wikipedia.org/wiki/Acheke"
+    }
+  ],
+  "CL": [
+    {
+      "id": "cl-everyday",
+      "title": "Once is an occasion, not an hour.",
+      "body": "In Chile, tomar once is an afternoon or evening meal associated with tea or coffee and bread with accompaniments. Despite the name, it does not mean that people sit down to it at eleven o’clock.",
+      "conversationStarter": "What has to be on the table for a good once?",
+      "sourceName": "Wikipedia · Elevenses",
+      "sourceURL": "https://en.wikipedia.org/wiki/Elevenses"
+    }
+  ],
+  "CM": [
+    {
+      "id": "cm-everyday",
+      "title": "A leafy dish with a nutty base.",
+      "body": "Cameroonian ndolé combines leafy greens with ground peanuts and seasonings. Fish, meat or shrimp can be added, and it is often served with plantains or fermented-cassava preparations such as miondo.",
+      "conversationStarter": "What do you most like to eat with ndolé?",
+      "sourceName": "Wikipedia · Ndolé",
+      "sourceURL": "https://en.wikipedia.org/wiki/Ndol%C3%A9"
+    }
+  ],
+  "CN": [
+    {
+      "id": "cn-everyday",
+      "title": "Small plates, a long conversation.",
+      "body": "Yum cha is a Cantonese tea-and-dim-sum tradition, especially associated with southern China. Small shared portions and repeated cups of tea make it a social meal, often enjoyed with family or friends.",
+      "conversationStarter": "What is the first dim sum dish you would order?",
+      "sourceName": "Wikipedia · Yum cha",
+      "sourceURL": "https://en.wikipedia.org/wiki/Yum_cha"
+    }
+  ],
+  "CO": [
+    {
+      "id": "co-everyday",
+      "title": "Ask which arepa.",
+      "body": "Colombian arepas are maize-based breads with many regional forms. The choice of corn, thickness, fillings and accompaniments changes the result, so asking about a favorite variety is more revealing than treating them all alike.",
+      "conversationStarter": "Which Colombian arepa would you recommend first?",
+      "sourceName": "Wikipedia · Arepa",
+      "sourceURL": "https://en.wikipedia.org/wiki/Arepa"
+    }
+  ],
+  "CR": [
+    {
+      "id": "cr-everyday",
+      "title": "Breakfast can begin with yesterday’s rice.",
+      "body": "Gallo pinto combines rice and beans and is strongly associated with Costa Rica as well as Nicaragua. Local recipes and preferred accompaniments differ, making it an easy food conversation with room for personal taste.",
+      "conversationStarter": "How do you like your gallo pinto served?",
+      "sourceName": "Wikipedia · Gallo pinto",
+      "sourceURL": "https://en.wikipedia.org/wiki/Gallo_pinto"
+    }
+  ],
+  "CU": [
+    {
+      "id": "cu-everyday",
+      "title": "Rumba is a whole musical conversation.",
+      "body": "Cuban rumba brings singing, percussion and dance together. Yambú, guaguancó and columbia are distinct forms, so the name describes a family of practices rather than one fixed beat.",
+      "conversationStarter": "Which style of rumba would you suggest listening to first?",
+      "sourceName": "Wikipedia · Cuban rumba",
+      "sourceURL": "https://en.wikipedia.org/wiki/Cuban_rumba"
+    }
+  ],
+  "CV": [
+    {
+      "id": "cv-everyday",
+      "title": "Yesterday’s stew becomes breakfast.",
+      "body": "Cape Verdean cachupa is a slow-cooked corn-and-bean stew with many island variations. Leftovers can be fried into cachupa refogada and served at breakfast with an egg or another accompaniment.",
+      "conversationStarter": "Do you prefer cachupa as a stew or refogada the next day?",
+      "sourceName": "Wikipedia · Cachupa",
+      "sourceURL": "https://en.wikipedia.org/wiki/Cachupa"
+    }
+  ],
+  "CY": [
+    {
+      "id": "cy-everyday",
+      "title": "A cheese that can take the heat.",
+      "body": "Halloumi from Cyprus keeps its shape unusually well when grilled or fried. Its characteristic squeak and firm texture are part of the experience, while traditional recipes use sheep’s and goat’s milk.",
+      "conversationStarter": "How do you most like to eat halloumi?",
+      "sourceName": "Wikipedia · Halloumi",
+      "sourceURL": "https://en.wikipedia.org/wiki/Halloumi"
+    }
+  ],
+  "CZ": [
+    {
+      "id": "cz-everyday",
+      "title": "A small sandwich with a full arrangement.",
+      "body": "Czech obložené chlebíčky are open sandwiches arranged with toppings such as salad, egg, cheese or cold cuts. They turn a slice of bread into a small, carefully assembled snack.",
+      "conversationStarter": "Which chlebíček topping would you choose?",
+      "sourceName": "Wikipedia · Chlebíček",
+      "sourceURL": "https://en.wikipedia.org/wiki/Oblo%C5%BEen%C3%A9_chleb%C3%AD%C4%8Dky"
+    }
+  ],
+  "DE": [
+    {
+      "id": "de-everyday-culture",
+      "title": "A sweet first day of school.",
+      "body": "A Schultüte is a large decorated cone given to a child starting primary school. It can hold sweets, small toys and school supplies, turning the first school day into a family occasion as well as an educational milestone.",
+      "conversationStarter": "Do you remember what was inside your first school cone?",
+      "sourceName": "Wikipedia · Schultüte",
+      "sourceURL": "https://en.wikipedia.org/wiki/Schult%C3%BCte"
+    }
+  ],
+  "DJ": [
+    {
+      "id": "dj-everyday",
+      "title": "A spongy bread shared around the region.",
+      "body": "Lahoh is a pancake-like bread eaten in Djibouti and neighboring places. A fermented batter gives it its soft, porous texture; the name and preferred flour can vary from one community to another.",
+      "conversationStarter": "What would you eat with lahoh for breakfast?",
+      "sourceName": "Wikipedia · Lahoh",
+      "sourceURL": "https://en.wikipedia.org/wiki/Lahoh"
+    }
+  ],
+  "DK": [
+    {
+      "id": "dk-everyday",
+      "title": "The sandwich stays open.",
+      "body": "Danish smørrebrød is an open sandwich, often built on dense rye bread with butter and carefully arranged toppings. Herring, egg, meat, cheese and vegetables offer many combinations.",
+      "conversationStarter": "What is your favorite smørrebrød topping?",
+      "sourceName": "Wikipedia · Smørrebrød",
+      "sourceURL": "https://en.wikipedia.org/wiki/Sm%C3%B8rrebr%C3%B8d"
+    }
+  ],
+  "DM": [
+    {
+      "id": "dm-everyday",
+      "title": "Dominica has a sound called bouyon.",
+      "body": "Bouyon is a music genre from Dominica that blends local forms such as jing ping and cadence-lypso with other dance styles. WCK is one of the groups associated with its development.",
+      "conversationStarter": "Which bouyon song would you play for a first-time listener?",
+      "sourceName": "Wikipedia · Bouyon music",
+      "sourceURL": "https://en.wikipedia.org/wiki/Bouyon_music"
+    }
+  ],
+  "DO": [
+    {
+      "id": "do-everyday",
+      "title": "Three sounds to pick out.",
+      "body": "In Dominican merengue típico, the accordion, güira scraper and tambora drum are central sounds. Recognizing that combination gives you a way to hear the music beyond its dance tempo.",
+      "conversationStarter": "Do you have a favorite merengue típico performer?",
+      "sourceName": "Wikipedia · Merengue music",
+      "sourceURL": "https://en.wikipedia.org/wiki/Merengue_music"
+    }
+  ],
+  "DZ": [
+    {
+      "id": "dz-everyday",
+      "title": "The name before the singer’s name.",
+      "body": "In raï, the artist titles cheb and cheba mean young. They distinguish a younger generation of performers from the older cheikh and cheikha tradition. It is a useful detail to recognize when exploring Algerian music.",
+      "conversationStarter": "Which raï artist should be the first one on my playlist?",
+      "sourceName": "Wikipedia · Raï",
+      "sourceURL": "https://en.wikipedia.org/wiki/Ra%C3%AF"
+    },
+    {
+      "id": "dz-rai",
+      "title": "A song can say what is hard to say.",
+      "body": "Raï is an Algerian popular music tradition that gives voice to love, freedom and social pressures. UNESCO describes it as a channel for young people to express feelings and negotiate social constraints.",
+      "conversationStarter": "Which raï song would you put on for someone hearing the genre for the first time?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/ra-popular-folk-song-of-algeria-01894"
+    }
+  ],
+  "EC": [
+    {
+      "id": "ec-everyday",
+      "title": "A fish stew with a bright finish.",
+      "body": "Ecuadorian encebollado combines fish with cassava and pickled red onion. Lime and accompaniments such as chifles, or plantain chips, add contrast; it is especially associated with the coast.",
+      "conversationStarter": "What do you like to add to encebollado?",
+      "sourceName": "Wikipedia · Encebollado",
+      "sourceURL": "https://en.wikipedia.org/wiki/Encebollado"
+    }
+  ],
+  "EE": [
+    {
+      "id": "ee-everyday",
+      "title": "A snack that skips the stove.",
+      "body": "Estonian kama is a flour mixture made from roasted grains and legumes, often including barley, rye, oats and peas. Mixed with milk or a cultured dairy drink, it becomes a quick snack without further cooking.",
+      "conversationStarter": "Do you prefer kama sweet or without added sugar?",
+      "sourceName": "Wikipedia · Kama (food)",
+      "sourceURL": "https://en.wikipedia.org/wiki/Kama_%28food%29"
+    }
+  ],
+  "EG": [
+    {
+      "id": "eg-everyday",
+      "title": "The toppings make the bowl.",
+      "body": "Egyptian koshary layers rice, lentils and pasta with chickpeas, tomato sauce and crisp fried onions. Garlic vinegar and hot sauce let each person adjust the finishing flavor.",
+      "conversationStarter": "Do you go heavy on the garlic vinegar or the hot sauce?",
+      "sourceName": "Wikipedia · Koshary",
+      "sourceURL": "https://en.wikipedia.org/wiki/Koshary"
+    },
+    {
+      "id": "eg-semsemiah",
+      "title": "The canal has a sound of its own.",
+      "body": "Semsemiah is a lyre-like instrument made and played in communities around the Suez Canal. Players often build their own instruments, and its music turns up at celebrations, concerts and football matches. It is also practiced in Saudi Arabia.",
+      "conversationStarter": "Have you heard semsemiah live, or is there a recording you love?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/semsemiah-instrument-crafting-and-playing-02119"
+    }
+  ],
+  "ER": [
+    {
+      "id": "er-everyday",
+      "title": "Coffee is time set aside together.",
+      "body": "In Eritrean and Ethiopian coffee ceremonies, beans can be roasted and ground in front of the guests before brewing in a clay jebena. The preparation itself creates time for neighbors, relatives or visitors to gather.",
+      "conversationStarter": "What is your favorite part of a coffee gathering?",
+      "sourceName": "Wikipedia · Coffee ceremony of Ethiopia and Eritrea",
+      "sourceURL": "https://en.wikipedia.org/wiki/Coffee_ceremony_of_Ethiopia_and_Eritrea"
+    }
+  ],
+  "ES": [
+    {
+      "id": "es-global-culture",
+      "title": "The conversation after the meal has a name",
+      "body": "Sobremesa is the time spent lingering at the table after eating, talking rather than immediately moving on. Coffee may arrive, but the conversation is the point. It is a familiar Spanish social custom, although a weekday lunch and a long gathering with friends need not look the same.",
+      "conversationStarter": "Do you enjoy a long sobremesa, or are you usually the first to get moving?",
+      "sourceName": "Spain Tourism · Everyday customs",
+      "sourceURL": "https://www.spain.info/es/top/estilo-vida-felicidad-espana/"
+    }
+  ],
+  "ET": [
+    {
+      "id": "et-everyday",
+      "title": "The brewing pot has a name.",
+      "body": "A jebena is the clay pot used in Ethiopian and Eritrean coffee ceremonies. Roasting, grinding and brewing the beans are part of the gathering, not just steps hidden away before guests arrive.",
+      "conversationStarter": "Do you have a favorite coffee-ceremony memory?",
+      "sourceName": "Wikipedia · Coffee ceremony of Ethiopia and Eritrea",
+      "sourceURL": "https://en.wikipedia.org/wiki/Coffee_ceremony_of_Ethiopia_and_Eritrea"
+    }
+  ],
+  "FI": [
+    {
+      "id": "fi-everyday",
+      "title": "There is a word for the steam.",
+      "body": "In Finnish sauna culture, löyly refers to the heat and steam produced when water is thrown onto hot stones. The experience is shaped by how that heat feels, rather than by temperature alone.",
+      "conversationStarter": "What makes a really good löyly for you?",
+      "sourceName": "Wikipedia · Finnish sauna",
+      "sourceURL": "https://en.wikipedia.org/wiki/Finnish_sauna"
+    }
+  ],
+  "FJ": [
+    {
+      "id": "fj-everyday",
+      "title": "The gathering has a shared bowl.",
+      "body": "In Fiji, yaqona is the local name associated with kava, a drink prepared from the plant’s root. Its preparation and sharing have social and ceremonial roles, with customs that depend on the setting.",
+      "conversationStarter": "What should a guest know before joining a yaqona gathering?",
+      "sourceName": "Wikipedia · Kava",
+      "sourceURL": "https://en.wikipedia.org/wiki/Kava"
+    }
+  ],
+  "FM": [
+    {
+      "id": "fm-everyday-culture",
+      "title": "A drink with a particular island method.",
+      "body": "On Pohnpei in the Federated States of Micronesia, sakau is the local name for a kava drink. Its preparation includes pounding the root and pressing it with hibiscus bark, a distinctive part of the island’s social and ceremonial practice.",
+      "conversationStarter": "What should a visitor understand about a sakau gathering?",
+      "sourceName": "Wikipedia · Kava",
+      "sourceURL": "https://en.wikipedia.org/wiki/Kava"
+    }
+  ],
+  "FR": [
+    {
+      "id": "fr-fete",
+      "title": "One evening. A country of stages.",
+      "body": "On June 21, the Fête de la Musique brings free performances by amateur and professional musicians into public spaces across France. A street-corner set can be as much a part of the night as a big concert.",
+      "conversationStarter": "Have you ever stumbled across a great Fête de la Musique performance?",
+      "sourceName": "French Ministry of Culture",
+      "sourceURL": "https://fetedelamusique.culture.gouv.fr/"
+    },
+    {
+      "id": "fr-baguette",
+      "title": "The bakery has its own rhythm.",
+      "body": "Artisan baguettes are baked in small batches throughout the day. The baker’s shallow cuts leave a signature on each loaf, and a daily bakery visit is part of the social life UNESCO documents around this bread.",
+      "conversationStarter": "Is there a neighborhood bakery you would send a friend to?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/artisanal-know-how-and-culture-of-baguette-bread-01883"
+    }
+  ],
+  "GA": [
+    {
+      "id": "ga-everyday-culture",
+      "title": "Palm nuts make the sauce.",
+      "body": "In Gabon, poulet nyembwe is chicken simmered with palm-nut butter, giving the sauce its rich character. Related versions appear across Central Africa, so the name and preparation can change across borders.",
+      "conversationStarter": "What would you serve alongside poulet nyembwe?",
+      "sourceName": "Wikipedia · Moambe chicken",
+      "sourceURL": "https://en.wikipedia.org/wiki/Moambe_chicken"
+    }
+  ],
+  "GB": [
+    {
+      "id": "gb-global-culture",
+      "title": "A builder’s brew is about the strength",
+      "body": "Builder’s tea is a British term for strong black tea, usually made with a tea bag in a mug, with milk and often sugar. The name recalls a work-break drink, but its use extends beyond building sites. It describes a style of brew, not a formal afternoon-tea service.",
+      "conversationStarter": "How strong do you like your tea, and what goes in it?",
+      "sourceName": "Wikipedia · Builder’s tea",
+      "sourceURL": "https://en.wikipedia.org/wiki/Builder%27s_tea"
+    }
+  ],
+  "GD": [
+    {
+      "id": "gd-everyday-culture",
+      "title": "Pack the pot, then let it cook.",
+      "body": "Grenadian oil down layers breadfruit, vegetables and often salted meat in coconut milk. The ingredients cook together until the liquid is absorbed; how to pack the pot varies between households, making the method a conversation of its own.",
+      "conversationStarter": "What goes into oil down in your family’s version?",
+      "sourceName": "Wikipedia · Oil down",
+      "sourceURL": "https://en.wikipedia.org/wiki/Oil_down"
+    }
+  ],
+  "GE": [
+    {
+      "id": "ge-everyday-culture",
+      "title": "The cheese bread has regions.",
+      "body": "Khachapuri comes in many regional forms. The Adjarian version is shaped like a boat, filled with cheese, and finished with an egg and butter; round Imeretian khachapuri offers a different experience of the same Georgian staple.",
+      "conversationStarter": "Which regional khachapuri would you tell someone to try first?",
+      "sourceName": "Georgia Travel",
+      "sourceURL": "https://georgia.travel/get-a-taste-of-khachapuri"
+    }
+  ],
+  "GH": [
+    {
+      "id": "gh-everyday-culture",
+      "title": "A dance that can tell a joke.",
+      "body": "Azonto developed in Ghana with connections to Ga dance traditions around Greater Accra. Its gestures can mime ordinary activities such as washing, driving or ironing, so a dancer can tell a little story as well as follow the beat.",
+      "conversationStarter": "What Azonto move or song would you teach a beginner?",
+      "sourceName": "Wikipedia · Azonto",
+      "sourceURL": "https://en.wikipedia.org/wiki/Azonto"
+    }
+  ],
+  "GM": [
+    {
+      "id": "gm-everyday-culture",
+      "title": "Tea leaves time to talk.",
+      "body": "Attaya is a tea tradition shared by Gambia and several neighboring West African countries. Its deliberately unhurried preparation makes the gathering and conversation part of the experience, beyond the sweet tea itself.",
+      "conversationStarter": "Is attaya part of how you like to catch up with friends?",
+      "sourceName": "Wikipedia · Senegalese tea culture",
+      "sourceURL": "https://en.wikipedia.org/wiki/Senegalese_tea_culture"
+    }
+  ],
+  "GN": [
+    {
+      "id": "gn-everyday-culture",
+      "title": "The gourds are part of the sound.",
+      "body": "A balafon pairs wooden keys with gourd resonators beneath them. It is closely associated with Mandé musical traditions, including Guinea’s Malinké communities, and related instruments and playing traditions extend across West Africa.",
+      "conversationStarter": "Which balafon musician would be a good first listen?",
+      "sourceName": "Wikipedia · Balafon",
+      "sourceURL": "https://en.wikipedia.org/wiki/Balafon"
+    }
+  ],
+  "GQ": [
+    {
+      "id": "gq-everyday",
+      "title": "This chocolate comes from a mango.",
+      "body": "In Equatorial Guinea, modica, sometimes called chocolate, is made from the seed of the African mango rather than cocoa. It is sold powdered or in blocks—a small food word that can easily surprise a visitor.",
+      "conversationStarter": "Have you tried a dish made with modica?",
+      "sourceName": "Wikipedia · Cuisine of Equatorial Guinea",
+      "sourceURL": "https://en.wikipedia.org/wiki/Cuisine_of_Equatorial_Guinea"
+    }
+  ],
+  "GR": [
+    {
+      "id": "gr-everyday-culture",
+      "title": "Listen for the bouzouki.",
+      "body": "Rebetiko is a Greek urban song tradition with several musical strands. The bouzouki became a signature sound, often alongside baglamas and guitar; asking about a favorite recording opens up more than a generic Greek music playlist.",
+      "conversationStarter": "Is there a rebetiko singer or recording you would start with?",
+      "sourceName": "Wikipedia · Rebetiko",
+      "sourceURL": "https://en.wikipedia.org/wiki/Rebetiko"
+    }
+  ],
+  "GT": [
+    {
+      "id": "gt-everyday-culture",
+      "title": "A familiar sound in wooden keys.",
+      "body": "The marimba has a special place in Guatemalan music. Mallets strike wooden bars, and chromatic instruments have two keyboard rows; the Guatemalan double-keyboard tradition helped shape the instrument heard well beyond the country today.",
+      "conversationStarter": "Is there a marimba piece that people around you immediately recognize?",
+      "sourceName": "Wikipedia · Marimba",
+      "sourceURL": "https://en.wikipedia.org/wiki/Marimba"
+    }
+  ],
+  "GW": [
+    {
+      "id": "gw-everyday-culture",
+      "title": "A rhythm with several roots.",
+      "body": "Gumbé is a vocal and percussion-driven music associated with Guinea-Bissau. It brings together several local traditions; the word can name a particular genre or be used more broadly when people discuss the country’s music.",
+      "conversationStarter": "Which Bissau-Guinean artist would you put on a first playlist?",
+      "sourceName": "Wikipedia · Gumbe",
+      "sourceURL": "https://en.wikipedia.org/wiki/Gumbe"
+    }
+  ],
+  "GY": [
+    {
+      "id": "gy-everyday-culture",
+      "title": "Christmas can smell like pepperpot.",
+      "body": "Guyanese pepperpot is a slow-cooked stew associated with Christmas and other special occasions. Cassareep, made from cassava, is a defining ingredient, and local wiri wiri peppers are traditional in the dish.",
+      "conversationStarter": "Is pepperpot part of your holiday table, and what do you eat with it?",
+      "sourceName": "Wikipedia · Guyanese pepperpot",
+      "sourceURL": "https://en.wikipedia.org/wiki/Guyanese_pepperpot"
+    }
+  ],
+  "HN": [
+    {
+      "id": "hn-everyday-culture",
+      "title": "Start with a simple baleada.",
+      "body": "A baleada sencilla folds a flour tortilla around refried beans, salty crumbled cheese and crema. Eggs, avocado or meat can turn it into a fuller meal, but the simple version is a useful place to start in Honduran food.",
+      "conversationStarter": "What is your ideal baleada filling?",
+      "sourceName": "Wikipedia · Baleada",
+      "sourceURL": "https://en.wikipedia.org/wiki/Baleada"
+    }
+  ],
+  "HR": [
+    {
+      "id": "hr-everyday",
+      "title": "Listen for the voices together.",
+      "body": "Klapa is a vocal tradition from Dalmatia in Croatia, centered on harmony and melody. Groups are traditionally a cappella, though some performances add instruments; contemporary groups and festivals keep the repertoire moving.",
+      "conversationStarter": "Is there a klapa group or song you would recommend?",
+      "sourceName": "Wikipedia · Klapa",
+      "sourceURL": "https://en.wikipedia.org/wiki/Klapa"
+    }
+  ],
+  "HT": [
+    {
+      "id": "ht-everyday-culture",
+      "title": "A new year begins with soup.",
+      "body": "Soup joumou is a squash-based Haitian soup closely tied to January 1, which is both New Year’s Day and Haiti’s Independence Day. Preparing and sharing it connects a family meal with the celebration of freedom.",
+      "conversationStarter": "How does your household make soup joumou?",
+      "sourceName": "Wikipedia · Soup joumou",
+      "sourceURL": "https://en.wikipedia.org/wiki/Soup_joumou"
+    }
+  ],
+  "HU": [
+    {
+      "id": "hu-everyday-culture",
+      "title": "The dance floor is the point.",
+      "body": "A Hungarian táncház is a participatory folk-dance gathering, rather than just a staged performance. The name means dance house, and the movement brings regional music and dance traditions into social settings, including cities such as Budapest.",
+      "conversationStarter": "Have you been to a táncház, and which dance would be easiest to join?",
+      "sourceName": "Wikipedia · Táncház",
+      "sourceURL": "https://en.wikipedia.org/wiki/T%C3%A1nch%C3%A1z"
+    }
+  ],
+  "ID": [
+    {
+      "id": "id-everyday-culture",
+      "title": "One player, one part of a melody.",
+      "body": "In a Sundanese angklung ensemble, players shake bamboo instruments to sound their notes. Each instrument usually contributes a particular pitch, so even a simple tune depends on the group coordinating its entries.",
+      "conversationStarter": "Have you ever played angklung with a group?",
+      "sourceName": "Wikipedia · Angklung",
+      "sourceURL": "https://en.wikipedia.org/wiki/Angklung"
+    }
+  ],
+  "IE": [
+    {
+      "id": "ie-everyday-culture",
+      "title": "A session is a shared repertoire.",
+      "body": "An Irish trad session is an informal gathering where musicians play traditional tunes together. It is a social practice as much as a performance, and a tune-playing session can feel quite different from a scheduled band concert.",
+      "conversationStarter": "Where would you take someone to hear a good trad session?",
+      "sourceName": "Wikipedia · Irish traditional music session",
+      "sourceURL": "https://en.wikipedia.org/wiki/Irish_traditional_music_session"
+    }
+  ],
+  "IL": [
+    {
+      "id": "il-everyday-culture",
+      "title": "Breakfast can be a whole spread.",
+      "body": "The Israeli-style breakfast buffet developed from kibbutz communal meals. Salads, breads, cheeses, eggs and fish are common components, and the format became familiar in hotels and restaurants; it is one breakfast tradition among many in the country.",
+      "conversationStarter": "Which part of a breakfast spread do you reach for first?",
+      "sourceName": "Wikipedia · Israeli breakfast",
+      "sourceURL": "https://en.wikipedia.org/wiki/Israeli_breakfast"
+    }
+  ],
+  "IN": [
+    {
+      "id": "in-everyday-culture",
+      "title": "A home lunch crosses Mumbai.",
+      "body": "Mumbai’s dabbawalas collect home-packed lunch boxes and deliver them to workplaces and schools. Their routes connect walking, bicycles and local trains, making the humble dabba part of a distinctive citywide food-delivery network.",
+      "conversationStarter": "What would be in your ideal home-packed lunch?",
+      "sourceName": "Mumbai Dabbawala",
+      "sourceURL": "https://www.dabbawala.net/frequently-asked-questions-faq-about-dabbawala/"
+    }
+  ],
+  "IQ": [
+    {
+      "id": "iq-everyday-culture",
+      "title": "Poetry carries the melody.",
+      "body": "Iraqi maqam combines a singer’s interpretation with an instrumental ensemble. Classical Arabic poetry and Iraqi dialect verses can shape the performance, while improvisation gives a familiar musical form a personal voice.",
+      "conversationStarter": "Which Iraqi maqam singer would you recommend hearing first?",
+      "sourceName": "Wikipedia · Iraqi maqam",
+      "sourceURL": "https://en.wikipedia.org/wiki/Iraqi_maqam"
+    }
+  ],
+  "IR": [
+    {
+      "id": "ir-everyday-culture",
+      "title": "Courtesy can be a conversation.",
+      "body": "Taarof is a Persian practice of ritual courtesy that shapes offers, invitations and deference. An exchange may involve more than the literal words, and its meaning depends on the relationship and situation rather than a single universal rule.",
+      "conversationStarter": "What is a taarof moment that a visitor might misunderstand?",
+      "sourceName": "Wikipedia · Taarof",
+      "sourceURL": "https://en.wikipedia.org/wiki/Taarof"
+    }
+  ],
+  "IS": [
+    {
+      "id": "is-everyday-culture",
+      "title": "Christmas has a book season.",
+      "body": "Jólabókaflóð, the Christmas book flood, is Iceland’s rush of new book releases before Christmas. A widely distributed book catalogue helps readers choose gifts; the phrase refers to the publishing season as well as the gift-giving around it.",
+      "conversationStarter": "Which Icelandic book would you give someone as a present?",
+      "sourceName": "Wikipedia · Icelandic Christmas book flood",
+      "sourceURL": "https://en.wikipedia.org/wiki/Icelandic_Christmas_book_flood"
+    }
+  ],
+  "IT": [
+    {
+      "id": "it-everyday-culture",
+      "title": "Make time before dinner.",
+      "body": "Aperitivo is the Italian before-meal drink occasion, often accompanied by small savory bites. The word is useful for making plans: it points to a different moment in the evening from a digestivo, which follows a meal.",
+      "conversationStarter": "What does a good aperitivo look like where you live?",
+      "sourceName": "Wikipedia · Apéritif and digestif",
+      "sourceURL": "https://en.wikipedia.org/wiki/Ap%C3%A9ritif_and_digestif"
+    }
+  ],
+  "JM": [
+    {
+      "id": "jm-everyday-culture",
+      "title": "The mixing desk becomes an instrument.",
+      "body": "Jamaican dub reworks recordings by bringing bass and drums forward, dropping vocal parts in and out, and using echo or reverb. Producers such as King Tubby and Lee Scratch Perry helped make the remix itself a creative performance.",
+      "conversationStarter": "Which dub record would make you turn up the bass?",
+      "sourceName": "Wikipedia · Dub music",
+      "sourceURL": "https://en.wikipedia.org/wiki/Dub_music"
+    }
+  ],
+  "JO": [
+    {
+      "id": "jo-everyday-culture",
+      "title": "The yogurt is the distinctive part.",
+      "body": "Mansaf combines lamb with a sauce made from jameed, dried fermented yogurt, and is served with rice or bulgur. It is strongly associated with Jordan and also eaten elsewhere in the Levant, with different family preparations.",
+      "conversationStarter": "What makes a good mansaf for you?",
+      "sourceName": "Wikipedia · Mansaf",
+      "sourceURL": "https://en.wikipedia.org/wiki/Mansaf"
+    },
+    {
+      "id": "jo-mansaf",
+      "title": "The gathering is part of the dish.",
+      "body": "Mansaf is a celebratory Jordanian meal with a strong social role. Jordan’s heritage inventory describes variations across regions and communities, including a parallel with fish-and-rice sayadyah in Aqaba.",
+      "conversationStarter": "Does your family have a particular way of making or serving mansaf?",
+      "sourceName": "Jordanian Intangible Cultural Heritage",
+      "sourceURL": "https://ich.gov.jo/node/71419"
+    }
+  ],
+  "JP": [
+    {
+      "id": "jp-everyday-culture",
+      "title": "Coffee with a side of thick toast.",
+      "body": "A kissaten is a Japanese coffee shop with roots in the country’s older café culture. Some offer morning service: coffee or tea with a small breakfast such as thick toast and eggs, making the food part of the café ritual.",
+      "conversationStarter": "Do you have a favorite kissaten or morning-service order?",
+      "sourceName": "Wikipedia · Kissaten",
+      "sourceURL": "https://en.wikipedia.org/wiki/Kissaten"
+    }
+  ],
+  "KE": [
+    {
+      "id": "ke-everyday-culture",
+      "title": "The roast is a reason to gather.",
+      "body": "Nyama choma means roasted meat in Swahili and is familiar in Kenya and neighboring countries. Goat is especially associated with Kenyan versions, often served with kachumbari salad or ugali at informal gatherings.",
+      "conversationStarter": "Where would you go for nyama choma with friends?",
+      "sourceName": "Wikipedia · Nyama choma",
+      "sourceURL": "https://en.wikipedia.org/wiki/Nyama_choma"
+    }
+  ],
+  "KG": [
+    {
+      "id": "kg-everyday-culture",
+      "title": "Felt becomes a graphic pattern.",
+      "body": "A shyrdak is a patterned felt carpet associated especially with Kyrgyz craftsmanship. Colored felt is cut and stitched into contrasting designs; making the carpet brings together wool preparation, composition and skilled sewing.",
+      "conversationStarter": "Are there shyrdak patterns or colors you particularly like?",
+      "sourceName": "Wikipedia · Shyrdak",
+      "sourceURL": "https://en.wikipedia.org/wiki/Shyrdak"
+    }
+  ],
+  "KH": [
+    {
+      "id": "kh-everyday",
+      "title": "A noodle breakfast with many versions.",
+      "body": "Num banhchok refers to lightly fermented Cambodian rice noodles and dishes made with them, often eaten for breakfast. The noodles take several preparation steps, and there are regional variations across Cambodia.",
+      "conversationStarter": "Which version of num banhchok should someone try first?",
+      "sourceName": "Wikipedia · Num banhchok",
+      "sourceURL": "https://en.wikipedia.org/wiki/Nom_banh_chok"
+    }
+  ],
+  "KI": [
+    {
+      "id": "ki-everyday-culture",
+      "title": "Watch the hands and the head.",
+      "body": "Many Kiribati dance styles emphasize extended arms and quick, birdlike head movements. The comparison with the frigatebird helps explain their distinctive appearance, though the islands have several different styles and performance settings.",
+      "conversationStarter": "Which Kiribati dance style would you show a first-time visitor?",
+      "sourceName": "Wikipedia · Dance in Kiribati",
+      "sourceURL": "https://en.wikipedia.org/wiki/Dance_in_Kiribati"
+    }
+  ],
+  "KM": [
+    {
+      "id": "km-everyday",
+      "title": "Fish, plantain and coconut meet.",
+      "body": "M’tsolola is a Comorian preparation combining firm fish with plantains and greens in coconut milk. It is one specific dish within an island cuisine with many Indian Ocean connections.",
+      "conversationStarter": "Is m’tsolola a dish you would recommend making at home?",
+      "sourceName": "Wikipedia · Comorian cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Comorian_cuisine"
+    }
+  ],
+  "KN": [
+    {
+      "id": "kn-global-culture",
+      "title": "The dumplings are called droppers",
+      "body": "Goat water in Saint Kitts and Nevis is a substantial stew, with versions combining goat, breadfruit, green papaya, and dumplings in a tomato-based broth. Those dumplings may be called droppers. The name sounds like a drink, but the conversation belongs firmly at the dinner table.",
+      "conversationStarter": "Is goat water a dish you know well? What belongs in your version?",
+      "sourceName": "Wikipedia · Saint Kitts and Nevis culture",
+      "sourceURL": "https://en.wikipedia.org/wiki/Culture_of_Saint_Kitts_and_Nevis"
+    }
+  ],
+  "KP": [
+    {
+      "id": "kp-global-culture",
+      "title": "Cold noodles, warm wishes",
+      "body": "Pyongyang raengmyon is a cold noodle dish made mainly with buckwheat, served in a brass bowl with broth or radish-kimchi liquid. UNESCO describes a custom of sharing the long noodles around a winter holiday as a wish for long life. The dish also appears at birthdays and weddings.",
+      "conversationStarter": "Have you tried Pyongyang-style cold noodles? What did you notice about the broth?",
+      "sourceName": "UNESCO · Pyongyang raengmyon",
+      "sourceURL": "https://ich.unesco.org/en/RL/pyongyang-raengmyon-custom-01695"
+    }
+  ],
+  "KR": [
+    {
+      "id": "kr-kimjang",
+      "title": "Making enough to share.",
+      "body": "Kimjang is the collective making and sharing of kimchi, especially in late autumn. Recipes and methods differ by region and family, so asking about someone’s version can open up a much more personal conversation than asking about kimchi in general.",
+      "conversationStarter": "Is there a kimchi recipe or ingredient your family is especially attached to?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/kimjang-making-and-sharing-kimchi-in-the-republic-of-korea-00881"
+    }
+  ],
+  "KW": [
+    {
+      "id": "kw-everyday-culture",
+      "title": "A gathering and a place share a name.",
+      "body": "In Kuwait, diwaniya can mean both a reception space and the gathering held there. Conversation can range from daily life to business and public affairs; who attends and how formal it feels depend on the particular gathering.",
+      "conversationStarter": "What makes a diwaniya gathering memorable for you?",
+      "sourceName": "Wikipedia · Dewaniya",
+      "sourceURL": "https://en.wikipedia.org/wiki/Dewaniya"
+    }
+  ],
+  "KZ": [
+    {
+      "id": "kz-everyday-culture",
+      "title": "Two strings can tell a story.",
+      "body": "The Kazakh dombra is a long-necked plucked instrument with two strings. Its solo instrumental repertoire, known as kuy, is a central part of Kazakh musical culture, alongside its role accompanying songs.",
+      "conversationStarter": "Is there a dombra piece or performer you would introduce to a friend?",
+      "sourceName": "Wikipedia · Dombra",
+      "sourceURL": "https://en.wikipedia.org/wiki/Dombra"
+    }
+  ],
+  "LA": [
+    {
+      "id": "la-everyday-culture",
+      "title": "The rice comes in a basket.",
+      "body": "Sticky rice is central to Lao food. It is steamed in a bamboo basket and commonly served in baskets to share, with diners taking small portions by hand alongside the other dishes on the table.",
+      "conversationStarter": "Which dish would you pair with sticky rice first?",
+      "sourceName": "Wikipedia · Lao cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Lao_cuisine"
+    }
+  ],
+  "LB": [
+    {
+      "id": "lb-everyday-culture",
+      "title": "Breakfast starts at the bakery.",
+      "body": "Man’ousheh is a Levantine flatbread with toppings such as za’atar or cheese. In Lebanon it is a familiar breakfast food, and the small fingertip indentations in the dough help hold the topping in place.",
+      "conversationStarter": "Za’atar, cheese, or a different man’ousheh topping?",
+      "sourceName": "Wikipedia · Manakish",
+      "sourceURL": "https://en.wikipedia.org/wiki/Manakish"
+    },
+    {
+      "id": "lb-manouche",
+      "title": "Breakfast has a gathering built in.",
+      "body": "Man’ouché, a flatbread made at home and in small bakeries, is closely tied to Lebanese breakfast. Its aroma evokes sobhhiyé: morning gatherings where food and conversation share the table.",
+      "conversationStarter": "Where would you take a friend for man’ouché, and what would you order?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/al-man-ouche-an-emblematic-culinary-practice-in-lebanon-02000"
+    }
+  ],
+  "LC": [
+    {
+      "id": "lc-global-culture",
+      "title": "Here, a green fig is a banana",
+      "body": "In Saint Lucia, the green figs in green fig and saltfish are unripe bananas, not the sweet tree fruit you may be imagining. They are served with seasoned salted fish in the island’s signature dish. That small vocabulary difference is useful when reading a menu or asking about home cooking.",
+      "conversationStarter": "How do you like your green fig and saltfish prepared?",
+      "sourceName": "Saint Lucia Tourism Authority · Street food",
+      "sourceURL": "https://stlucia.org/en_uk/things-to-do/saint-lucian-street-food/"
+    }
+  ],
+  "LI": [
+    {
+      "id": "li-everyday-culture",
+      "title": "Cheese dumplings meet apple sauce.",
+      "body": "Liechtenstein’s Käsknöpfle layers small dumplings with cheese and crisp onions. Apple sauce is a traditional accompaniment, creating a sweet contrast to the savory dish rather than serving only as dessert.",
+      "conversationStarter": "Would you choose apple sauce with your Käsknöpfle?",
+      "sourceName": "Liechtenstein Tourism",
+      "sourceURL": "https://en.tourismus.li/kaesknoepfle-essen-in-liechtenstein.html"
+    }
+  ],
+  "LK": [
+    {
+      "id": "lk-global-culture",
+      "title": "You may hear your dinner being made",
+      "body": "Sri Lankan kottu combines chopped flatbread with ingredients such as vegetables, egg, and curry. Cooks chop and mix it on a hot griddle using metal blades, creating a recognizable rhythm. The sound is a useful clue when you are looking for the dish before you can see the stall.",
+      "conversationStarter": "What is your favorite kottu combination?",
+      "sourceName": "Wikipedia · Kottu",
+      "sourceURL": "https://en.wikipedia.org/wiki/Kottu"
+    }
+  ],
+  "LR": [
+    {
+      "id": "lr-everyday-culture",
+      "title": "A sauce built around greens.",
+      "body": "Palava sauce is a leafy stew found in Liberia and elsewhere in West Africa. Liberian versions use molokhia leaves; meat or fish and the accompanying starch vary, so the name covers a family of preparations.",
+      "conversationStarter": "How is palava sauce made in the version you know?",
+      "sourceName": "Wikipedia · Palaver sauce",
+      "sourceURL": "https://en.wikipedia.org/wiki/Palaver_sauce"
+    }
+  ],
+  "LS": [
+    {
+      "id": "ls-everyday-culture",
+      "title": "The hat on the flag is real.",
+      "body": "The mokorotlo is a distinctive conical Basotho straw hat, woven from local grasses. It appears on Lesotho’s flag and is also a wearable craft, connecting an immediately recognizable national symbol with a physical object.",
+      "conversationStarter": "Where would you look for a well-made mokorotlo?",
+      "sourceName": "Wikipedia · Mokorotlo",
+      "sourceURL": "https://en.wikipedia.org/wiki/Mokorotlo"
+    }
+  ],
+  "LT": [
+    {
+      "id": "lt-everyday-culture",
+      "title": "The pink soup is served cold.",
+      "body": "Lithuanian šaltibarščiai gets its striking pink color from beetroot mixed with a cultured dairy base such as kefir. It is a cold summer soup, part of a wider regional family of beet soups with different local versions.",
+      "conversationStarter": "What do you like to serve alongside šaltibarščiai?",
+      "sourceName": "Wikipedia · Cold beet soup",
+      "sourceURL": "https://en.wikipedia.org/wiki/Cold_beet_soup"
+    }
+  ],
+  "LU": [
+    {
+      "id": "lu-everyday-culture",
+      "title": "A spring fair you can whistle home.",
+      "body": "At Luxembourg’s Émaischen celebration on Easter Monday, small clay whistles shaped like birds are a signature purchase. Called peckvillercher, they link the festivities in Nospelt and Luxembourg City with local pottery traditions.",
+      "conversationStarter": "Have you ever collected a peckvillchen from Émaischen?",
+      "sourceName": "Wikipedia · Emaischen",
+      "sourceURL": "https://en.wikipedia.org/wiki/Emaischen"
+    }
+  ],
+  "LV": [
+    {
+      "id": "lv-everyday-culture",
+      "title": "Midsummer has its own soundtrack.",
+      "body": "Latvia’s Jāņi celebrations bring together songs, wreaths, fires and cheese around midsummer. Līgo is the name associated with the preceding evening and its singing, so it is a useful word to recognize in June.",
+      "conversationStarter": "Which Jāņi tradition do you most look forward to?",
+      "sourceName": "Wikipedia · Jāņi",
+      "sourceURL": "https://en.wikipedia.org/wiki/J%C4%81%C5%86i"
+    }
+  ],
+  "LY": [
+    {
+      "id": "ly-everyday-culture",
+      "title": "A dome in the middle of the platter.",
+      "body": "Libyan bazin is a firm barley-based dough shaped into a dome. A tomato-based sauce with ingredients such as meat, potatoes or eggs is served around it, giving the shared dish a distinctive appearance.",
+      "conversationStarter": "What goes into the bazin sauce you like best?",
+      "sourceName": "Wikipedia · Bazin (bread)",
+      "sourceURL": "https://en.wikipedia.org/wiki/Bazin_(bread)"
+    }
+  ],
+  "MA": [
+    {
+      "id": "ma-everyday-culture",
+      "title": "Mint tea can change with the season.",
+      "body": "Moroccan mint tea combines green tea, mint and sugar, within a tea tradition shared across the Maghreb. Other herbs or orange-blossom water can change the flavor, so a familiar glass need not taste the same in every home.",
+      "conversationStarter": "Do you prefer plain mint tea or a version with other herbs?",
+      "sourceName": "Wikipedia · Maghrebi mint tea",
+      "sourceURL": "https://en.wikipedia.org/wiki/Maghrebi_mint_tea"
+    },
+    {
+      "id": "ma-gnawa",
+      "title": "Listen for the castanets.",
+      "body": "In Gnawa music, castanets join strings in some urban ensembles and large drums in rural traditions. The music connects performance with communal and spiritual practices; festivals are one way new generations learn it.",
+      "conversationStarter": "If I wanted to get into Gnawa, which musician or festival would you start with?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/gnawa-01170"
+    },
+    {
+      "id": "ma-couscous",
+      "title": "A shared dish across borders.",
+      "body": "Couscous knowledge and practices are jointly recognized for Algeria, Mauritania, Morocco and Tunisia. The ingredients, utensils and occasions vary, so there is no single recipe that stands for every household or place.",
+      "conversationStarter": "How is couscous usually made or served where you grew up?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/knowledge-know-how-and-practices-pertaining-to-the-production-and-consumption-of-couscous-01602"
+    }
+  ],
+  "MC": [
+    {
+      "id": "mc-everyday-culture",
+      "title": "A little fritter with a local following.",
+      "body": "Barbajuan is a savory stuffed fritter associated with Monaco and the nearby Riviera. Swiss chard, rice and ricotta are common filling ingredients, and the snack has a special place in Monaco’s National Day celebrations.",
+      "conversationStarter": "Where would you send someone to try barbajuan?",
+      "sourceName": "Wikipedia · Barbajuan",
+      "sourceURL": "https://en.wikipedia.org/wiki/Barbajuan"
+    }
+  ],
+  "MD": [
+    {
+      "id": "md-everyday-culture",
+      "title": "Spring arrives on a red-and-white thread.",
+      "body": "In Moldova, Mărțișor marks the beginning of March with intertwined red and white threads, often attached to a small ornament. The tradition is shared with Romania and related to other spring customs in southeastern Europe.",
+      "conversationStarter": "Do you keep the mărțișor ornaments you receive?",
+      "sourceName": "Wikipedia · Mărțișor",
+      "sourceURL": "https://en.wikipedia.org/wiki/M%C4%83r%C8%9Bi%C8%99or"
+    }
+  ],
+  "ME": [
+    {
+      "id": "me-everyday-culture",
+      "title": "Cornmeal gets a hearty mountain variation.",
+      "body": "Kačamak is eaten across parts of southeastern Europe. In Montenegro, one preparation mixes the cooked cornmeal with crushed potatoes and cheese into a thick dish, making the local version worth distinguishing from plain polenta.",
+      "conversationStarter": "What do you serve with kačamak at home?",
+      "sourceName": "Wikipedia · Kačamak",
+      "sourceURL": "https://en.wikipedia.org/wiki/Ka%C4%8Damak"
+    }
+  ],
+  "MG": [
+    {
+      "id": "mg-everyday-culture",
+      "title": "The audience answers back.",
+      "body": "Hira gasy brings music, dance and kabary speech together in Madagascar’s highland performance tradition. A show can last much of the day, and the audience responds openly to both the performers’ skill and their message.",
+      "conversationStarter": "What part of a hira gasy performance holds your attention most?",
+      "sourceName": "Wikipedia · Hiragasy",
+      "sourceURL": "https://en.wikipedia.org/wiki/Hiragasy"
+    }
+  ],
+  "MH": [
+    {
+      "id": "mh-everyday-culture",
+      "title": "A map of how water moves.",
+      "body": "Marshallese stick charts represent ocean swells and the way islands interrupt them, using a framework of sticks and markers. Traditionally, navigators studied them before a voyage rather than holding them like a road map while traveling.",
+      "conversationStarter": "Have you seen how a navigator explains a stick chart?",
+      "sourceName": "Wikipedia · Marshall Islands stick chart",
+      "sourceURL": "https://en.wikipedia.org/wiki/Marshall_Islands_stick_chart"
+    }
+  ],
+  "MK": [
+    {
+      "id": "mk-global-culture",
+      "title": "A jar of roasted-pepper season",
+      "body": "Ajvar is a roasted-pepper relish made in North Macedonia and elsewhere in the Balkans. It can be spread on bread or served alongside a meal, and homemade versions are often prepared in autumn and preserved in jars. Heat levels vary, making mild-versus-spicy a useful question rather than an assumption.",
+      "conversationStarter": "Do you prefer mild or spicy ajvar, and what do you eat it with?",
+      "sourceName": "Wikipedia · Ajvar",
+      "sourceURL": "https://en.wikipedia.org/wiki/Ajvar"
+    }
+  ],
+  "ML": [
+    {
+      "id": "ml-everyday-culture",
+      "title": "Mud is part of the dye.",
+      "body": "Malian bògòlanfini, often called mud cloth, uses cotton and an iron-rich mud dyeing process. The Bamana tradition is especially well known; its contrasting patterns also appear in contemporary fashion and design.",
+      "conversationStarter": "Are there bogolan patterns or designers you particularly like?",
+      "sourceName": "Wikipedia · Bògòlanfini",
+      "sourceURL": "https://en.wikipedia.org/wiki/B%C3%B2g%C3%B2lanfini"
+    }
+  ],
+  "MM": [
+    {
+      "id": "mm-everyday-culture",
+      "title": "Tea can be the salad.",
+      "body": "Lahpet is fermented tea eaten in Myanmar as well as served to guests. In lahpet thoke, the tea leaves become the basis of a salad with ingredients such as tomato, garlic and cabbage, rather than being steeped into a drink.",
+      "conversationStarter": "What makes a good lahpet thoke for you?",
+      "sourceName": "Wikipedia · Lahpet",
+      "sourceURL": "https://en.wikipedia.org/wiki/Lahpet"
+    }
+  ],
+  "MN": [
+    {
+      "id": "mn-everyday-culture",
+      "title": "Look at the top of the fiddle.",
+      "body": "The Mongolian morin khuur has two strings and a carved horse’s head at the top of its neck. It is played upright with a bow, giving the instrument both a distinctive silhouette and a recognizable sound.",
+      "conversationStarter": "Which morin khuur performance would you share with a friend?",
+      "sourceName": "Wikipedia · Morin khuur",
+      "sourceURL": "https://en.wikipedia.org/wiki/Morin_khuur"
+    }
+  ],
+  "MR": [
+    {
+      "id": "mr-everyday-culture",
+      "title": "Couscous is also shared knowledge.",
+      "body": "Mauritania shares a UNESCO-recognized couscous tradition with Algeria, Morocco and Tunisia. The heritage includes rolling and steaming the grains, making the utensils, and passing on ways of preparing and sharing the meal.",
+      "conversationStarter": "What grain or accompaniment makes the couscous you know distinctive?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/knowledge-know-how-and-practices-related-to-the-production-and-consumption-of-couscous-01602"
+    }
+  ],
+  "MT": [
+    {
+      "id": "mt-everyday-culture",
+      "title": "The same bread name can mean two forms.",
+      "body": "Maltese ftira is a leavened bread often used for fillings such as tuna, tomato, olives or capers. A Gozitan ftira can instead resemble an open baked pie, so asking which version someone means is worthwhile.",
+      "conversationStarter": "Do you prefer a filled ftira or the Gozitan baked version?",
+      "sourceName": "Wikipedia · Ftira",
+      "sourceURL": "https://en.wikipedia.org/wiki/Ftira"
+    }
+  ],
+  "MU": [
+    {
+      "id": "mu-everyday-culture",
+      "title": "Listen for the ravanne.",
+      "body": "Mauritian sega brings music, storytelling and dance together. Traditional ensembles use percussion such as the ravanne frame drum and triangle, while newer styles combine sega with other genres; it is a living musical family with several forms.",
+      "conversationStarter": "Which sega song would you put on for someone hearing it for the first time?",
+      "sourceName": "Wikipedia · Sega (genre)",
+      "sourceURL": "https://en.wikipedia.org/wiki/Sega_(genre)"
+    }
+  ],
+  "MV": [
+    {
+      "id": "mv-everyday-culture",
+      "title": "The beat builds gradually.",
+      "body": "Maldivian boduberu brings together drumming, singing and dancing. Performances often begin with a slower rhythm and gather intensity, so the changing pace is part of the experience rather than one repeated beat from start to finish.",
+      "conversationStarter": "Have you heard a boduberu group you would recommend?",
+      "sourceName": "Wikipedia · Boduberu",
+      "sourceURL": "https://en.wikipedia.org/wiki/Boduberu"
+    }
+  ],
+  "MW": [
+    {
+      "id": "mw-everyday-culture",
+      "title": "The staple helps scoop the sauce.",
+      "body": "Malawian nsima is a thick cooked maize-flour staple served with vegetables, fish or other side dishes. Small portions can be shaped by hand to pick up the accompanying food, making texture important to how the meal is eaten.",
+      "conversationStarter": "Which side dish would you choose with nsima?",
+      "sourceName": "Wikipedia · Ugali",
+      "sourceURL": "https://en.wikipedia.org/wiki/Ugali"
+    }
+  ],
+  "MX": [
+    {
+      "id": "mx-everyday-culture",
+      "title": "The dance floor is percussion too.",
+      "body": "In Veracruz’s son jarocho tradition, a tarima is a wooden platform that becomes an instrument when dancers strike it with their heels. Stringed instruments such as the jarana and improvised sung verses complete the shared sound.",
+      "conversationStarter": "Which son jarocho group or song would you recommend?",
+      "sourceName": "Wikipedia · Son jarocho",
+      "sourceURL": "https://en.wikipedia.org/wiki/Son_jarocho"
+    }
+  ],
+  "MY": [
+    {
+      "id": "my-everyday-culture",
+      "title": "A coffee-shop name crosses languages.",
+      "body": "Kopitiam combines kopi, the Malay word for coffee, with tiam, a Hokkien word for shop. In Malaysia these coffee shops are places for meals as well as drinks, and older shops coexist with modern versions of the format.",
+      "conversationStarter": "What is your regular kopitiam order?",
+      "sourceName": "Wikipedia · Kopitiam",
+      "sourceURL": "https://en.wikipedia.org/wiki/Kopitiam"
+    }
+  ],
+  "MZ": [
+    {
+      "id": "mz-everyday-culture",
+      "title": "Start a playlist with marrabenta.",
+      "body": "Marrabenta is a Mozambican dance-music style associated with Maputo. It brings local rhythms together with influences including Portuguese music, and musicians such as Dilon Djindji helped give the genre its energetic public identity.",
+      "conversationStarter": "Which marrabenta artist would you introduce to a newcomer?",
+      "sourceName": "Wikipedia · Marrabenta",
+      "sourceURL": "https://en.wikipedia.org/wiki/Marrabenta"
+    }
+  ],
+  "NA": [
+    {
+      "id": "na-global-culture",
+      "title": "A barbecue stop called kapana",
+      "body": "Kapana is Namibian grilled meat, often beef, cooked over an open fire and served in small pieces with seasoning. It is a street-food tradition with a strong presence in markets. Learning the name gives you something specific to ask about beyond a generic recommendation for barbecue.",
+      "conversationStarter": "Where would you take a friend for good kapana?",
+      "sourceName": "Wikipedia · Kapana",
+      "sourceURL": "https://en.wikipedia.org/wiki/Kapana_(grilled_meat)"
+    }
+  ],
+  "NE": [
+    {
+      "id": "ne-global-culture",
+      "title": "Look for the moringa in dambou",
+      "body": "Dambou is associated with Zarma and Songhai communities in southwestern Niger. It combines steamed grain with moringa leaves, with the grain and accompaniments changing between cooks. It appears at everyday meals and festive gatherings, and related versions are also found across the border in northern Benin.",
+      "conversationStarter": "Which grain and accompaniments would you choose for dambou?",
+      "sourceName": "Wikipedia · Dambou",
+      "sourceURL": "https://en.wikipedia.org/wiki/Dambou"
+    }
+  ],
+  "NG": [
+    {
+      "id": "ng-global-culture",
+      "title": "The spice mix has a name: yaji",
+      "body": "Suya is grilled, thinly sliced meat associated with Hausa food traditions in northern Nigeria and enjoyed far beyond the region. Its yaji seasoning often includes chili, ginger, and ground peanut cake. Recipes vary, so the distinctive flavor is a good reason to ask someone about their favorite vendor.",
+      "conversationStarter": "Where is your favorite place for suya, and how spicy do you like it?",
+      "sourceName": "Wikipedia · Suya",
+      "sourceURL": "https://en.wikipedia.org/wiki/Suya"
+    }
+  ],
+  "NI": [
+    {
+      "id": "ni-global-culture",
+      "title": "Yesterday’s rice, today’s gallopinto",
+      "body": "Nicaraguan gallopinto combines rice and red beans, often with onion. Day-old rice is useful because the grains stay separate, and the dish can accompany meals throughout the day, including food from fritanga stalls. It is a shared Central American tradition with distinct local versions, not a recipe with just one owner.",
+      "conversationStarter": "What do you like alongside gallopinto?",
+      "sourceName": "Wikipedia · Gallo pinto",
+      "sourceURL": "https://en.wikipedia.org/wiki/Gallo_pinto"
+    }
+  ],
+  "NL": [
+    {
+      "id": "nl-global-culture",
+      "title": "Chocolate sprinkles can be breakfast",
+      "body": "Hagelslag are sprinkles used as a bread topping in the Netherlands, with chocolate versions especially familiar. They go onto buttered bread and can turn up at breakfast, lunch, or snack time. Think of them as one option among everyday bread toppings, rather than a dessert decoration reserved for cake.",
+      "conversationStarter": "Were you a hagelslag-on-bread person, or did you prefer something savory?",
+      "sourceName": "Wikipedia · Hagelslag",
+      "sourceURL": "https://en.wikipedia.org/wiki/Hagelslag"
+    }
+  ],
+  "NO": [
+    {
+      "id": "no-waffles",
+      "title": "A waffle can be a thank-you",
+      "body": "In Norway, waffles turn up well beyond dessert. A turvaffel is a hiking waffle, often eaten with sour cream and jam; waffles can also be a reward after dugnad, a shared volunteer effort. Brown cheese is another familiar topping, while Moss has its own sausage-in-a-waffle specialty.",
+      "conversationStarter": "Would you choose brown cheese, jam, or a sausage on a waffle?",
+      "sourceName": "Visit Norway · Wafflecation",
+      "sourceURL": "https://www.visitnorway.com/things-to-do/food-and-drink/wafflecation/"
+    }
+  ],
+  "NP": [
+    {
+      "id": "np-global-culture",
+      "title": "The dumpling is only half the story",
+      "body": "Momo are a familiar snack in Nepal, served steamed or fried. A hot, sour pickle can be just as important to the experience as the dumpling itself. Nepal Tourism Board also emphasizes that food varies by region and community, so one momo recommendation is an invitation to discover someone’s own favorites.",
+      "conversationStarter": "Do you have a favorite momo filling or dipping sauce?",
+      "sourceName": "Nepal Tourism Board · Cultural treasures",
+      "sourceURL": "https://trade.ntb.gov.np/wp-content/uploads/2023/04/cultural-treasures-of-nepal-inside.pdf"
+    }
+  ],
+  "NR": [
+    {
+      "id": "nr-global-culture",
+      "title": "Coconut is part of the savory table",
+      "body": "Nauruan cooking includes a traditional coconut-fish dish: raw fish, often tuna, served with coconut milk and seasonings. Coconut and pandanus also appear among the island’s food ingredients. It is a more useful starting point for a conversation than assuming that every Pacific island has exactly the same food traditions.",
+      "conversationStarter": "Is coconut fish a dish you grew up with, or is there another you would recommend?",
+      "sourceName": "Wikipedia · Nauruan cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Nauruan_cuisine"
+    }
+  ],
+  "NZ": [
+    {
+      "id": "nz-global-culture",
+      "title": "Dinner from an earth oven",
+      "body": "A Māori hāngī cooks food with heated stones in an earth oven. Meat, seafood, and vegetables such as kūmara can cook together for hours, with earth helping trap the heat. It is especially associated with gatherings and special occasions, rather than being a universal everyday meal in New Zealand.",
+      "conversationStarter": "Have you been part of preparing a hāngī? What was on the menu?",
+      "sourceName": "Tourism New Zealand · Māori foods",
+      "sourceURL": "https://www.newzealand.com/uk/feature/traditional-maori-foods/"
+    }
+  ],
+  "OM": [
+    {
+      "id": "om-coffee",
+      "title": "A small cup, a generous welcome.",
+      "body": "In Arabic coffee hospitality, a small shake of the cup can signal that you have finished. UNESCO documents this custom across the UAE, Saudi Arabia, Oman, Qatar and Jordan; practice varies between people and communities.",
+      "conversationStarter": "How do you like your coffee prepared, and when do you usually share it?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/arabic-coffee-a-symbol-of-generosity-02111"
+    }
+  ],
+  "PA": [
+    {
+      "id": "pa-global-culture",
+      "title": "This filled snack starts with cassava",
+      "body": "A Panamanian carimañola resembles a filled pastry, but its outer layer is made from yuca, or cassava, rather than ordinary wheat dough. Beef is one familiar filling. It is a small, specific introduction to a cuisine whose ingredients and techniques reflect several different communities.",
+      "conversationStarter": "Would you choose a carimañola or another snack for a first taste of Panama?",
+      "sourceName": "Wikipedia · Panamanian cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Panamanian_cuisine"
+    }
+  ],
+  "PE": [
+    {
+      "id": "pe-ceviche",
+      "title": "Ceviche has a local accent",
+      "body": "Peruvian ceviche pairs fish marinated in citrus with chili, salt, and locally grown accompaniments. The ingredients and preparation vary by region, and the dish belongs at everyday meals as well as celebrations. The useful question is which regional version someone knows best.",
+      "conversationStarter": "Which version of ceviche would you want someone to try first?",
+      "sourceName": "UNESCO · Ceviche",
+      "sourceURL": "https://ich.unesco.org/en/RL/practices-and-meanings-associated-with-the-preparation-and-consumption-of-ceviche-an-expression-of-peruvian-traditional-cuisine-01952"
+    }
+  ],
+  "PG": [
+    {
+      "id": "pg-global-culture",
+      "title": "Mumu names the oven and the meal",
+      "body": "In Papua New Guinea, mumu refers to cooking food with heated stones in an earth oven, and to the resulting meal. Parcels can include meat, sweet potato, taro, plantain, and greens. The ingredients vary by region, so it makes more sense to ask about someone’s local version than a single national recipe.",
+      "conversationStarter": "What would go into a mumu where your family is from?",
+      "sourceName": "Wikipedia · Papua New Guinean cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Papua_New_Guinean_cuisine"
+    }
+  ],
+  "PH": [
+    {
+      "id": "ph-global-culture",
+      "title": "There is a word for that snack break",
+      "body": "Meryenda in the Philippines can mean a light morning or afternoon meal. It might be sweet or savory: bread, pastries, street food, or even a smaller portion of noodles. An early-evening version called merienda cena can take the place of dinner. The category is broader than coffee and a biscuit.",
+      "conversationStarter": "What is your ideal meryenda?",
+      "sourceName": "Wikipedia · Merienda",
+      "sourceURL": "https://en.wikipedia.org/wiki/Merienda"
+    }
+  ],
+  "PK": [
+    {
+      "id": "pk-global-culture",
+      "title": "Look closely at the truck ahead",
+      "body": "Pakistani truck decoration can combine flowers, calligraphy, poetry, portraits, and carved or mirrored details. Owners customize vehicles as a form of expression, sometimes including reminders of home. The art extends to buses too, turning an ordinary road journey into a chance to spot individual styles.",
+      "conversationStarter": "Have you seen a truck design or painted phrase that stayed with you?",
+      "sourceName": "Wikipedia · Truck art",
+      "sourceURL": "https://en.wikipedia.org/wiki/Truck_art_in_South_Asia"
+    }
+  ],
+  "PL": [
+    {
+      "id": "pl-global-culture",
+      "title": "The doughnut day is Thursday",
+      "body": "In Poland, Tłusty Czwartek, or Fat Thursday, falls on the Thursday before Lent. Pączki, filled yeast doughnuts, are a signature treat, alongside crisp pastry twists called faworki. The calendar detail matters: the comparable doughnut celebration in some Polish communities abroad happens on Tuesday instead.",
+      "conversationStarter": "Which pączki filling would you choose on Fat Thursday?",
+      "sourceName": "Wikipedia · Fat Thursday",
+      "sourceURL": "https://en.wikipedia.org/wiki/Fat_Thursday"
+    }
+  ],
+  "PS": [
+    {
+      "id": "ps-dabkeh",
+      "title": "The celebration moves together.",
+      "body": "Dabkeh is a Palestinian group dance accompanied by singing and wind instruments. It brings people together at weddings, graduations and festivals, with steps passed on through participation as well as schools and dance groups.",
+      "conversationStarter": "Have you learned dabkeh from family, friends or a dance group?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/dabkeh-traditional-dance-in-palestine-01998"
+    }
+  ],
+  "PT": [
+    {
+      "id": "pt-fado",
+      "title": "Listen for the twelve strings",
+      "body": "In Lisbon fado, a solo voice is traditionally accompanied by an acoustic guitar and a Portuguese guitarra, a pear-shaped instrument with twelve wire strings. You can encounter the music in small fado houses as well as concert halls. Recognizing that distinctive instrument gives you a detail to listen for.",
+      "conversationStarter": "Is there a fado singer or performance you would recommend?",
+      "sourceName": "UNESCO · Fado",
+      "sourceURL": "https://ich.unesco.org/en/RL/fado-urban-popular-song-of-portugal-00563"
+    }
+  ],
+  "PW": [
+    {
+      "id": "pw-global-culture",
+      "title": "Taro is more than the root",
+      "body": "Taro is an important part of Palauan food and cultivation traditions. One dish to know is demok, a soup that combines taro leaves with coconut milk and land crab. The leaf is the useful detail: a taro conversation does not have to stop at the starchy root.",
+      "conversationStarter": "Have you tried demok, or is there another taro dish you would recommend?",
+      "sourceName": "Palau Visitors Authority · Alii Palau",
+      "sourceURL": "https://pristineparadisepalau.com/wp-content/uploads/2018/11/Alii-Palau-English.pdf"
+    }
+  ],
+  "PY": [
+    {
+      "id": "py-terere",
+      "title": "A cold drink made for sharing",
+      "body": "Tereré brings yerba mate together with cold water and, in the pohã ñana tradition, prepared herbs. In Paraguay, sharing it is a social practice as much as a drink: the preparation and knowledge are passed between generations. Ask about a favorite version rather than assuming every household makes it the same way.",
+      "conversationStarter": "What goes into your favorite tereré?",
+      "sourceName": "UNESCO · Tereré",
+      "sourceURL": "https://ich.unesco.org/en/RL/practices-and-traditional-knowledge-of-terere-in-the-culture-of-poha-nana-guarani-ancestral-drink-in-paraguay-01603"
+    }
+  ],
+  "QA": [
+    {
+      "id": "qa-coffee",
+      "title": "A small cup, a generous welcome.",
+      "body": "In Arabic coffee hospitality, a small shake of the cup can signal that you have finished. UNESCO documents this custom across the UAE, Saudi Arabia, Oman, Qatar and Jordan; practice varies between people and communities.",
+      "conversationStarter": "How do you like your coffee prepared, and when do you usually share it?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/arabic-coffee-a-symbol-of-generosity-02111"
+    }
+  ],
+  "RO": [
+    {
+      "id": "ro-global-culture",
+      "title": "Spring arrives on a red-and-white thread",
+      "body": "Romania’s Mărțișor tradition welcomes spring with red-and-white threads that are made, offered, and worn. Related customs exist in neighboring countries, with local variations in how and when the thread is removed. It is a small object that can carry a personal gift-giving story.",
+      "conversationStarter": "Did you exchange mărțișoare growing up? What kinds did you like?",
+      "sourceName": "UNESCO · First of March traditions",
+      "sourceURL": "https://ich.unesco.org/en/RL/cultural-practices-associated-to-the-1st-of-march-01287"
+    }
+  ],
+  "RS": [
+    {
+      "id": "rs-global-culture",
+      "title": "A family’s own celebration day",
+      "body": "Slava is a patron-saint celebration observed by Orthodox Christian families in Serbia. Relatives, neighbors, and friends gather for a feast, with a candle and specially prepared bread among its ritual elements. It is a family tradition within a diverse country, so ask whether someone celebrates it instead of assuming they do.",
+      "conversationStarter": "Does your family celebrate a slava, and what makes the gathering special?",
+      "sourceName": "UNESCO · Slava",
+      "sourceURL": "https://ich.unesco.org/en/RL/slava-celebration-of-family-saint-patrons-day-01010"
+    }
+  ],
+  "RU": [
+    {
+      "id": "ru-global-culture",
+      "title": "A blin may be bigger than you expect",
+      "body": "The small canapé-sized blini familiar abroad are only one version. In modern Russian usage, blini commonly means thin, pan-sized pancakes, with sweet or savory accompaniments. They are especially associated with Maslenitsa, but someone’s favorite filling can be a much more everyday conversation starter than a festival lesson.",
+      "conversationStarter": "What would you put inside or on a blin?",
+      "sourceName": "Wikipedia · Blini",
+      "sourceURL": "https://en.wikipedia.org/wiki/Blini"
+    }
+  ],
+  "RW": [
+    {
+      "id": "rw-global-culture",
+      "title": "An evening can start with brochettes",
+      "body": "Brochettes are a familiar option for an evening meal out in Rwanda: skewers of grilled meat, often goat, though other versions exist. Grilled bananas can accompany them. Knowing the local food conversation includes brochettes gives you a specific way to ask about a favorite neighborhood spot.",
+      "conversationStarter": "Where would you take someone for brochettes, and what would you order with them?",
+      "sourceName": "Wikipedia · Culture of Rwanda",
+      "sourceURL": "https://en.wikipedia.org/wiki/Culture_of_Rwanda"
+    }
+  ],
+  "SA": [
+    {
+      "id": "sa-coffee",
+      "title": "A small cup, a generous welcome.",
+      "body": "In Arabic coffee hospitality, a small shake of the cup can signal that you have finished. UNESCO documents this custom across the UAE, Saudi Arabia, Oman, Qatar and Jordan; practice varies between people and communities.",
+      "conversationStarter": "How do you like your coffee prepared, and when do you usually share it?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/arabic-coffee-a-symbol-of-generosity-02111"
+    }
+  ],
+  "SB": [
+    {
+      "id": "sb-global-culture",
+      "title": "Panpipes do not always form a straight row",
+      "body": "Bamboo panpipes are part of the Solomon Islands’ varied musical traditions, especially on Malaita. They can be bound in a flat raft or arranged in a circular bundle. Group and solo singing, slit drums, and panpipe ensembles offer several starting points for exploring the islands’ sounds.",
+      "conversationStarter": "Have you heard a Solomon Islands panpipe group you would recommend?",
+      "sourceName": "Tourism Solomons · Music and art",
+      "sourceURL": "https://www.visitsolomons.com.sb/about-the-solomon/music-art/"
+    }
+  ],
+  "SC": [
+    {
+      "id": "sc-global-culture",
+      "title": "The performance starts by warming the drums",
+      "body": "In Seychelles’ moutya tradition, drums are warmed near a fire before the dancing begins. Drumming, call-and-response singing, and movement work together, with lyrics that can include social commentary. It is a living performance tradition at community and cultural gatherings, not simply background music for visitors.",
+      "conversationStarter": "Is there a moutya performance you would recommend listening to or watching?",
+      "sourceName": "UNESCO · Moutya",
+      "sourceURL": "https://ich.unesco.org/en/RL/moutya-01690"
+    }
+  ],
+  "SD": [
+    {
+      "id": "sd-global-culture",
+      "title": "A bean breakfast with room for toppings",
+      "body": "Ful is a familiar breakfast dish in Sudan and neighboring countries, made by cooking fava beans until soft and crushing them into a coarse mixture. Tomatoes, onions, peppers, and other toppings can change the plate, with bread alongside. Ask about the additions rather than expecting one fixed recipe.",
+      "conversationStarter": "What toppings do you like on ful?",
+      "sourceName": "Wikipedia · Shahan ful",
+      "sourceURL": "https://en.wikipedia.org/wiki/Shahan_ful"
+    }
+  ],
+  "SE": [
+    {
+      "id": "se-global-culture",
+      "title": "The break matters as much as the coffee",
+      "body": "Fika is a Swedish coffee break with a social dimension, often accompanied by something sweet. It can happen at work, at home, outdoors, or in a café. The word works as both a noun and a verb, and the useful invitation is to make time for the person, not just order a drink.",
+      "conversationStarter": "What would you choose for fika: a cinnamon bun or something else?",
+      "sourceName": "Visit Sweden · Fika",
+      "sourceURL": "https://visitsweden.com/what-to-do/food-drink/swedish-kitchen/all-about-swedish-fika/"
+    }
+  ],
+  "SG": [
+    {
+      "id": "sg-global-culture",
+      "title": "The stall can be someone’s specialty",
+      "body": "Singapore’s hawker centres bring many food stalls into a shared dining space. Some cooks specialize in a single dish and refine it over years, while the food reflects Chinese, Malay, Indian, and other influences. Asking for a particular stall can lead to a much more personal answer than asking for one national dish.",
+      "conversationStarter": "Which hawker stall would be your first stop after coming home?",
+      "sourceName": "UNESCO · Hawker culture",
+      "sourceURL": "https://ich.unesco.org/en/rl/hawker-culture-in-singapore-community-dining-and-culinary-practices-in-a-multicultural-urban-context-01568"
+    }
+  ],
+  "SI": [
+    {
+      "id": "si-global-culture",
+      "title": "The filling might be tarragon",
+      "body": "Potica is a Slovenian rolled yeast-dough pastry with a spiral of filling. Walnuts are familiar, but hazelnut, poppy seed, cheese, and even tarragon also belong in the conversation. It is associated with holidays and family baking, and the balance between dough and filling is part of the baker’s craft.",
+      "conversationStarter": "What is your favorite potica filling: walnut, tarragon, or something else?",
+      "sourceName": "Slovenian Tourist Board · Potica",
+      "sourceURL": "https://www.slovenia.info/en/stories/potica-the-delicious-queen-of-festive-dishes"
+    }
+  ],
+  "SK": [
+    {
+      "id": "sk-global-culture",
+      "title": "The cheese is the clue",
+      "body": "Bryndzové halušky pairs small potato dumplings with bryndza, a distinctive sheep’s-milk cheese, and often fried bacon. It is one of Slovakia’s best-known comfort dishes. Remembering bryndza gives you more than just the name of a dumpling: it identifies the ingredient that makes this version distinctive.",
+      "conversationStarter": "Where would you go for bryndzové halušky?",
+      "sourceName": "Slovakia Travel · Cuisine",
+      "sourceURL": "https://slovakia.travel/en/practical-information"
+    }
+  ],
+  "SL": [
+    {
+      "id": "sl-global-culture",
+      "title": "Cassava leaves have their own place at the table",
+      "body": "In Sierra Leonean cooking, cassava is more than a root crop: its leaves are pounded or finely prepared and cooked into a green stew. Versions can include palm oil, onion, pepper, fish, or meat, often with rice alongside. Asking about a household’s version leaves room for the details that make it personal.",
+      "conversationStarter": "What goes into your favorite cassava-leaf stew?",
+      "sourceName": "Wikipedia · Sierra Leonean cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Sierra_Leonean_cuisine"
+    }
+  ],
+  "SM": [
+    {
+      "id": "sm-global-culture",
+      "title": "A cake built from wafers",
+      "body": "San Marino’s Torta Tre Monti is a layered wafer cake, with chocolate or hazelnut cream and a chocolate finish. Its name refers to the country’s three towers. You can find full cakes and smaller snack versions, making it a food detail that also gives the skyline a familiar name.",
+      "conversationStarter": "Have you tried Torta Tre Monti with a coffee?",
+      "sourceName": "Wikipedia · Torta Tre Monti",
+      "sourceURL": "https://en.wikipedia.org/wiki/Torta_Tre_Monti"
+    }
+  ],
+  "SN": [
+    {
+      "id": "sn-ceebujen",
+      "title": "One dish, many family versions.",
+      "body": "Ceebu jën is a Senegalese rice-and-fish dish whose ingredients change from region to region. Broken rice, fish and seasonal vegetables are central to the preparation documented by UNESCO. Family recipes carry their own knowledge and preferences.",
+      "conversationStarter": "What makes a really good ceebu jën for you?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/ceebu-jen-a-culinary-art-of-senegal-01748"
+    }
+  ],
+  "SO": [
+    {
+      "id": "so-global-culture",
+      "title": "Breakfast can begin with canjeero",
+      "body": "Canjeero, also called laxoox, is a pancake-like bread in Somali cooking. It can be eaten with honey and ghee, broken into pieces with other toppings, or paired with something savory. Shaah, tea that may be flavored with spices such as cardamom and ginger, is another familiar breakfast companion.",
+      "conversationStarter": "Do you prefer canjeero with something sweet or savory?",
+      "sourceName": "Wikipedia · Somali cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Somali_cuisine"
+    }
+  ],
+  "SR": [
+    {
+      "id": "sr-global-culture",
+      "title": "Pom can move from a celebration to a sandwich",
+      "body": "Surinamese pom layers grated pomtajer with ingredients including chicken and citrus, then bakes into a rich oven dish. It is associated with festive meals, and a bread roll filled with pom is another familiar form, especially in the Surinamese diaspora in the Netherlands. The same dish can tell very different meal-time stories.",
+      "conversationStarter": "Would you rather have pom at a celebration or in a broodje pom?",
+      "sourceName": "Wikipedia · Pom",
+      "sourceURL": "https://en.wikipedia.org/wiki/Pom_(dish)"
+    }
+  ],
+  "SS": [
+    {
+      "id": "ss-global-culture",
+      "title": "Sorghum can become bread or porridge",
+      "body": "South Sudanese cooking includes kisra, a sorghum-based pancake or flatbread, and aseeda, a thicker sorghum porridge. That contrast is a useful way to notice how the same grain takes different forms at a meal. The country has many food traditions, so a local pairing is worth asking about.",
+      "conversationStarter": "Would you choose kisra or aseeda, and what would you serve with it?",
+      "sourceName": "Wikipedia · South Sudanese cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/South_Sudanese_cuisine"
+    }
+  ],
+  "ST": [
+    {
+      "id": "st-global-culture",
+      "title": "The audience has a role in the trial",
+      "body": "Tchiloli in São Tomé and Príncipe is open-air theatre with music and an actively responding audience. Its central story puts an emperor’s son on trial, making justice and equality part of the performance. Drums, flutes, and maracas help mark scenes, and spectators can become part of the action.",
+      "conversationStarter": "Have you watched tchiloli? What stood out about the audience’s part in it?",
+      "sourceName": "UNESCO · Tchiloli",
+      "sourceURL": "https://ich.unesco.org/en/RL/tchiloli-living-theatre-of-sao-tome-and-principe-in-the-quest-of-justice-02309"
+    }
+  ],
+  "SV": [
+    {
+      "id": "sv-everyday",
+      "title": "A filled griddle cake and its sidekick.",
+      "body": "Salvadoran pupusas are thick griddle cakes with fillings such as cheese, beans or pork. Curtido, a tangy cabbage accompaniment, is part of the familiar serving combination.",
+      "conversationStarter": "What is your favorite pupusa filling?",
+      "sourceName": "Wikipedia · Pupusa",
+      "sourceURL": "https://en.wikipedia.org/wiki/Pupusa"
+    }
+  ],
+  "SY": [
+    {
+      "id": "sy-global-culture",
+      "title": "The melody stays; the words can move",
+      "body": "Al-Qudoud al-Halabiya is a music tradition associated with Aleppo. Singers work with established melodies, while lyrics can change with the occasion and skilled performers may improvise. The audience helps shape the performance; an especially moving passage can create the emotional state called tarab.",
+      "conversationStarter": "Is there an Aleppan singer or qudoud performance you would suggest listening to?",
+      "sourceName": "UNESCO · Al-Qudoud al-Halabiya",
+      "sourceURL": "https://ich.unesco.org/en/RL/al-qudoud-al-halabiya-01578"
+    }
+  ],
+  "SZ": [
+    {
+      "id": "sz-everyday",
+      "title": "Pumpkin can go into the porridge.",
+      "body": "Sidvudvu is a Swazi preparation of pumpkin with cornmeal. It sits alongside other maize and sorghum dishes in Eswatini’s food traditions, showing how a familiar staple changes with an added ingredient.",
+      "conversationStarter": "Is there a particular porridge or maize dish you grew up with?",
+      "sourceName": "Wikipedia · Cuisine of Eswatini",
+      "sourceURL": "https://en.wikipedia.org/wiki/Cuisine_of_Eswatini"
+    }
+  ],
+  "TD": [
+    {
+      "id": "td-everyday",
+      "title": "A red drink with a spice cabinet.",
+      "body": "Karkanji, also called carcaje, is a Chadian hibiscus drink that can be flavored with ginger, cloves or cinnamon. The combination offers a specific thing to ask about when the conversation turns to tea.",
+      "conversationStarter": "Which spices do you like in karkanji?",
+      "sourceName": "Wikipedia · Chadian cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Chadian_cuisine"
+    }
+  ],
+  "TG": [
+    {
+      "id": "tg-global-culture",
+      "title": "The sauce completes the fufu",
+      "body": "In Togolese cooking, fufu can begin with boiled yam pounded until it becomes a smooth, elastic dough. It is served with a sauce, making the accompaniment part of the dish’s character. Fufu has many versions across West Africa; asking about a favorite sauce leaves room for that variety.",
+      "conversationStarter": "Which sauce would you recommend with Togolese fufu?",
+      "sourceName": "Wikipedia · Togolese cuisine",
+      "sourceURL": "https://en.wikipedia.org/wiki/Togolese_cuisine"
+    }
+  ],
+  "TH": [
+    {
+      "id": "th-global-culture",
+      "title": "Sticky rice has a sweet side",
+      "body": "Khao niao mamuang pairs ripe mango with sticky rice enriched with coconut milk. That sweet preparation is different from the plain sticky rice eaten as an everyday staple in northern and northeastern Thailand. Knowing the distinction opens a better conversation than assuming that sticky rice always means dessert.",
+      "conversationStarter": "Do you prefer sticky rice with mango, or alongside a savory meal?",
+      "sourceName": "Wikipedia · Mango sticky rice",
+      "sourceURL": "https://en.wikipedia.org/wiki/Mango_sticky_rice"
+    }
+  ],
+  "TJ": [
+    {
+      "id": "tj-oshi-palav",
+      "title": "A cooking lesson ends with a skimmer",
+      "body": "Oshi palav is a rice, meat, vegetable, and spice dish shared at meals and gatherings in Tajikistan. UNESCO describes a lovely apprenticeship custom: a cook who has mastered it hosts a meal for the teacher, receives a cooking skimmer, and gives the teacher traditional clothing. It is a skill with a social ceremony attached.",
+      "conversationStarter": "Who taught you, or someone in your family, to make oshi palav?",
+      "sourceName": "UNESCO · Oshi palav",
+      "sourceURL": "https://ich.unesco.org/en/RL/osh-palav-a-traditional-meal-and-its-social-and-cultural-contexts-in-tajikistan-01191"
+    }
+  ],
+  "TL": [
+    {
+      "id": "tl-global-culture",
+      "title": "A textile can carry a family connection",
+      "body": "Tais is a handwoven cotton textile whose colors and patterns vary among communities in Timor-Leste. It is worn at celebrations, exchanged as a gift, and used to welcome newborns. A piece can express a connection to family or place, so asking about its pattern is more revealing than treating it only as a souvenir.",
+      "conversationStarter": "Is there a tais pattern or color connected with your family’s region?",
+      "sourceName": "UNESCO · Tais, traditional textile",
+      "sourceURL": "https://ich.unesco.org/en/USL/tais-traditional-textile-01688"
+    }
+  ],
+  "TM": [
+    {
+      "id": "tm-global-culture",
+      "title": "Two strings, two kinds of wood",
+      "body": "The Turkmen dutar is a long-necked, two-stringed lute. Traditional makers use mulberry for its body and soundboard and apricot wood for its neck. Its music can stand alone or accompany a singer called a bagshy, making the instrument a useful starting point for exploring Turkmen performances.",
+      "conversationStarter": "Is there a dutar player or bagshy performance you would recommend?",
+      "sourceName": "UNESCO · Dutar craftsmanship and performance",
+      "sourceURL": "https://ich.unesco.org/en/RL/dutar-making-craftsmanship-and-traditional-music-performing-art-combined-with-singing-01565"
+    }
+  ],
+  "TN": [
+    {
+      "id": "tn-harissa",
+      "title": "A pantry staple with a personal recipe.",
+      "body": "Harissa is part of everyday Tunisian cooking. UNESCO’s documented preparation starts with sun-dried red peppers, then adds garlic, salt and coriander before grinding. Making it can also be a shared family or neighborhood occasion.",
+      "conversationStarter": "What do you most like to eat with harissa?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/harissa-knowledge-skills-and-culinary-and-social-practices-01710"
+    }
+  ],
+  "TO": [
+    {
+      "id": "to-global-culture",
+      "title": "Lū names both a leaf and a meal",
+      "body": "In Tongan, lū refers to edible taro leaves and to a dish prepared with them. Lū pulu wraps beef, often corned beef, with onions and coconut milk inside the leaves before cooking. It is one of several lū variations, so the word after lū gives a useful clue to the filling.",
+      "conversationStarter": "Which lū filling would you suggest trying first?",
+      "sourceName": "Wikipedia · Taro in Tonga",
+      "sourceURL": "https://en.wikipedia.org/wiki/Taro#Tonga"
+    }
+  ],
+  "TR": [
+    {
+      "id": "tr-coffee",
+      "title": "The conversation outlasts the coffee.",
+      "body": "Turkish coffee is slowly brewed from finely ground beans and served in small cups with water. The grounds left behind can become part of a playful fortune-reading tradition, while the invitation itself makes space for a long conversation.",
+      "conversationStarter": "Do you have a favorite place for Turkish coffee, or do you make it at home?",
+      "sourceName": "UNESCO · Living heritage",
+      "sourceURL": "https://ich.unesco.org/en/RL/turkish-coffee-culture-and-tradition-00645"
+    }
+  ],
+  "TT": [
+    {
+      "id": "tt-global-culture",
+      "title": "Two bara, one doubles",
+      "body": "A Trinidadian doubles starts with two overlapping pieces of fried bread called bara, topped with curried chickpeas, or channa. The finishing touches matter: tamarind sauce, chadon beni, cucumber, and pepper sauce offer different combinations. Asking how someone orders theirs is a small way into a much bigger food conversation.",
+      "conversationStarter": "What toppings and level of pepper make your ideal doubles?",
+      "sourceName": "Visit Trinidad · Street food favourites",
+      "sourceURL": "https://visittrinidad.tt/blog/street-food-favourites-how-to-make-trini-doubles/"
+    }
+  ],
+  "TV": [
+    {
+      "id": "tv-global-culture",
+      "title": "The song gathers speed",
+      "body": "Tuvalu’s fatele brings singing, dancing, and percussion together at community celebrations. A performance can build gradually, becoming louder and faster as more voices join in. Wooden boxes and other everyday objects can supply the rhythm, so listening for that rising energy reveals more than treating it as a fixed dance routine.",
+      "conversationStarter": "Have you seen a fatele performance where the whole gathering joined in?",
+      "sourceName": "Wikipedia · Fatele",
+      "sourceURL": "https://en.wikipedia.org/wiki/Fatele"
+    }
+  ],
+  "TZ": [
+    {
+      "id": "tz-global-culture",
+      "title": "The fries go inside the omelette",
+      "body": "Chipsi mayai combines two familiar foods in one pan: French fries and beaten eggs cooked into an omelette. The Swahili name means chips and eggs. In Tanzania, accompaniments such as kachumbari salad or pili-pili hot sauce can turn this street-food dish into a very personal order.",
+      "conversationStarter": "What would you add to chipsi mayai: kachumbari, hot sauce, or something else?",
+      "sourceName": "Wikipedia · Chipsi mayai",
+      "sourceURL": "https://en.wikipedia.org/wiki/Chipsi_mayai"
+    }
+  ],
+  "UA": [
+    {
+      "id": "ua-global-culture",
+      "title": "Borscht has a family signature",
+      "body": "Ukrainian borscht is a beet-based soup with many local and household variations. Preparing and sharing it is part of family and community life, and it may come with bread or garlic buns. The interesting detail is often someone’s own version, rather than a single recipe claimed to represent everyone.",
+      "conversationStarter": "What makes your family’s or favorite cook’s borscht distinctive?",
+      "sourceName": "UNESCO · Culture of Ukrainian borscht cooking",
+      "sourceURL": "https://ich.unesco.org/en/USL/culture-of-ukrainian-borscht-cooking-01852"
+    }
+  ],
+  "UG": [
+    {
+      "id": "ug-global-culture",
+      "title": "This rolex is something you eat",
+      "body": "In Uganda, a rolex is an omelette with vegetables rolled inside a chapati. The name comes from rolled eggs, rather than the watch brand. It is a portable street-food meal, and the vegetables or other additions give each version its own character.",
+      "conversationStarter": "What would go inside your favorite rolex?",
+      "sourceName": "Wikipedia · Rolex food",
+      "sourceURL": "https://en.wikipedia.org/wiki/Rolex_(food)"
+    }
+  ],
+  "US": [
+    {
+      "id": "us-global-culture",
+      "title": "The invitation can include a dish",
+      "body": "At a potluck, guests each bring a prepared dish to a shared meal. American homes and community groups use the format for gatherings where the menu emerges from everyone’s contributions. You may also hear names such as covered-dish supper or pitch-in, depending on the community.",
+      "conversationStarter": "What is your go-to dish to bring to a potluck?",
+      "sourceName": "Wikipedia · Potluck",
+      "sourceURL": "https://en.wikipedia.org/wiki/Potluck"
+    }
+  ],
+  "UY": [
+    {
+      "id": "uy-global-culture",
+      "title": "Here, the piano is a drum",
+      "body": "In Uruguayan candombe, piano names the largest, deepest-sounding drum. In Montevideo’s Afro-Uruguayan communities, its rhythms can distinguish one neighborhood’s style from another. Candombe is a shared musical and social practice, so a recommendation from someone who knows it can lead you beyond a single parade performance.",
+      "conversationStarter": "Is there a candombe group or neighborhood rhythm you would recommend listening to?",
+      "sourceName": "UNESCO · Candombe and its social space",
+      "sourceURL": "https://ich.unesco.org/en/RL/candombe-and-its-socio-cultural-space-a-community-practice-00182"
+    }
+  ],
+  "UZ": [
+    {
+      "id": "uz-palov",
+      "title": "An invitation can arrive as a plate of palov",
+      "body": "In Uzbekistan, palov combines rice with ingredients such as meat, vegetables, and spices. It can be an ordinary meal, a wedding dish, or a way to welcome guests and support neighbors. Recipes and techniques travel through families and cooking apprenticeships, so asking about a particular cook is a good place to start.",
+      "conversationStarter": "Whose palov would you most want me to try?",
+      "sourceName": "UNESCO · Palov",
+      "sourceURL": "https://ich.unesco.org/en/RL/palov-culture-and-tradition-01166"
+    }
+  ],
+  "VA": [
+    {
+      "id": "va-global-culture",
+      "title": "The Sunday prayer changes at Easter",
+      "body": "The Angelus is associated with the Pope’s Sunday midday gathering and reflection, often seen from St Peter’s Square. During the Easter season, from Easter to Pentecost, the Regina Coeli takes its place. That small calendar detail helps explain why a familiar Vatican gathering can sound different at different times of year.",
+      "conversationStarter": "Have you watched the Sunday gathering in St Peter’s Square, in person or online?",
+      "sourceName": "Vatican News · Angelus explained",
+      "sourceURL": "https://www.vaticannews.va/en/pope/news/2026-06/pope-leo-xiv-angelus-prayer-god-grace-forgiveness.html"
+    }
+  ],
+  "VC": [
+    {
+      "id": "vc-global-culture",
+      "title": "Breadfruit belongs beside the fish",
+      "body": "Roasted breadfruit with fried jackfish is a signature pairing in Saint Vincent and the Grenadines. Breadfruit is starchy, and its cooked texture can suggest bread or potato rather than a sweet fruit dessert. The useful question is how someone likes it cooked, since it can also be boiled or fried.",
+      "conversationStarter": "Do you prefer your breadfruit roasted, boiled, or fried?",
+      "sourceName": "Wikipedia · Breadfruit",
+      "sourceURL": "https://en.wikipedia.org/wiki/Breadfruit"
+    }
+  ],
+  "VE": [
+    {
+      "id": "ve-global-culture",
+      "title": "Not every arepa is made from corn",
+      "body": "Venezuelan arepas are often corn-based rounds split open for fillings such as cheese, meat, or avocado. But in the Venezuelan Andes, arepas de trigo use wheat flour. The regional variation is a reminder that even a familiar food name can lead to something different from one place to another.",
+      "conversationStarter": "Have you tried an Andean wheat arepa, and what would you put in it?",
+      "sourceName": "Wikipedia · Arepa",
+      "sourceURL": "https://en.wikipedia.org/wiki/Arepa"
+    }
+  ],
+  "VN": [
+    {
+      "id": "vn-global-culture",
+      "title": "A coffee with a spoon-worthy top",
+      "body": "Hanoi’s cà phê trứng, or egg coffee, puts a thick, creamy egg-yolk foam over strong coffee. The topping is part of the pleasure: it can be gently mixed into the drink or enjoyed by the spoonful. It is a Hanoi specialty within a much wider Vietnamese coffee culture.",
+      "conversationStarter": "Would you start with egg coffee, coconut coffee, or a traditional condensed-milk coffee?",
+      "sourceName": "Vietnam Tourism · Five Vietnamese coffees",
+      "sourceURL": "https://vietnam.travel/things-to-do/5-fantastic-vietnamese-coffees"
+    }
+  ],
+  "VU": [
+    {
+      "id": "vu-global-culture",
+      "title": "One line can tell a story",
+      "body": "In parts of central and northern Vanuatu, sand drawing uses a finger to trace a continuous line across a pattern on sand, ash, or clay. The drawings can carry stories, practical knowledge, and messages. Their meaning matters as much as the finished shape, making the accompanying explanation part of the experience.",
+      "conversationStarter": "Is there a story behind a sand drawing that has stayed with you?",
+      "sourceName": "UNESCO · Vanuatu sand drawings",
+      "sourceURL": "https://ich.unesco.org/en/RL/vanuatu-sand-drawings-00073"
+    }
+  ],
+  "WS": [
+    {
+      "id": "ws-global-culture",
+      "title": "An earth oven can sit above the ground",
+      "body": "The Samoan umu uses hot stones, with food laid on top and covered with leaves to hold the heat. Unlike the dug pit you might picture, this version is traditionally above ground. A meal can bring together fish, meat, taro, bananas, and coconut cream in the same cooking space.",
+      "conversationStarter": "Have you helped prepare an umu? Which part of the meal is your favorite?",
+      "sourceName": "Samoa Tourism Authority · Food and cuisine",
+      "sourceURL": "https://www.samoa.travel/discover/our-food-and-cuisine/"
+    }
+  ],
+  "YE": [
+    {
+      "id": "ye-global-culture",
+      "title": "A copper tray can carry the rhythm",
+      "body": "In the Song of Sana’a tradition, a singer may be accompanied by a qanbus lute and a sahn nuhasi: a copper tray balanced on the thumbs and tapped with the other fingers. The repertoire is associated with social gatherings and wedding evenings, and its poetry draws on different Yemeni dialects.",
+      "conversationStarter": "Have you heard a performance with the copper tray? Which Yemeni music would you start with?",
+      "sourceName": "UNESCO · Song of Sana’a",
+      "sourceURL": "https://ich.unesco.org/en/RL/baul-songs-00077"
+    }
+  ],
+  "ZA": [
+    {
+      "id": "za-global-culture",
+      "title": "A bunny without the rabbit",
+      "body": "Durban’s bunny chow is curry served inside a hollowed-out portion of a white bread loaf. The dish is associated with the city’s Indian South African food traditions, and bean, chicken, and mutton versions are among the options. The bread is both container and part of the meal.",
+      "conversationStarter": "Which curry would you choose for a bunny chow?",
+      "sourceName": "South African Tourism · Durban cuisine",
+      "sourceURL": "https://www.southafrica.net/cd/en/travel/article/all-you-need-to-know-about-durban-indian-cuisine"
+    }
+  ],
+  "ZM": [
+    {
+      "id": "zm-global-culture",
+      "title": "The staple doubles as a scoop",
+      "body": "Nshima is a thick white-cornmeal staple in Zambia, served alongside relishes, beans, meat, or other accompaniments. Small portions can be shaped by hand to scoop up what is served beside it. The accompaniment is a useful conversation starter because it changes the character of the meal.",
+      "conversationStarter": "What relish would you choose with nshima?",
+      "sourceName": "Zambia Tourism · Food and more",
+      "sourceURL": "https://www.zambiatourism.com/what-to-see-during-your-holidays-in-zambia/"
+    }
+  ],
+  "ZW": [
+    {
+      "id": "zw-global-culture",
+      "title": "The melody changes as it comes around",
+      "body": "The mbira’s metal keys are plucked with thumbs and fingers, sometimes with the instrument set inside a resonator. In traditions shared by Zimbabwe and Malawi, interwoven melodies repeat with small variations. Listening for those changes can make a seemingly repeating phrase feel like an unfolding conversation.",
+      "conversationStarter": "Is there a mbira recording or performer you would recommend for a first listen?",
+      "sourceName": "UNESCO · Mbira and Sansi music",
+      "sourceURL": "https://ich.unesco.org/en/RL/art-of-crafting-and-playing-mbirasanza-01541"
+    }
+  ]
+}
