@@ -1,0 +1,39 @@
+/* Shared reading layout for public privacy, safety, and support pages. */
+.care-layout{display:grid;grid-template-columns:190px minmax(0,720px);column-gap:70px;justify-content:center;padding-top:64px;padding-bottom:110px}
+.care-intro{grid-column:1/-1;max-width:820px;padding-bottom:62px}
+.care-intro .eyebrow{margin-bottom:22px;color:var(--muted)}
+.care-intro h1{font-size:clamp(48px,6vw,76px);line-height:1.08;max-width:850px}
+.care-deck{font-size:18px;color:var(--muted);max-width:620px;margin-top:24px}
+.care-date{font-size:12px;color:var(--muted);margin-top:18px}
+.care-nav{align-self:start;position:sticky;top:28px;display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--line);padding-top:14px}
+.care-nav a{font-size:13px;padding:12px 0;text-decoration:none;color:var(--muted)}
+.care-nav a:hover,.care-nav a[aria-current=page]{color:var(--ink);text-decoration:underline;text-underline-offset:6px}
+.care-nav a[aria-current=page]{font-weight:650}
+.care-content{min-width:0;font-size:15px;line-height:1.75;overflow-wrap:anywhere}
+.care-content section+section{margin-top:46px;padding-top:34px;border-top:1px solid var(--line)}
+.care-content h2{font-size:33px;letter-spacing:-.035em;line-height:1.2;margin-bottom:18px}
+.care-content p+p,.care-content ul+p,.care-content ol+p{margin-top:16px}
+.care-content strong{font-weight:600}
+.care-content ul,.care-content ol{padding-left:22px;margin-block:16px}
+.care-content li+li{margin-top:12px}
+.care-summary{padding:28px 30px;background:#e9eee4;border:1px solid var(--line);border-radius:20px;margin-bottom:42px;font-size:14px}
+.care-summary p+p{margin-top:14px}
+.care-summary strong{display:block;margin-bottom:2px}
+.care-table-wrap{margin-block:22px;overflow-x:auto}
+.care-content table{border-collapse:collapse;width:100%;text-align:left;font-size:13px}
+.care-content caption{text-align:left;color:var(--muted);font-size:12px;margin-bottom:14px}
+.care-content th,.care-content td{border-bottom:1px solid var(--line);padding:16px 15px 16px 0;vertical-align:top;line-height:1.65}
+.care-content th{font-weight:600}.care-content thead th{font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.care-content tbody th{width:34%}
+.care-content .contact-address{font-size:clamp(18px,3vw,26px);margin-block:22px;letter-spacing:-.025em}
+.care-content details{border-bottom:1px solid var(--line);padding-block:17px}
+.care-content summary{cursor:pointer;font-weight:550;padding-block:7px;line-height:1.5}
+.care-content summary:focus-visible{outline:3px solid var(--accent);outline-offset:5px;border-radius:4px}
+.care-content details p{margin-top:12px;color:var(--muted)}
+.care-steps li{padding-left:5px}
+.care-footer{flex-wrap:wrap;align-items:center;gap:14px 28px}
+.care-footer nav{display:flex;flex-wrap:wrap;gap:8px 22px;justify-content:center;font-size:12px}
+.care-footer nav a{min-height:44px;display:inline-flex;align-items:center}
+@media(max-width:1020px){.care-layout{column-gap:40px;grid-template-columns:160px minmax(0,1fr)}}
+@media(max-width:740px){.care-layout{display:block;padding-top:35px;padding-bottom:65px}.care-intro{padding-bottom:32px}.care-intro .eyebrow{font-size:9px;margin-bottom:18px}.care-intro h1{font-size:47px}.care-deck{font-size:16px;margin-top:20px}.care-nav{position:static;flex-direction:row;flex-wrap:wrap;gap:0 20px;padding-block:12px;border-bottom:1px solid var(--line);margin-bottom:35px}.care-nav a{font-size:12px;min-height:44px;display:flex;align-items:center}.care-content{font-size:14px}.care-content h2{font-size:29px}.care-content section+section{margin-top:34px;padding-top:28px}.care-summary{padding:23px;margin-bottom:32px}.care-content th,.care-content td{padding-right:10px}.care-page .site-header nav{gap:14px}.care-page .site-header nav a{font-size:11px}.care-footer nav{gap:0 20px}.care-footer{gap:8px}}
+@media(prefers-reduced-motion:reduce){.care-page html{scroll-behavior:auto}}

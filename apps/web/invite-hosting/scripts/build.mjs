@@ -38,6 +38,12 @@ if (!routes["/"]) throw new Error("Missing landing index.html");
 for (const media of ["app-demo.mp4", "app-poster.jpg"]) {
   if (!routes[`/landing/assets/${media}`]) throw new Error(`Missing actual app media: ${media}. Import it before publishing.`);
 }
+for (const page of ["privacy", "security", "support", "community", "delete-account"]) {
+  const route = routes[`/landing/${page}.html`];
+  if (!route) throw new Error(`Missing public information page: ${page}`);
+  routes[`/${page}`] = route;
+  routes[`/${page}/`] = route;
+}
 let invitation = await readFile(resolve(root, "content/invite/index.html"), "utf8");
 invitation = invitation.replace("__INSTALL_ACTION__", '<p class="install">WorldNiche is in development. If you already have it installed, open your invitation above.</p>');
 add("/invite-template", Buffer.from(invitation), types[".html"], "no-store");

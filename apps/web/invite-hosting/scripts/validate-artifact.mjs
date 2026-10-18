@@ -47,6 +47,24 @@ assert.equal(invite.status, 200);
 assert.equal(invite.headers.get("cache-control"), "no-store");
 assert.doesNotMatch(await invite.text(), /__INSTALL_ACTION__/);
 
+for (const page of ["privacy", "security", "support", "community", "delete-account"]) {
+  const response = await fetch(`/${page}`);
+  assert.equal(response.status, 200, page);
+  assert.equal(response.headers.get("content-type"), "text/html; charset=utf-8");
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.equal(response.headers.get("set-cookie"), null);
+  assert.match(response.headers.get("content-security-policy"), /frame-ancestors 'none'/);
+  const pageHTML = await response.text();
+  assert.match(pageHTML, /mailto:boutayeb\.reda@icloud\.com/);
+  assert.doesNotMatch(pageHTML, /\[MONITORED|\[PUBLICATION|__INSTALL_ACTION__|\u2014/);
+  for (const match of pageHTML.matchAll(/(?:src|href)="(\/[^"#]*)(?:#[^"]*)?"/g)) {
+    assert.equal((await fetch(match[1], { method: "HEAD" })).status, 200, `${page}: ${match[1]}`);
+  }
+  const head = await fetch(`/${page}/`, { method: "HEAD" });
+  assert.equal(head.status, 200);
+  assert.equal((await head.arrayBuffer()).byteLength, 0);
+}
+
 for (const [name, type] of [["app-demo.mp4", "video/mp4"], ["app-poster.jpg", "image/jpeg"], ["hand-phone.png", "image/png"], ["logo.png", "image/png"], ["logo-dark.png", "image/png"]]) {
   const expected = await readFile(resolve(projectRoot, "content/landing/assets", name));
   const path = `/landing/assets/${name}`;

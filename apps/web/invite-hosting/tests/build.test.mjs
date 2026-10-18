@@ -13,6 +13,8 @@ test("packaging is self-contained, rejects missing real media, and deduplicates 
     for (const directory of ["scripts", "worker", ".openai", "content/landing/assets", "content/invite"]) await mkdir(resolve(scratch, directory), { recursive: true });
     for (const path of ["scripts/build.mjs", "scripts/configuration.mjs", "worker/handler.js", "hosting.example.json", "association.example.json"]) await cp(resolve(source, path), resolve(scratch, path));
     await writeFile(resolve(scratch, "content/landing/index.html"), '<!doctype html><title>WorldNiche</title><video poster="/landing/assets/app-poster.jpg"><source src="/landing/assets/app-demo.mp4"></video>');
+    const publicPages = ["privacy", "security", "support", "community", "delete-account"];
+    for (const page of publicPages) await writeFile(resolve(scratch, `content/landing/${page}.html`), `<!doctype html><title>${page}</title><main>${page}</main>`);
     await writeFile(resolve(scratch, "content/invite/index.html"), '<!doctype html><title>Invitation</title>__INSTALL_ACTION__');
     await writeFile(resolve(scratch, "content/invite/style.css"), 'body { margin: 0; }');
     await writeFile(resolve(scratch, "content/invite/invite.js"), 'void 0;');
@@ -35,6 +37,17 @@ test("packaging is self-contained, rejects missing real media, and deduplicates 
     const generated = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`);
     const association = await generated.default.fetch(new Request("https://worldniche.app/.well-known/apple-app-site-association"));
     assert.equal(association.headers.get("content-type"), "application/json");
+    for (const page of publicPages) {
+      for (const path of [`/${page}`, `/${page}/`]) {
+        const response = await generated.default.fetch(new Request(`https://worldniche.app${path}`));
+        assert.equal(response.status, 200, path);
+        assert.equal(response.headers.get("content-type"), "text/html; charset=utf-8");
+        assert.equal(response.headers.get("cache-control"), "no-store");
+        assert.equal(response.headers.get("location"), null);
+        assert.equal(response.headers.get("set-cookie"), null);
+        assert.match(await response.text(), new RegExp(`<main>${page}</main>`));
+      }
+    }
     const video = await generated.default.fetch(new Request("https://worldniche.app/landing/assets/app-demo.mp4", { headers: { range: "bytes=5-7" } }));
     assert.equal(video.status, 206);
     assert.deepEqual(Buffer.from(await video.arrayBuffer()), Buffer.from([5, 6, 7]));
