@@ -34,4 +34,8 @@ Recheck this list against the exact build and deployed service submitted for rev
 
 ## Public TestFlight
 
-The intended group is an external group named WorldNiche Public Beta with a public signup link. Do not substitute a private tester group. External builds need Apple's TestFlight review before testers can install them. At the October 18 check, App Store Connect blocked new app creation and its API with an agreement error, while the Developer account showed the current agreement accepted that same day. No public TestFlight link or approved external build exists yet. Recheck the account state before upload and preserve the verified backend configuration in the signed build.
+The intended group is an external group named WorldNiche Public Beta with a public signup link. Do not substitute a private tester group. External builds need Apple's TestFlight review before testers can install them. Release 1.0 (1) now exports successfully with an App Store distribution profile. The exported IPA passes signature verification and includes the expected Apple sign-in and Universal Link entitlements, production service configuration, and privacy manifest. It has not passed Apple's upload validation or beta review yet.
+
+At the October 18 check, App Store Connect still blocked new app creation and its API with an agreement error, while the Developer account showed the current agreement accepted that same day. No public TestFlight link or approved external build exists yet. Recheck the account state before upload. [Public beta notes](testflight.md) contain the external group plan, beta metadata, and remaining native validation and operational checks.
+
+The full App Store listing tasks above, including store screenshots and final privacy labels, remain tracked separately from beta upload requirements. Their unfinished status is not evidence that Apple has rejected a TestFlight upload.
