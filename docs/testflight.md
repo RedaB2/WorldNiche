@@ -1,6 +1,6 @@
 # Public beta
 
-Use an external TestFlight group called **WorldNiche Public Beta**, with a public signup link. Start with 100 places so feedback and profile reviews stay manageable. Do not replace this with an internal or invite-only group. Apple's external beta review must approve the build before people can install it.
+The external **WorldNiche Public Beta** group has a [public signup link](https://testflight.apple.com/join/kqpQhYFw) with 100 places. Build 1.0 (1) is waiting for Apple's beta review. People can install it after approval.
 
 Apple currently requires an internal group before an external group can be created. If needed, create that prerequisite without adding testers, then use the external group for public distribution. Do not upload the build as TestFlight Internal Only. [Apple's external testing instructions](https://developer.apple.com/help/app-store-connect/test-a-beta-version/invite-external-testers/).
 
@@ -36,12 +36,16 @@ Provide any private reviewer access details only in App Store Connect. Do not co
 
 For email sign-in, open Profile, choose the email option, enter an address the reviewer can receive mail at, then enter the six-digit code. Native Sign in with Apple is also available. A code is short-lived and must not be saved as a reusable review credential. Supply the review contact and any required private access details in App Store Connect before submission. [Apple's test information requirements](https://developer.apple.com/help/app-store-connect/test-a-beta-version/provide-test-information/).
 
-Before opening the public link, confirm production email-code delivery, the native social and deletion flows on the submitted build, and regular human monitoring of the profile queue and support inbox. The hosted integration suite sends no emails; its passing result does not establish email delivery. Live Apple authorization revocation still needs a disposable Apple identity.
+Before inviting testers, confirm production email-code delivery, the native social and deletion flows on the submitted build, and regular human monitoring of the profile queue and support inbox. The hosted integration suite sends no emails; its passing result does not establish email delivery. Live Apple authorization revocation still needs a disposable Apple identity.
 
 ## Current state
 
 October 18, 2026: Release 1.0 (1) is exported as an App Store distribution-signed IPA. The installed WorldNiche App Store profile uses the existing distribution certificate. Signature verification passes; the exported app has Sign in with Apple, the worldniche.app associated domain, disabled debugger access, the configured service, and its privacy manifest. The warm/cold invitation simulator test also passes. Signing artifacts and configured binaries stay outside the public repository.
 
-App Store Connect still blocks app creation and API access with an agreement error, although a fresh Developer account read shows the current agreement accepted on October 18. No build has been uploaded or submitted to external beta review, and no public TestFlight link exists yet. Once Apple resolves that mismatch, create the app record, upload this verified build, complete beta metadata and review access, and submit it for external beta review. Local export success is not Apple upload validation or beta approval.
+October 19, 2026: The agreement block is resolved. WorldNiche's app record was created, and Release 1.0 (1) uploaded and processed successfully. The beta description, privacy and marketing URLs, feedback contact, test notes, and reviewer access instructions are saved. TestFlight preflight reported no errors or warnings.
 
-A fresh sign-out and sign-in did not clear the warning. The Business page lists only the Free Apps Agreement and offers no acceptance action. The Developer account later redirected to Apple's maintenance page. An Agreements and Contracts support case has been submitted with the account evidence; correspondence and case details stay private. The underlying cause is not confirmed, and no synchronization deadline is assumed.
+The build was submitted for external review on October 19 at 11:07 p.m. Pacific. App Store Connect shows **Waiting for Review**. The external group has this build, its public link is enabled, feedback is enabled, and the limit is 100 testers. Automatic notification after approval is enabled. The empty Release Checks internal group satisfies Apple's prerequisite; the build is assigned to the external group.
+
+The public link exists, but there is no approved external build yet. Do not describe the beta as available to install or add an install call to action on the website until approval and a fresh public-link check.
+
+An Agreements and Contracts support case was submitted after the earlier agreement mismatch. No reply was found in Mail or the support portal at this check. The cause of the earlier mismatch remains unconfirmed. Correspondence, reviewer contact details, configured binaries, and signing artifacts stay outside this repository.
