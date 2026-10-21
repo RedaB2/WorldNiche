@@ -36,6 +36,6 @@ Recheck this list against the exact build and deployed service submitted for rev
 
 The external WorldNiche Public Beta group has a [public signup link](https://testflight.apple.com/join/kqpQhYFw) with a 100-tester limit. Release 1.0 (1) uploaded and processed successfully. Its distribution-signed IPA includes the expected Apple sign-in and Universal Link entitlements, production service configuration, and privacy manifest.
 
-The agreement block is resolved. At the October 19 check, the build is **Waiting for Review**, with beta metadata and review instructions saved. TestFlight preflight reported no errors or warnings. Public installation still depends on Apple's beta approval. [Public beta notes](testflight.md) contain the distribution status, beta metadata, and remaining native validation and operational checks.
+The agreement block is resolved. Apple approved build 1.0 (1), verified on October 20, and the public group shows Testing. Beta metadata and review instructions are saved, and the first TestFlight preflight reported no errors or warnings. Beta approval does not replace the App Store submission checks above. [Public beta notes](testflight.md) contain the distribution status, beta metadata, and remaining native validation and operational checks.
 
 The full App Store listing tasks above, including store screenshots and final privacy labels, remain tracked separately from beta upload requirements. Their unfinished status is not evidence that Apple has rejected a TestFlight upload.

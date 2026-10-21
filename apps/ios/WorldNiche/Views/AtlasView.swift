@@ -139,7 +139,7 @@ struct AboutView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 25) {
-                    Image("AppLogo").resizable().scaledToFit()
+                    Image("AppLogo").renderingMode(.template).resizable().scaledToFit()
                         .frame(width: 180, height: 180)
                         .padding(.leading, -25)
                         .accessibilityLabel("WorldNiche")

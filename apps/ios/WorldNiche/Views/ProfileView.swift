@@ -1041,7 +1041,7 @@ private final class ProfileInviteShareSource: NSObject, @MainActor UIActivityIte
         metadata.originalURL = url
         metadata.url = url
         metadata.title = "WorldNiche · Explore together"
-        if let logo = UIImage(named: "AppLogo") {
+        if let logo = UIImage(named: "BrandIcon") {
             metadata.iconProvider = NSItemProvider(object: logo)
             metadata.imageProvider = NSItemProvider(object: logo)
         }

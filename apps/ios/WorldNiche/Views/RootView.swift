@@ -115,8 +115,8 @@ struct ExploreView: View {
     private var masthead: some View {
         HStack(alignment: .center) {
             Image("AppLogo")
+                .renderingMode(.template)
                 .resizable().scaledToFit()
-                .frame(width: 70, height: 70)
                 .frame(width: 52, height: 52)
                 .accessibilityLabel("WorldNiche")
             Spacer()
