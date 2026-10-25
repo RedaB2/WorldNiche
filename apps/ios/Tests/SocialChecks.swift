@@ -1218,6 +1218,28 @@ private final class CheckSuite {
         check(stranger == nil && fixture.observed().isEmpty, "Unrelated profile photo paths are denied before any network request")
         let route = "/storage/v1/object/authenticated/profile-photos/\(path)"
         fixture.respond(route, data: jpeg)
+        fixture.fail(route, statuses: [503])
+        let recovered = await signed.avatarData(path: path)
+        check(recovered == jpeg && fixture.observed(route).count == 2,
+              "A transient photo download failure retries once so an approved friend photo can appear")
+        check(Set(fixture.observed(route).compactMap(\.query)).count == 2,
+              "Photo retries must use new URLs to recheck current storage access")
+        fixture.clearRequests()
+        fixture.fail(route, statuses: [URLError.networkConnectionLost.rawValue])
+        let connectionRecovered = await signed.avatarData(path: path)
+        check(connectionRecovered == jpeg && fixture.observed(route).count == 2,
+              "A lost network connection during photo download follows the same bounded recovery")
+        fixture.clearRequests()
+        fixture.fail(route, statuses: [503, 503, 503])
+        let unavailable = await signed.avatarData(path: path)
+        check(unavailable == nil && fixture.observed(route).count == 2,
+              "Persistent photo outages have a bounded retry instead of an endless request loop")
+        fixture.clearRequests()
+        fixture.fail(route, statuses: [403])
+        let denied = await signed.avatarData(path: path)
+        check(denied == nil && fixture.observed(route).count == 1,
+              "A forbidden photo never retries as a transient network failure")
+        fixture.clearRequests()
         responseGate.arm(route)
         let photo = Task { await signed.avatarData(path: path) }
         guard await waitForHeldResponse() else { check(false, "Photo privacy race must hold download"); responseGate.release(); photo.cancel(); return }
@@ -1527,6 +1549,76 @@ private final class CheckSuite {
               "Late friend refresh must not restore private friends after sign-out")
     }
 
+    func independentProfileRefresh() async {
+        fixture.reset()
+        let encoder = JSONEncoder(); encoder.keyEncodingStrategy = .convertToSnakeCase
+        let pending = ExplorerProfile(id: userA, displayName: "Mira", avatar: "globe", shareExploration: false,
+                                      pendingDisplayName: "Mira Rose", nameModerationStatus: .pending,
+                                      nameCheckState: .review, automaticProfileChecksEnabled: false)
+        let approved = ExplorerProfile(id: userA, displayName: "Mira Rose", avatar: "globe", shareExploration: false)
+        fixture.respond("/rest/v1/rpc/get_my_profile", data: try! encoder.encode(pending))
+        let defaults = isolatedDefaults()
+        let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                configuration: configuration, api: api(vault: MemoryVault(savedSession())))
+        await store.refresh()
+        fixture.respond("/rest/v1/rpc/get_my_profile", data: try! encoder.encode(approved))
+        fixture.fail("/rest/v1/rpc/list_friends", statuses: [503])
+        await store.refreshVisibleProfiles(force: true)
+        check(store.profile?.displayName == "Mira Rose" && store.profile?.hasPendingContent == false,
+              "Friend-list failure must not prevent the owner's approved update from appearing")
+        check(store.friends.count == 2 && store.errorMessage == nil,
+              "A transient friend-list failure retains the last visible friends without an error card")
+
+        fixture.respond("/rest/v1/rpc/get_my_profile", data: try! encoder.encode(pending))
+        await store.refresh()
+        fixture.respond("/rest/v1/rpc/get_my_profile", data: try! encoder.encode(approved))
+        responseGate.arm("/rest/v1/rpc/list_friends")
+        let held = Task { await store.refreshVisibleProfiles(force: true) }
+        guard await waitForHeldResponse() else {
+            responseGate.release(); held.cancel(); check(false, "Independent refresh fixture must hold friends"); return
+        }
+        for _ in 0..<100 where store.profile?.hasPendingContent == true { try? await Task.sleep(for: .milliseconds(2)) }
+        check(store.profile?.displayName == "Mira Rose" && store.profile?.hasPendingContent == false,
+              "A slow friend response must not delay the owner's completed safety check")
+        responseGate.release(); await held.value
+
+        fixture.respond("/rest/v1/rpc/get_my_profile", data: try! encoder.encode(pending))
+        await store.refresh()
+        let fresh = #"[{"id":"33333333-3333-4333-8333-333333333333","display_name":"Jun Fresh","avatar":"leaf","share_exploration":false,"country_ids":[],"explored_count":0}]"#
+        fixture.respond("/rest/v1/rpc/list_friends", json: fresh)
+        responseGate.arm("/rest/v1/rpc/get_my_profile")
+        let ownerHeld = Task { await store.refreshVisibleProfiles(force: true) }
+        guard await waitForHeldResponse() else {
+            responseGate.release(); ownerHeld.cancel(); check(false, "Independent refresh fixture must hold owner"); return
+        }
+        for _ in 0..<100 where store.friends.first?.displayName != "Jun Fresh" { try? await Task.sleep(for: .milliseconds(2)) }
+        check(store.friends.first?.displayName == "Jun Fresh",
+              "A slow owner response must not delay a friend's newly approved name")
+        responseGate.release(); await ownerHeld.value
+
+        fixture.fail("/rest/v1/rpc/get_my_profile", statuses: [503])
+        fixture.respond("/rest/v1/rpc/list_friends", json: fresh.replacingOccurrences(of: "Jun Fresh", with: "Jun New"))
+        await store.refreshVisibleProfiles(force: true)
+        check(store.friends.first?.displayName == "Jun New" && store.profile?.ownerDisplayName == "Mira Rose"
+              && store.profile?.hasPendingContent == true && store.errorMessage == nil,
+              "Owner-refresh failure preserves its preview while a friend's new profile still appears")
+
+        responseGate.arm("/rest/v1/rpc/get_my_profile")
+        let staleOwner = Task { await store.refreshVisibleProfiles(force: true) }
+        guard await waitForHeldResponse() else {
+            responseGate.release(); staleOwner.cancel(); check(false, "Edit race fixture must hold owner refresh"); return
+        }
+        await store.saveProfile(name: "A Later Edit", avatar: "leaf", sharing: false)
+        responseGate.release(); await staleOwner.value
+        check(store.profile?.ownerDisplayName == "A Later Edit" && store.profile?.avatar == "leaf",
+              "An old owner refresh cannot overwrite an edit saved while it was in flight")
+
+        fixture.clearRequests()
+        await store.refreshVisibleProfiles(now: Date().addingTimeInterval(5))
+        check(fixture.observed("/rest/v1/rpc/list_friends").count == 1,
+              "A visible social screen can refresh friends again after five seconds")
+    }
+
     func appleNameRecoveryAndLinking() async {
         fixture.reset(profile: false)
         let defaults = isolatedDefaults()
@@ -1709,6 +1801,7 @@ private final class CheckSuite {
         await suite.profileModeration()
         await suite.profilePreviewAndChecks()
         await suite.profileSetupConsentRecovery()
+        await suite.independentProfileRefresh()
         await suite.visibleProfileRefresh()
         await suite.appleNameRecoveryAndLinking()
         await suite.newAccountSharingChoices()

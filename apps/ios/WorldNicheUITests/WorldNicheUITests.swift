@@ -1,4 +1,5 @@
 import XCTest
+import UIKit
 
 final class WorldNicheUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
@@ -127,6 +128,140 @@ final class WorldNicheUITests: XCTestCase {
     }
 
     @MainActor
+    func testProfileSaveShowsPrivatePreviewThenAutomaticApproval() throws {
+        let app = openProfileFixture("approval")
+        editFixtureName(app, name: "Mira Rose", allowChecks: true)
+        XCTAssertTrue(app.staticTexts["profileName"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["profileName"].label, "Mira Rose")
+        XCTAssertTrue(app.staticTexts["Checking before sharing with friends…"].exists)
+        capture("Saved name during automatic check", app: app)
+        XCTAssertTrue(app.staticTexts["profileSaveConfirmation"].waitForExistence(timeout: 15))
+        XCTAssertEqual(app.staticTexts["profileSaveConfirmation"].label, "Profile saved.")
+        XCTAssertEqual(app.staticTexts["profileName"].label, "Mira Rose")
+        XCTAssertFalse(app.staticTexts["Checking before sharing with friends…"].exists)
+        capture("Approved profile update", app: app)
+    }
+
+    @MainActor
+    func testProfileCheckFailureKeepsSavedNameAndCanRetry() throws {
+        let app = openProfileFixture("retry")
+        editFixtureName(app, name: "Mira Rose", allowChecks: true)
+        let retry = app.buttons["retryProfileCheck"]
+        let retryAppeared = retry.waitForExistence(timeout: 10)
+        capture("Profile check recovery state", app: app)
+        XCTAssertTrue(retryAppeared, app.debugDescription)
+        XCTAssertEqual(app.staticTexts["profileName"].label, "Mira Rose")
+        XCTAssertTrue(retry.isEnabled)
+        capture("Saved profile after temporary check failure", app: app)
+        retry.tap()
+        XCTAssertTrue(app.staticTexts["profileSaveConfirmation"].waitForExistence(timeout: 15))
+        XCTAssertEqual(app.staticTexts["profileName"].label, "Mira Rose")
+        XCTAssertFalse(retry.exists)
+    }
+
+    @MainActor
+    func testHumanReviewChoiceKeepsPrivateNameVisible() throws {
+        let app = openProfileFixture("manual")
+        editFixtureName(app, name: "Mira Rose", allowChecks: false)
+        XCTAssertTrue(app.staticTexts["Name saved for review"].waitForExistence(timeout: 8))
+        XCTAssertEqual(app.staticTexts["profileName"].label, "Mira Rose")
+        XCTAssertFalse(app.buttons["retryProfileCheck"].exists)
+        XCTAssertTrue(app.buttons["Use quick safety checks"].exists)
+        capture("Explicit human review retains private preview", app: app)
+    }
+
+    @MainActor
+    func testOpenFriendProfileRefreshesApprovedNameAutomatically() throws {
+        let app = openProfileFixture("friend")
+        let friend = app.buttons["friend-33333333-3333-4333-8333-333333333333"]
+        for _ in 0..<4 where !friend.isHittable { app.swipeUp() }
+        XCTAssertTrue(friend.waitForExistence(timeout: 8))
+        XCTAssertTrue(app.staticTexts["Jun"].exists)
+        friend.tap()
+        XCTAssertTrue(app.navigationBars["Friend"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Jun Updated"].waitForExistence(timeout: 20))
+        XCTAssertFalse(app.staticTexts["Jun"].exists)
+        capture("Friend approval appears without manual refresh", app: app)
+    }
+
+    @MainActor
+    func testFriendPhotoRecoversAfterTemporaryOutageWithoutNavigation() throws {
+        let app = openProfileFixture("photo")
+        let friend = app.buttons["friend-33333333-3333-4333-8333-333333333333"]
+        for _ in 0..<5 where !friend.isHittable || friend.frame.maxY > app.frame.maxY - 100 { app.swipeUp() }
+        XCTAssertTrue(friend.isHittable)
+        // The fixture rejects both initial image requests, then serves the
+        // same immutable photo path. A successful retry paints a red avatar.
+        let recovered = NSPredicate { _, _ in
+            MainActor.assumeIsolated { self.hasRedAvatar(row: friend) }
+        }
+        let result = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: recovered, object: app)], timeout: 20)
+        let rowImage = friend.screenshot().image
+        let rowCapture = XCTAttachment(image: rowImage)
+        rowCapture.name = "Recovered friend photo row"
+        rowCapture.lifetime = .keepAlways
+        add(rowCapture)
+        capture("Friend photo recovery screen", app: app)
+        XCTAssertEqual(result, .completed, "Row frame: \(friend.frame), screenshot size: \(rowImage.size), orientation: \(rowImage.imageOrientation.rawValue)")
+        XCTAssertTrue(app.navigationBars["Profile"].exists)
+        capture("Friend photo recovers on the same visible screen", app: app)
+    }
+
+    @MainActor
+    private func hasRedAvatar(row: XCUIElement) -> Bool {
+        let screenshot = row.screenshot().image
+        let format = UIGraphicsImageRendererFormat(); format.scale = 1
+        let image = UIGraphicsImageRenderer(size: screenshot.size, format: format).image { _ in
+            screenshot.draw(in: CGRect(origin: .zero, size: screenshot.size))
+        }
+        guard let cgImage = image.cgImage, row.frame.width > 0, row.frame.height > 0 else { return false }
+        let scaleX = CGFloat(cgImage.width) / row.frame.width
+        let scaleY = CGFloat(cgImage.height) / row.frame.height
+        // Dual-display XCTest snapshots can encode rotated pixels with an up
+        // orientation. Check both row ends, also allowing right-to-left layout.
+        for centerX in [CGFloat(22), row.frame.width - 22] {
+            let rect = CGRect(x: centerX * scaleX, y: row.frame.height * 0.5 * scaleY, width: 1, height: 1)
+            guard let pixel = cgImage.cropping(to: rect) else { continue }
+            var rgba = [UInt8](repeating: 0, count: 4)
+            let rendered = rgba.withUnsafeMutableBytes { buffer in
+                guard let context = CGContext(data: buffer.baseAddress, width: 1, height: 1, bitsPerComponent: 8,
+                                              bytesPerRow: 4, space: CGColorSpaceCreateDeviceRGB(),
+                                              bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return false }
+                context.draw(pixel, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+                return true
+            }
+            if rendered && rgba[0] > 220 && rgba[1] < 40 && rgba[2] < 40 { return true }
+        }
+        return false
+    }
+
+    @MainActor
+    private func openProfileFixture(_ mode: String) -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-social-fixture", mode]
+        app.launch()
+        app.tabBars.buttons["Profile"].tap()
+        XCTAssertTrue(app.buttons["editProfile"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.staticTexts["profileName"].label, "Mira")
+        return app
+    }
+
+    @MainActor
+    private func editFixtureName(_ app: XCUIApplication, name: String, allowChecks: Bool) {
+        app.buttons["editProfile"].tap()
+        let field = app.textFields["profileNameField"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap()
+        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: (field.value as? String ?? "").count) + name)
+        app.buttons["saveProfile"].tap()
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "OpenAI")).firstMatch.waitForExistence(timeout: 5))
+        let choice = app.buttons[allowChecks ? "Allow quick checks and save" : "Use human review and save"]
+        XCTAssertTrue(choice.isHittable)
+        choice.tap()
+        XCTAssertTrue(app.navigationBars["Profile"].waitForExistence(timeout: 8))
+    }
+
+    @MainActor
     func testInvitationSheetFromWarmAndColdURLLaunch() throws {
         let app = XCUIApplication()
         // Invalid input still presents the real invitation sheet, without
@@ -233,7 +368,9 @@ final class WorldNicheUITests: XCTestCase {
         input.tap()
         input.typeText("Give me one simple question I can ask about the cultural note shown here.")
         app.buttons["Send question"].tap()
-        XCTAssertTrue(app.staticTexts["assistantMessage"].firstMatch.waitForExistence(timeout: 45))
+        let responseAppeared = app.staticTexts["assistantMessage"].firstMatch.waitForExistence(timeout: 45)
+        capture("Companion response state", app: app)
+        XCTAssertTrue(responseAppeared, app.debugDescription)
         let message = app.staticTexts["assistantMessage"].firstMatch.label
         XCTAssertGreaterThan(message.count, 10)
         capture("Companion response", app: app)

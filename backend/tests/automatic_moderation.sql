@@ -28,6 +28,7 @@ do $$ begin
  assert public.get_my_profile()->>'pending_display_name'='Alice';
  begin perform public.claim_profile_checks(); raise exception 'Client claimed moderation jobs'; exception when insufficient_privilege then null; end;
  begin perform public.finish_profile_check(auth.uid(),'name',gen_random_uuid(),gen_random_uuid(),'approve'); raise exception 'Client approved a job'; exception when insufficient_privilege then null; end;
+ begin perform public.profile_check_is_current(auth.uid(),'name',gen_random_uuid(),gen_random_uuid()); raise exception 'Client inspected a worker claim'; exception when insufficient_privilege then null; end;
  begin perform wn_private.dispatch_profile_checks(); raise exception 'Client dispatched worker'; exception when insufficient_privilege then null; end;
  begin perform count(*) from wn_private.profile_check_jobs; raise exception 'Client read private jobs'; exception when insufficient_privilege then null; end;
  assert public.authorize_profile_check()->>'user_id'=auth.uid()::text;
@@ -69,6 +70,8 @@ do $$ declare jobs jsonb; n jsonb; f jsonb; begin
  select x into n from jsonb_array_elements(jobs)x where x->>'kind'='name';
  select x into f from jsonb_array_elements(jobs)x where x->>'kind'='photo';
  assert n->>'text'='Alice' and n->>'photo_path' is null;
+ assert public.profile_check_is_current((n->>'user_id')::uuid,'name',(n->>'revision')::uuid,(n->>'claim_token')::uuid);
+ assert not public.profile_check_is_current((n->>'user_id')::uuid,'name',(n->>'revision')::uuid,gen_random_uuid()),'A different claim cannot disclose content';
  assert f->>'photo_path' like '%aaaaaaaaaaaa.jpg' and f->>'text' is null;
  assert public.claim_profile_checks()='[]','Claims exclude in-flight and unconsented jobs';
  perform set_config('test.name_job',n::text,false);
@@ -92,6 +95,7 @@ reset role;
 set role service_role;
 do $$ declare n jsonb:=current_setting('test.name_job')::jsonb; fresh jsonb; begin
  assert public.finish_profile_check((n->>'user_id')::uuid,'name',(n->>'revision')::uuid,(n->>'claim_token')::uuid,'approve')->>'applied'='false','Old revision must never publish';
+ assert not public.profile_check_is_current((n->>'user_id')::uuid,'name',(n->>'revision')::uuid,(n->>'claim_token')::uuid),'Old revision cannot be sent to provider';
  fresh:=public.claim_profile_checks('00000000-0000-0000-0000-000000000001',2)->0;
  assert fresh->>'text'='Alice Changed';
  assert public.finish_profile_check((fresh->>'user_id')::uuid,'name',(fresh->>'revision')::uuid,gen_random_uuid(),'approve')->>'applied'='false','Claim token is required';
@@ -125,6 +129,7 @@ reset role;
 set role service_role;
 do $$ declare n jsonb:=current_setting('test.revoked_job')::jsonb; begin
  assert public.finish_profile_check((n->>'user_id')::uuid,'name',(n->>'revision')::uuid,(n->>'claim_token')::uuid,'approve')->>'applied'='false','Revocation invalidates even an in-flight approval';
+ assert not public.profile_check_is_current((n->>'user_id')::uuid,'name',(n->>'revision')::uuid,(n->>'claim_token')::uuid),'Revoked consent prevents external disclosure';
  assert public.claim_profile_checks()='[]';
 end $$;
 reset role;
@@ -136,6 +141,7 @@ do $$ declare n jsonb; begin
  n:=public.claim_profile_checks('00000000-0000-0000-0000-000000000001')->0;
  perform set_config('test.restricted_job',n::text,false);
  perform public.moderate_user((n->>'user_id')::uuid,'restrict','Test restriction');
+ assert not public.profile_check_is_current((n->>'user_id')::uuid,'name',(n->>'revision')::uuid,(n->>'claim_token')::uuid),'Restriction prevents external disclosure';
  assert public.finish_profile_check((n->>'user_id')::uuid,'name',(n->>'revision')::uuid,(n->>'claim_token')::uuid,'approve')->>'applied'='false','Restriction wins over automatic approval';
 end $$;
 reset role;

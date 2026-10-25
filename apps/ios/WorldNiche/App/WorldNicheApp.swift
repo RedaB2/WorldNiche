@@ -8,6 +8,13 @@ struct WorldNicheApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        #if DEBUG && targetEnvironment(simulator)
+        if let fixture = SocialUITestFixture.make() {
+            _journal = State(initialValue: fixture.journal)
+            _social = State(initialValue: fixture.social)
+            return
+        }
+        #endif
         let journal = DiscoveryJournal()
         _journal = State(initialValue: journal)
         _social = State(initialValue: SocialStore(journal: journal, appleCredentialIsAuthorized: { userID in

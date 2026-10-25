@@ -30,7 +30,7 @@ private struct VisibleSocialProfilesModifier: ViewModifier {
                 guard visible, enabled, scenePhase == .active, social.isSignedIn else { return }
                 await social.refreshVisibleProfiles()
                 while !Task.isCancelled {
-                    do { try await Task.sleep(for: .seconds(15)) }
+                    do { try await Task.sleep(for: .seconds(5)) }
                     catch { return }
                     guard !Task.isCancelled, visible, enabled, scenePhase == .active else { return }
                     await social.refreshVisibleProfiles()
@@ -271,7 +271,6 @@ private struct ProfileModerationNotice: View {
         }
         .font(.subheadline)
         .foregroundStyle(Palette.muted)
-        .accessibilityIdentifier("profileModerationNotice")
         .confirmationDialog("Allow automatic profile checks?", isPresented: $showCheckConsent, titleVisibility: .visible) {
             Button("Allow quick checks") { Task { await social.setProfileCheckConsent(enabled: true) } }
             Button("Keep human review", role: .cancel) { Task { await social.setProfileCheckConsent(enabled: false) } }

@@ -6,7 +6,8 @@
     "node": ">=24"
   },
   "scripts": {
-    "test:edge": "node tests/delete_account.mjs",
+    "test:edge": "node tests/delete_account.mjs && node --test tests/moderate_profile.mjs",
+    "test:moderation": "node --test tests/moderate_profile.mjs",
     "test:database": "sh tests/run_database.sh",
     "test:invites": "python3 tests/invite_site.py"
   },

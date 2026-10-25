@@ -27,6 +27,7 @@ trap finish EXIT HUP INT TERM
   -f "$project_root/supabase/migrations/202610180004_profile_moderation.sql" \
   -f "$project_root/tests/moderation_security.sql" \
   -f "$project_root/supabase/migrations/202610240005_automatic_profile_checks.sql" \
+  -f "$project_root/supabase/migrations/202610240006_profile_check_disclosure.sql" \
   -f "$project_root/tests/automatic_moderation.sql" \
   -f "$project_root/tests/sharing_preferences.sql"
 PGUSER=wn_test python3 "$project_root/tests/automatic_check_race.py" --psql "$pg_bin/psql" --socket "$scratch"

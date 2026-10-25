@@ -10,6 +10,7 @@ final class SocialStore {
     private(set) var isCheckingProfile = false
     private(set) var profileCheckFailed = false
     private(set) var profileSaveMessage: String?
+    private(set) var profilePhotoRefreshID = UUID()
     var errorMessage: String?
     private(set) var emailForCode: String?
     private(set) var pendingInvitation: InvitationPreview?
@@ -162,6 +163,7 @@ final class SocialStore {
             profile = remote
             persistProfile()
             friends = remoteFriends
+            profilePhotoRefreshID = UUID()
             lastVisibleProfileRefresh = Date()
             if !presentsInvitation { errorMessage = nil }
             await synchronizeExploration()
@@ -231,29 +233,55 @@ final class SocialStore {
     func refreshVisibleProfiles(force: Bool = false, now: Date = Date()) async {
         guard let api, isSignedIn, let owner = localOwnerID, !deletionPending,
               !isBusy, !refreshing, !refreshingVisibleProfiles else { return }
-        if !force, let lastVisibleProfileRefresh, now.timeIntervalSince(lastVisibleProfileRefresh) < 10 { return }
+        if !force, let lastVisibleProfileRefresh, now.timeIntervalSince(lastVisibleProfileRefresh) < 4 { return }
         refreshingVisibleProfiles = true
         lastVisibleProfileRefresh = now
         let current = generation
         defer { refreshingVisibleProfiles = false }
-        do {
-            let updatedFriends = try await api.friends()
-            guard current == generation, owner == localOwnerID, isSignedIn, !deletionPending, !Task.isCancelled else { return }
-            friends = updatedFriends
-            if profile?.hasPendingContent == true, !isCheckingProfile {
-                let updated = try await api.profile()
-                guard current == generation, owner == localOwnerID, isSignedIn, !deletionPending, !Task.isCancelled else { return }
-                guard updated?.id == owner else { throw SocialError.invalidResponse }
-                profile = updated
-                persistProfile()
-                if updated?.hasPendingContent != true { profileCheckFailed = false }
-                resumeProfileCheckIfNeeded()
+        let refreshOwner = profile?.hasPendingContent == true && !isCheckingProfile
+        await withTaskGroup(of: VisibleProfileRefresh.self) { group in
+            group.addTask {
+                do { return .friends(try await api.friends()) }
+                catch { return .failure(error) }
             }
-        } catch {
-            guard current == generation, owner == localOwnerID, !Task.isCancelled else { return }
-            // A transient background failure must not replace profile content
-            // with an error card or erase the user's successful save feedback.
-            if case SocialError.signInRequired = error { record(error) }
+            if refreshOwner {
+                group.addTask {
+                    do { return .owner(try await api.profile()) }
+                    catch { return .failure(error) }
+                }
+            }
+            for await result in group {
+                guard current == generation, owner == localOwnerID, isSignedIn, !deletionPending, !Task.isCancelled else {
+                    group.cancelAll()
+                    return
+                }
+                switch result {
+                case .friends(let updated):
+                    friends = updated
+                    profilePhotoRefreshID = UUID()
+                case .owner(let updated):
+                    guard let updated, updated.id == owner else { continue }
+                    profile = updated
+                    persistProfile()
+                    if !updated.hasPendingContent { profileCheckFailed = false }
+                    resumeProfileCheckIfNeeded()
+                case .failed(let signInRequired):
+                    // Independent refresh failures retain the successful side
+                    // and the last saved profile instead of replacing it.
+                    if signInRequired { record(SocialError.signInRequired) }
+                }
+            }
+        }
+    }
+
+    private enum VisibleProfileRefresh: Sendable {
+        case friends([ExplorerFriend])
+        case owner(ExplorerProfile?)
+        case failed(Bool)
+
+        static func failure(_ error: Error) -> Self {
+            if case SocialError.signInRequired = error { return .failed(true) }
+            return .failed(false)
         }
     }
 
@@ -329,9 +357,18 @@ final class SocialStore {
         guard let api, isVisible() else { return nil }
         let current = generation
         let owner = localOwnerID
-        let data = try? await api.avatarData(path: path)
-        guard current == generation, owner == localOwnerID, isVisible(), !Task.isCancelled else { return nil }
-        return data
+        for attempt in 0..<2 {
+            guard current == generation, owner == localOwnerID, isVisible(), !Task.isCancelled else { return nil }
+            do {
+                let data = try await api.avatarData(path: path)
+                guard current == generation, owner == localOwnerID, isVisible(), !Task.isCancelled else { return nil }
+                return data
+            } catch SocialError.unavailable where attempt == 0 {
+                do { try await Task.sleep(for: .milliseconds(350)) }
+                catch { return nil }
+            } catch { return nil }
+        }
+        return nil
     }
 
     func requestCode(email: String, existingAccountOnly: Bool = false) async {
