@@ -240,7 +240,11 @@ final class WorldNicheUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-worldniche-social-fixture", mode]
         app.launch()
-        app.tabBars.buttons["Profile"].tap()
+        let tab = app.tabBars.buttons["Profile"]
+        let destination = tab.exists ? tab : app.buttons.matching(NSPredicate(format: "label == %@", "Profile")).firstMatch
+        XCTAssertTrue(destination.waitForExistence(timeout: 8), "Profile must be available in the native navigation.")
+        XCTAssertTrue(destination.isHittable)
+        destination.tap()
         XCTAssertTrue(app.buttons["editProfile"].waitForExistence(timeout: 10))
         XCTAssertEqual(app.staticTexts["profileName"].label, "Mira")
         return app

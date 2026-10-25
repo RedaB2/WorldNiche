@@ -19,12 +19,13 @@ This work is on the development branch. It has not been deployed to Supabase or 
 - All 5 moderation UI scenarios passed on iOS 26.5.
 - The complete iOS 27.0 simulator suite passed: 18 tests, no failures or skips. The final photo assertion also passed separately.
 - All 3 globe and adaptive layout tests passed on iOS 26.5. The new pinch test also passed on the open Duo.
-- 26 website behavior and packaging tests passed.
+- The photo recovery test passed on both the open landscape Duo and regular iPhone after its navigation helper was updated for the native sidebar.
+- 28 website behavior and packaging tests passed, including a regression for empty lazy video sources.
 - Repository secret scanning passed without findings.
 
 The actual on-device companion response test passed twice on iOS 27.0. The iOS 26.5 simulator reports a host model compatibility failure. Duo photo recovery and landscape layout were verified directly in Device Hub. Local mocks establish behavior, not connectivity to the deployed provider.
 
-XCTest on the Duo inner display accepted rotation commands without rotating its active interface. Its full-screen captures were black, and row captures were upside down despite upright orientation metadata. The assertions remain intact; the photo check now samples both possible row-end avatar positions. These tooling failures are recorded separately from the passing iOS 27.0 suite. Closing the Duo also left XCTest unable to locate its tab bar, so that attempted outer-display run is not passing evidence.
+XCTest on the Duo inner display accepted rotation commands without rotating its active interface. Its full-screen captures were black, and row captures were upside down despite upright orientation metadata. The assertions remain intact; the photo check samples both possible row-end avatar positions. The final landscape photo run passed with adaptive navigation. Rotation tooling failures are recorded separately from the passing iOS 27.0 suite. Closing the Duo also left XCTest unable to locate its tab bar, so that earlier attempted outer-display run is not passing evidence.
 
 ## Deployment gates
 
@@ -38,6 +39,8 @@ No real profile content has been sent to OpenAI by these local tests. No provide
 
 ## iPhone Duo
 
-The landing page pairs a separate, unfolded landscape mockup with a real landscape simulator recording before publication. The original iPhone preview remains available. App Store Connect's Duo optimization badge requires Duo screenshots; there is no separate TestFlight compatibility switch. See [Apple's Duo submission guidance](https://developer.apple.com/news/?id=kkphp5qo) and [screenshot sizes](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/).
+The published landing page pairs a separate, unfolded landscape mockup with a real 29.53-second landscape simulator recording. The original iPhone preview remains available. Desktop and 390-pixel mobile browser checks confirmed both screen masks, switching, keyboard selection, playback and no horizontal overflow. The hosting artifact passed exact-byte and video range validation. The live legal pages retain the existing disclosures until the new moderation backend is deployed.
+
+App Store Connect's Duo optimization badge requires Duo screenshots; there is no separate TestFlight compatibility switch. See [Apple's Duo submission guidance](https://developer.apple.com/news/?id=kkphp5qo) and [screenshot sizes](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/).
 
 Apple documents that the simulator's Foundation Models depend on compatible host and simulator versions. A model failure on an older simulator must be reported separately from UI test results. See [Apple's simulator guidance](https://developer.apple.com/forums/thread/787445).
