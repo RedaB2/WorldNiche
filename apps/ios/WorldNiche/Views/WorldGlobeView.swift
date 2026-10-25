@@ -20,6 +20,7 @@ struct WorldGlobeView: UIViewRepresentable {
         view.preferredFramesPerSecond = 60
         view.rendersContinuously = false
         view.autoenablesDefaultLighting = false
+        view.isAccessibilityElement = true
         view.accessibilityLabel = "Interactive world globe"
         view.accessibilityHint = "Drag to turn the world. Pinch to zoom. Tap a country to explore it. All destinations are also available in the country list."
         view.accessibilityTraits = [.image]

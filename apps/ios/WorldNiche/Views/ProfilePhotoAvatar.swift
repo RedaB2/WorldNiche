@@ -11,8 +11,8 @@ struct ProfilePhotoAvatar: View {
     @State private var remoteData: Data?
 
     private var canReadRemote: Bool {
-        guard social.isSignedIn, let path else { return false }
-        return social.profile?.avatarPath == path || social.friends.contains { $0.avatarPath == path }
+        guard social.isSignedIn, !social.deletionPending, let path else { return false }
+        return social.profile?.referencesPhoto(path) == true || social.friends.contains { $0.avatarPath == path }
     }
     private var accessID: String {
         "\(social.profile?.id?.uuidString ?? "guest")|\(canReadRemote)|\(path ?? "")"

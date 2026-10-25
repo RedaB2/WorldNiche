@@ -4,6 +4,129 @@ final class WorldNicheUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     @MainActor
+    func testDiscoverGuidanceAppearsAboveInteractiveGlobe() throws {
+        let app = XCUIApplication()
+        app.launch()
+        app.tabBars.buttons["Discover"].tap()
+        assertDiscoverGuidanceOrdering(app)
+        let globe = app.descendants(matching: .any)["interactiveGlobe"].firstMatch
+        XCTAssertEqual(globe.label, "Interactive world globe")
+        XCTAssertTrue(globe.isHittable)
+        globe.coordinate(withNormalizedOffset: CGVector(dx: 0.35, dy: 0.45))
+            .press(forDuration: 0.05, thenDragTo: globe.coordinate(withNormalizedOffset: CGVector(dx: 0.65, dy: 0.45)))
+        XCTAssertTrue(globe.isHittable)
+        capture("Discover guidance above globe", app: app)
+        let landing = app.buttons["landingCountry"]
+        XCTAssertTrue(landing.isHittable)
+        landing.tap()
+        XCTAssertTrue(app.staticTexts["countryTitle"].waitForExistence(timeout: 8))
+        XCTAssertEqual(app.staticTexts["countryTitle"].label, "Morocco")
+    }
+
+    @MainActor
+    func testDiscoverGuidanceLargeTextKeepsCountryControlsAccessible() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
+        app.launch()
+        app.tabBars.buttons["Discover"].tap()
+        assertDiscoverGuidanceOrdering(app)
+        let guidance = app.staticTexts["discoverGuidance"]
+        XCTAssertGreaterThanOrEqual(guidance.frame.minX, app.frame.minX)
+        XCTAssertLessThanOrEqual(guidance.frame.maxX, app.frame.maxX)
+        capture("Discover guidance with large text", app: app)
+        let spin = app.buttons["spinButton"]
+        if !spin.isHittable {
+            // A swipe starting inside SceneKit rotates the globe. Start on
+            // the guidance to exercise the surrounding page's scroll gesture.
+            XCTAssertTrue(guidance.isHittable)
+            guidance.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.15)))
+        }
+        XCTAssertTrue(spin.isHittable)
+        let landing = app.buttons["landingCountry"]
+        let original = landing.label
+        spin.tap()
+        expectation(for: NSPredicate(format: "label != %@", original), evaluatedWith: landing)
+        waitForExpectations(timeout: 8)
+        for _ in 0..<5 where !landing.isHittable { app.swipeDown() }
+        XCTAssertTrue(landing.isHittable)
+        landing.tap()
+        XCTAssertTrue(app.staticTexts["countryTitle"].waitForExistence(timeout: 8))
+    }
+
+    @MainActor
+    private func assertDiscoverGuidanceOrdering(_ app: XCUIApplication) {
+        let headline = app.staticTexts["discoverHeadline"]
+        let guidance = app.staticTexts["discoverGuidance"]
+        let globe = app.descendants(matching: .any)["interactiveGlobe"].firstMatch
+        XCTAssertTrue(headline.waitForExistence(timeout: 10))
+        XCTAssertTrue(guidance.exists)
+        XCTAssertEqual(app.staticTexts.matching(identifier: "discoverGuidance").count, 1)
+        XCTAssertEqual(guidance.label, "Turn the globe. Tap a country. Stay curious.")
+        XCTAssertTrue(globe.exists)
+        XCTAssertGreaterThan(guidance.frame.height, 0)
+        XCTAssertLessThanOrEqual(headline.frame.maxY, guidance.frame.minY)
+        XCTAssertLessThanOrEqual(guidance.frame.maxY, globe.frame.minY)
+    }
+
+    @MainActor
+    func testNewAccountSharingStartsOnAndCanBeDisabled() throws {
+        let app = XCUIApplication()
+        openSignedOutSignIn(app)
+        let sharing = app.switches["signUpSharingToggle"]
+        XCTAssertTrue(sharing.waitForExistence(timeout: 5))
+        XCTAssertEqual(sharing.value as? String, "1")
+        for _ in 0..<3 where !sharing.isHittable { app.swipeUp() }
+        XCTAssertTrue(sharing.isHittable)
+        // SwiftUI can expose the entire labeled row as the switch frame.
+        // Tap its trailing control and wait for the native value transition.
+        sharing.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+        expectation(for: NSPredicate(format: "value == %@", "0"), evaluatedWith: sharing)
+        waitForExpectations(timeout: 5)
+        XCTAssertEqual(sharing.value as? String, "0")
+        capture("New account sharing disabled before sign-in", app: app)
+        app.navigationBars["Sign in"].buttons["Cancel"].tap()
+        XCTAssertTrue(app.navigationBars["Profile"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testAppleSignInIsVisibleAndEmailRecoveryIsOptIn() throws {
+        let app = XCUIApplication()
+        openSignedOutSignIn(app)
+        let apple = app.buttons["signInWithApple"]
+        XCTAssertTrue(apple.waitForExistence(timeout: 5))
+        for _ in 0..<3 where apple.frame.midY >= app.frame.maxY - 50 { app.swipeUp() }
+        XCTAssertTrue(app.frame.contains(CGPoint(x: apple.frame.midX, y: apple.frame.midY)))
+        let email = app.textFields["signInEmailField"]
+        XCTAssertFalse(email.exists)
+        let recover = app.buttons["recoverEmailAccount"]
+        for _ in 0..<3 where !recover.isHittable { app.swipeUp() }
+        XCTAssertTrue(recover.isHittable)
+        recover.tap()
+        XCTAssertTrue(email.waitForExistence(timeout: 5))
+        XCTAssertTrue(email.isHittable)
+        XCTAssertFalse(app.buttons["recoverEmailAccount"].exists)
+        email.typeText("not-an-address")
+        XCTAssertFalse(app.buttons["requestEmailCode"].isEnabled)
+        XCTAssertFalse(app.textFields["emailCodeField"].exists)
+        capture("Existing email account recovery", app: app)
+        app.navigationBars["Sign in"].buttons["Cancel"].tap()
+        XCTAssertTrue(app.navigationBars["Profile"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    private func openSignedOutSignIn(_ app: XCUIApplication) {
+        app.launch()
+        app.tabBars.buttons["Profile"].tap()
+        let signIn = app.buttons["signInForFriends"]
+        XCTAssertTrue(signIn.waitForExistence(timeout: 8), "Run this check with a signed-out simulator.")
+        for _ in 0..<4 where !signIn.isHittable { app.swipeUp() }
+        XCTAssertTrue(signIn.isHittable)
+        signIn.tap()
+        XCTAssertTrue(app.navigationBars["Sign in"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testInvitationSheetFromWarmAndColdURLLaunch() throws {
         let app = XCUIApplication()
         // Invalid input still presents the real invitation sheet, without

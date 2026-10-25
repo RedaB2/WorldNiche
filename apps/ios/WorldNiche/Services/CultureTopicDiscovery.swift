@@ -35,7 +35,7 @@ actor CultureTopicDiscovery {
         self.now = now
     }
 
-    func topics(for country: Country, excluding: Set<String> = [], minimumCount: Int = 6) async -> [String] {
+    func topics(for country: Country, excluding: Set<String> = [], minimumCount: Int = 6, preferCountryLinked: Bool = false) async -> [String] {
         guard !Task.isCancelled else { return [] }
         let excluded = Set(excluding.map(Self.normalized))
         let waiterID = UUID()
@@ -45,7 +45,7 @@ actor CultureTopicDiscovery {
             inFlight[country.id] = pending
             flight = pending
         } else {
-            let task = Task { await discover(for: country, excluding: excluded, minimumCount: max(1, min(12, minimumCount))) }
+            let task = Task { await discover(for: country, excluding: excluded, minimumCount: max(1, min(12, minimumCount)), preferCountryLinked: preferCountryLinked) }
             flight = Flight(id: UUID(), task: task, waiters: [waiterID])
             inFlight[country.id] = flight
         }
@@ -73,12 +73,16 @@ actor CultureTopicDiscovery {
         } else { inFlight[countryID] = flight }
     }
 
-    private func discover(for country: Country, excluding: Set<String>, minimumCount: Int) async -> [String] {
+    private func discover(for country: Country, excluding: Set<String>, minimumCount: Int, preferCountryLinked: Bool) async -> [String] {
         let date = now()
         var pool = cache[country.id] ?? Pool(fetchedAt: date)
         if date.timeIntervalSince(pool.fetchedAt) >= 86_400 { pool = Pool(fetchedAt: date) }
         func available() -> [String] { pool.titles.filter { !excluding.contains(Self.normalized($0)) } }
-        if available().count >= minimumCount { return available() }
+        func hasEnough() -> Bool {
+            let titles = available()
+            return titles.count >= minimumCount && (!preferCountryLinked || titles.contains { pool.countryLinkedTitles.contains(Self.normalized($0)) })
+        }
+        if hasEnough() { return available() }
         if let until = backoffUntil, until > date { return available() }
         if let until = pool.retryAfter, until > date { return available() }
         guard let identity = Self.identities[country.id] else { return available() }
@@ -106,7 +110,7 @@ actor CultureTopicDiscovery {
                 }.map(\.element)
                 pool.retryAfter = nil
                 cache[country.id] = pool
-                if available().count >= minimumCount { break }
+                if hasEnough() { break }
             } catch {
                 if Task.isCancelled { return [] }
                 pool.retryAfter = now().addingTimeInterval(60)

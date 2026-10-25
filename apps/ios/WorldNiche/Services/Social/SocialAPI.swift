@@ -108,6 +108,19 @@ actor SocialAPI {
                                 body: ["provider": "apple", "id_token": identityToken, "nonce": nonce], invalidCredential: .appleSignInFailed)
     }
 
+    func linkAppleIdentity(identityToken: String, nonce: String) async throws {
+        guard !identityToken.isEmpty, !nonce.isEmpty else { throw SocialError.appleSignInFailed }
+        guard let owner = session?.user.id else { throw SocialError.signInRequired }
+        let current = generation
+        let data = try await authenticated(path: "auth/v1/token", query: "grant_type=id_token",
+                                           body: ["provider": "apple", "id_token": identityToken,
+                                                  "nonce": nonce, "link_identity": true])
+        let linked = try Self.decodeSession(data)
+        guard generation == current, session?.user.id == owner else { throw CancellationError() }
+        guard linked.user.id == owner, linked.user.hasAppleIdentity else { throw SocialError.invalidResponse }
+        try persist(linked)
+    }
+
     private func signIn(path: String, query: String? = nil, body: [String: Any], invalidCredential: SocialError) async throws -> UUID {
         guard !storageFailed else { throw SocialError.storageFailure }
         generation = UUID()
@@ -133,6 +146,15 @@ actor SocialAPI {
 
     func updateProfile(name: String, avatar: String, sharing: Bool) async throws -> ExplorerProfile {
         try await rpc("update_my_profile", body: ["p_display_name": name, "p_avatar": avatar, "p_share_exploration": sharing])
+    }
+
+    func checkProfileContent() async throws -> ExplorerProfile {
+        let data = try await authenticated(path: "functions/v1/moderate-profile", body: [:])
+        return try Self.decoder().decode(ExplorerProfile.self, from: data)
+    }
+
+    func setProfileCheckConsent(enabled: Bool) async throws -> ExplorerProfile {
+        try await rpc("set_profile_check_consent", body: ["p_enabled": enabled])
     }
 
     /// Uploads a new immutable object, then submits it for profile review.

@@ -4,6 +4,7 @@ struct CountryDetailView: View {
     let country: Country
     @Environment(\.dismiss) private var dismiss
     @Environment(DiscoveryJournal.self) private var journal
+    @Environment(SocialStore.self) private var social
     @State private var music: FeedSnapshot<MusicTrack>?
     @State private var news: FeedSnapshot<NewsStory>?
     @State private var musicLoading = true
@@ -85,7 +86,8 @@ struct CountryDetailView: View {
                 await loadNews(forceRefresh: newsRefreshID > 0 || refreshID > 0)
             }
             .refreshLiveContent { refreshID += 1 }
-            .task(id: "\(country.id)-\(cultureRotation)-\(refreshID)") { await loadCulture(forceRefresh: cultureRotation > 0) }
+            .refreshSocialProfiles(enabled: social.isSignedIn)
+            .task(id: "\(country.id)-\(cultureRotation)-\(refreshID)") { await loadCulture(forceRefresh: refreshID > 0) }
             .refreshable {
                 async let music: () = loadMusic(forceRefresh: true)
                 async let news: () = loadNews(forceRefresh: true)
@@ -99,8 +101,8 @@ struct CountryDetailView: View {
         let requestID = UUID()
         cultureRequestID = requestID
         cultureLoading = true
-        let result = await Self.cultureService.fetch(for: country, rotation: cultureRotation, forceRefresh: forceRefresh, discoverySessionID: cultureSessionID)
-        if !Task.isCancelled && cultureRequestID == requestID {
+        for await result in Self.cultureService.updates(for: country, rotation: cultureRotation, forceRefresh: forceRefresh, discoverySessionID: cultureSessionID) {
+            guard !Task.isCancelled && cultureRequestID == requestID else { break }
             cultureReading = result.reading
             cultureMessage = result.message
             cultureLoaded = true

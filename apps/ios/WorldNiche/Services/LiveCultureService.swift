@@ -49,6 +49,7 @@ actor LiveCultureService {
     private var discovery: CultureTopicDiscovery
     private let allowsDiscovery: Bool
     private let allowsGeneration: Bool
+    private let factGenerator: @Sendable (String, String, String) async -> CultureFact?
     private let historyDefaults: UserDefaults?
     private var history: [String: [String]] = [:]
     private var selections: [String: String] = [:]
@@ -56,16 +57,51 @@ actor LiveCultureService {
     private var lastSelectionDays: [String: Int] = [:]
     private var rejected: [String: Set<String>] = [:]
     private var cache: [String: CultureReading] = [:]
+    private var requestSequence = 0
+    private var selectedRequests: [String: Int] = [:]
+    private var cachedRequests: [String: Int] = [:]
     private var backoffUntil: Date?
     private var historyGeneration = UUID()
+    private struct PendingEnrichment: Codable, Sendable {
+        let imageSource: String?
+        var needsImage: Bool
+        var needsFact: Bool
+        var unfinished: Bool { needsImage || needsFact }
+    }
+    private enum EnrichmentResult: Sendable { case image(CultureImage?); case fact(CultureFact?) }
+    private struct SavedReading: Codable {
+        let day: Int
+        let reading: CultureReading
+        let pending: PendingEnrichment?
+    }
+    private var pendingEnrichment: [String: PendingEnrichment] = [:]
+    private var restoredCountries: Set<String> = []
+    private struct UpdateFlight {
+        let id: UUID
+        let task: Task<Void, Never>
+        var subscribers: [UUID: AsyncStream<CultureReadingResult>.Continuation]
+        var latest: CultureReadingResult?
+    }
+    private var updateFlights: [String: UpdateFlight] = [:]
+    private var updateSubscriptions: [UUID: String] = [:]
+
+    #if WORLDNICHE_TESTING
+    func pendingUpdateSubscriberCount(for countryID: String) -> Int {
+        updateFlights.filter { $0.key.hasPrefix(countryID + "|") }.values.reduce(0) { $0 + $1.subscribers.count }
+    }
+    #endif
     private let topics: [String: [String]]
 
     init(session: URLSession = .shared, topics: [String: [String]]? = nil,
-         persistsHistory: Bool = false, historySuiteName: String? = nil, allowsGeneration: Bool = true) {
+         persistsHistory: Bool = false, historySuiteName: String? = nil, allowsGeneration: Bool = true,
+         factGenerator: (@Sendable (String, String, String) async -> CultureFact?)? = nil) {
         self.session = session
         self.discovery = CultureTopicDiscovery(session: session)
         self.allowsDiscovery = topics == nil
-        self.allowsGeneration = allowsGeneration && topics == nil
+        self.allowsGeneration = allowsGeneration && (topics == nil || factGenerator != nil)
+        self.factGenerator = factGenerator ?? { title, text, place in
+            await Self.generateFact(title: title, sourceText: text, country: place)
+        }
         self.historyDefaults = persistsHistory ? (historySuiteName.flatMap(UserDefaults.init(suiteName:)) ?? .standard) : nil
         if let topics { self.topics = topics }
         else if let url = Bundle.main.url(forResource: "culture-topics", withExtension: "json"),
@@ -78,16 +114,26 @@ actor LiveCultureService {
     func clearHistory() {
         // Invalidate suspended reads before clearing both persisted and live state.
         historyGeneration = UUID()
+        for flight in updateFlights.values {
+            flight.task.cancel()
+            for subscriber in flight.subscribers.values { subscriber.finish() }
+        }
+        updateFlights.removeAll()
+        updateSubscriptions.removeAll()
         history.removeAll()
         selections.removeAll()
         lastReadings.removeAll()
         lastSelectionDays.removeAll()
         rejected.removeAll()
+        restoredCountries.removeAll()
         cache.removeAll()
+        selectedRequests.removeAll()
+        cachedRequests.removeAll()
+        pendingEnrichment.removeAll()
         backoffUntil = nil
         discovery = CultureTopicDiscovery(session: session)
         if let historyDefaults {
-            for key in historyDefaults.dictionaryRepresentation().keys where key.hasPrefix("worldniche.culture.history.") {
+            for key in historyDefaults.dictionaryRepresentation().keys where key.hasPrefix("worldniche.culture.history.") || key.hasPrefix("worldniche.culture.reading.") {
                 historyDefaults.removeObject(forKey: key)
             }
         }
@@ -98,9 +144,13 @@ actor LiveCultureService {
         guard generation == historyGeneration else { throw CancellationError() }
     }
 
-    func fetch(for country: Country, rotation: Int = 0, forceRefresh: Bool = false, now: Date = Date(), discoverySessionID: UUID? = nil) async -> CultureReadingResult {
+    func fetch(for country: Country, rotation: Int = 0, forceRefresh: Bool = false, now: Date = Date(), discoverySessionID: UUID? = nil, publish: (@Sendable (CultureReadingResult) async -> Void)? = nil) async -> CultureReadingResult {
         guard !Task.isCancelled else { return CultureReadingResult(reading: nil, message: nil) }
+        restoreReading(for: country)
         let generation = historyGeneration
+        requestSequence += 1
+        let requestID = requestSequence
+        selectedRequests[country.id] = requestID
         let day = Calendar.current.ordinality(of: .day, in: .era, for: now) ?? 0
         let selectionKey = "\(country.id)|\(day)|\(discoverySessionID?.uuidString ?? "shared")|\(rotation)"
         // A new detail view starts on the current reading. Its subsequent button
@@ -111,6 +161,13 @@ actor LiveCultureService {
         }
         if let title = selections[selectionKey], !forceRefresh, let reading = cache[title],
            Date().timeIntervalSince(reading.fetchedAt) < 900 {
+            if let pending = pendingEnrichment[title] {
+                do {
+                    let enriched = try await enrich(reading, pending: pending, alias: title, country: country,
+                                                    day: day, generation: generation, requestID: requestID, publish: publish)
+                    return CultureReadingResult(reading: enriched, message: nil)
+                } catch { return CultureReadingResult(reading: nil, message: nil) }
+            }
             return CultureReadingResult(reading: reading, message: nil)
         }
         if let until = backoffUntil, until > Date() {
@@ -128,7 +185,7 @@ actor LiveCultureService {
                     title = selected
                 } else {
                     let excluded = Set(history[country.id, default: []]).union(rejected[country.id, default: []]).union(attempted)
-                    var candidates = allowsDiscovery ? await discovery.topics(for: country, excluding: excluded) : []
+                    var candidates = allowsDiscovery ? await discovery.topics(for: country, excluding: excluded, minimumCount: 1, preferCountryLinked: true) : []
                     try checkCurrentHistory(generation)
                     let normalizedExcluded = Set(excluded.map(CultureTopicDiscovery.normalized))
                     if candidates.isEmpty {
@@ -165,20 +222,24 @@ actor LiveCultureService {
                 }
                 let words = summary.extract.split(whereSeparator: \.isWhitespace)
                 let excerpt = words.prefix(110).joined(separator: " ") + (words.count > 110 ? "…" : "")
-                async let image = loadImage(summary.originalimage?.source)
-                async let generated = allowsGeneration ? Self.generateFact(title: canonical, sourceText: excerpt, country: country.name) : nil
-                let (sourceImage, fact) = await (image, generated)
-                try checkCurrentHistory(generation)
+                // Show the verified source immediately. Photo licensing and optional
+                // on-device wording enrich that same reading without holding up the card.
+                let fetchedAt = Date()
                 let reading = CultureReading(title: canonical, excerpt: excerpt, sourceURL: source,
-                                             fetchedAt: Date(), revisionDate: summary.timestamp,
-                                             image: sourceImage, generatedFact: fact)
-                cache[title] = reading
-                cache[canonical] = reading
-                lastSelectionDays[country.id] = day
-                lastReadings[country.id] = reading
+                                             fetchedAt: fetchedAt, revisionDate: summary.timestamp)
+                let pending = PendingEnrichment(imageSource: summary.originalimage?.source,
+                                                needsImage: summary.originalimage != nil, needsFact: allowsGeneration)
+                if publish != nil {
+                    saveReading(reading, alias: title, countryID: country.id, day: day, requestID: requestID, pending: pending)
+                    remember(title, countryID: country.id)
+                    if canonical != title { remember(canonical, countryID: country.id) }
+                    await publish?(CultureReadingResult(reading: reading, message: nil))
+                }
+                let enriched = try await enrich(reading, pending: pending, alias: title, country: country,
+                                                day: day, generation: generation, requestID: requestID, publish: publish)
                 remember(title, countryID: country.id)
                 if canonical != title { remember(canonical, countryID: country.id) }
-                return CultureReadingResult(reading: reading, message: nil)
+                return CultureReadingResult(reading: enriched, message: nil)
             } catch {
                 guard generation == historyGeneration else { return CultureReadingResult(reading: nil, message: nil) }
                 if Task.isCancelled { selections.removeValue(forKey: selectionKey); return CultureReadingResult(reading: nil, message: nil) }
@@ -193,6 +254,152 @@ actor LiveCultureService {
             }
         }
         return fallback(country, message: "The next sources didn’t contain a useful cultural discovery. Try another search shortly.")
+    }
+
+    private func enrich(_ source: CultureReading, pending initial: PendingEnrichment, alias: String,
+                        country: Country, day: Int, generation: UUID, requestID: Int,
+                        publish: (@Sendable (CultureReadingResult) async -> Void)?) async throws -> CultureReading {
+        try checkCurrentHistory(generation)
+        var pending = initial
+        if !allowsGeneration { pending.needsFact = false }
+        return try await withThrowingTaskGroup(of: EnrichmentResult.self) { group in
+            if pending.needsImage {
+                let imageSource = pending.imageSource
+                group.addTask { .image(await self.loadImage(imageSource)) }
+            }
+            if pending.needsFact {
+                let generator = factGenerator
+                group.addTask { .fact(await generator(source.title, source.excerpt, country.name)) }
+            }
+            var image = source.image
+            var fact = source.generatedFact
+            var reading = source
+            for try await result in group {
+                try checkCurrentHistory(generation)
+                switch result {
+                case .image(let loaded): image = loaded; pending.needsImage = false
+                case .fact(let generated): fact = generated; pending.needsFact = false
+                }
+                reading = CultureReading(title: source.title, excerpt: source.excerpt, sourceURL: source.sourceURL,
+                                         fetchedAt: source.fetchedAt, revisionDate: source.revisionDate,
+                                         image: image, generatedFact: fact)
+                if publish != nil {
+                    saveReading(reading, alias: alias, countryID: country.id, day: day, requestID: requestID, pending: pending)
+                    await publish?(CultureReadingResult(reading: reading, message: nil))
+                }
+            }
+            try checkCurrentHistory(generation)
+            saveReading(reading, alias: alias, countryID: country.id, day: day, requestID: requestID)
+            return reading
+        }
+    }
+
+    /// Cached and source-first updates let views keep useful content on screen
+    /// while fresh sources, licensed imagery, and on-device enrichment arrive.
+    nonisolated func updates(for country: Country, rotation: Int = 0, forceRefresh: Bool = false,
+                             now: Date = Date(), discoverySessionID: UUID? = nil) -> AsyncStream<CultureReadingResult> {
+        AsyncStream { continuation in
+            let subscriberID = UUID()
+            let subscription = Task {
+                await self.subscribe(continuation, id: subscriberID, country: country, rotation: rotation,
+                                     forceRefresh: forceRefresh, now: now, discoverySessionID: discoverySessionID)
+            }
+            continuation.onTermination = { @Sendable _ in
+                subscription.cancel()
+                Task { await self.unsubscribe(subscriberID) }
+            }
+        }
+    }
+
+    private func subscribe(_ continuation: AsyncStream<CultureReadingResult>.Continuation, id subscriberID: UUID,
+                           country: Country, rotation: Int, forceRefresh: Bool, now: Date, discoverySessionID: UUID?) {
+        guard !Task.isCancelled else { continuation.finish(); return }
+        let day = Calendar.current.ordinality(of: .day, in: .era, for: now) ?? 0
+        // Home and a newly opened detail share the current reading, including
+        // enrichment already in progress. Each later button press remains distinct.
+        let selection = rotation == 0 ? "current" : "\(discoverySessionID?.uuidString ?? "shared")|\(rotation)"
+        let key = "\(country.id)|\(day)|\(selection)|\(forceRefresh)"
+        updateSubscriptions[subscriberID] = key
+        if var flight = updateFlights[key] {
+            flight.subscribers[subscriberID] = continuation
+            updateFlights[key] = flight
+            if let latest = flight.latest { continuation.yield(latest) }
+            return
+        }
+        let saved = rotation == 0 ? savedReading(for: country).map {
+            let needsRefresh = lastSelectionDays[country.id] != day || Date().timeIntervalSince($0.fetchedAt) >= 900
+            return CultureReadingResult(reading: $0, message: needsRefresh ? "Showing your saved discovery while the source refreshes." : nil)
+        } : nil
+        if let saved { continuation.yield(saved) }
+        let flightID = UUID()
+        let task = Task {
+            let result = await self.fetch(for: country, rotation: rotation, forceRefresh: forceRefresh,
+                                          now: now, discoverySessionID: discoverySessionID,
+                                          publish: { update in await self.publishUpdate(update, key: key, flightID: flightID) })
+            self.finishUpdate(result, key: key, flightID: flightID)
+        }
+        updateFlights[key] = UpdateFlight(id: flightID, task: task, subscribers: [subscriberID: continuation], latest: saved)
+    }
+
+    private func publishUpdate(_ update: CultureReadingResult, key: String, flightID: UUID) {
+        guard var flight = updateFlights[key], flight.id == flightID, !Task.isCancelled else { return }
+        flight.latest = update
+        updateFlights[key] = flight
+        for subscriber in flight.subscribers.values { subscriber.yield(update) }
+    }
+
+    private func finishUpdate(_ update: CultureReadingResult, key: String, flightID: UUID) {
+        guard let flight = updateFlights[key], flight.id == flightID else { return }
+        updateFlights.removeValue(forKey: key)
+        for (id, subscriber) in flight.subscribers {
+            updateSubscriptions.removeValue(forKey: id)
+            if !Task.isCancelled { subscriber.yield(update) }
+            subscriber.finish()
+        }
+    }
+
+    private func unsubscribe(_ id: UUID) {
+        guard let key = updateSubscriptions.removeValue(forKey: id), var flight = updateFlights[key] else { return }
+        flight.subscribers.removeValue(forKey: id)
+        if flight.subscribers.isEmpty {
+            flight.task.cancel()
+            updateFlights.removeValue(forKey: key)
+        } else { updateFlights[key] = flight }
+    }
+
+    private func savedReading(for country: Country) -> CultureReading? {
+        restoreReading(for: country)
+        return lastReadings[country.id]
+    }
+
+    private func restoreReading(for country: Country) {
+        guard restoredCountries.insert(country.id).inserted,
+              let data = historyDefaults?.data(forKey: "worldniche.culture.reading.\(country.id)"),
+              let saved = try? JSONDecoder().decode(SavedReading.self, from: data),
+              Date().timeIntervalSince(saved.reading.fetchedAt) < 7 * 86_400 else { return }
+        let reading = saved.reading
+        lastReadings[country.id] = reading
+        lastSelectionDays[country.id] = saved.day
+        cache[reading.title] = reading
+        pendingEnrichment[reading.title] = saved.pending
+    }
+
+    private func saveReading(_ reading: CultureReading, alias: String, countryID: String, day: Int, requestID: Int,
+                             pending: PendingEnrichment? = nil) {
+        let unfinished = pending?.unfinished == true ? pending : nil
+        for key in Set([alias, reading.title]) where (cachedRequests[key] ?? 0) <= requestID {
+            cache[key] = reading
+            cachedRequests[key] = requestID
+            pendingEnrichment[key] = unfinished
+        }
+        // Ownership begins before source requests, so neither a slow summary
+        // nor enrichment can replace a more recently requested selection.
+        guard selectedRequests[countryID] == requestID else { return }
+        lastReadings[countryID] = reading
+        lastSelectionDays[countryID] = day
+        if let historyDefaults, let data = try? JSONEncoder().encode(SavedReading(day: day, reading: reading, pending: unfinished)) {
+            historyDefaults.set(data, forKey: "worldniche.culture.reading.\(countryID)")
+        }
     }
 
     private func remember(_ title: String, countryID: String) {

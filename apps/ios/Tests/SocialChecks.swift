@@ -67,6 +67,7 @@ private final class SocialFixture: @unchecked Sendable {
     private var hasProfile = true
     private var sharing = false
     private var name = "Mira"
+    private var profileAvatar = "globe"
     private var syncedIDs: [String] = ["JP"]
     private var deletionAcknowledged = true
     private var overrides: [String: Data] = [:]
@@ -75,13 +76,15 @@ private final class SocialFixture: @unchecked Sendable {
     private var approvedPhoto: String?
     private var pendingPhoto: String?
     private var losePhotoCommitResponse = false
+    private var profileCheckConsent: Bool?
 
     func reset(user: UUID = userA, profile: Bool = true, sharing: Bool = false) {
         lock.lock(); defer { lock.unlock() }
         requests = []; failures = [:]; failureCodes = [:]; account = user; hasProfile = profile
-        self.sharing = sharing; name = user == userA ? "Mira" : "Noah"
+        self.sharing = sharing; name = user == userA ? "Mira" : "Noah"; profileAvatar = "globe"
         syncedIDs = ["JP"]; deletionAcknowledged = true; overrides = [:]; appleAccount = false
         moderatingPhotos = false; approvedPhoto = nil; pendingPhoto = nil; losePhotoCommitResponse = false
+        profileCheckConsent = nil
     }
     func reviewPhotos(approved: String?, pending: String? = nil, loseCommitResponse: Bool = false) {
         lock.lock(); defer { lock.unlock() }
@@ -148,7 +151,12 @@ private final class SocialFixture: @unchecked Sendable {
             name = body["p_display_name"] as? String ?? "Missing name"
             sharing = body["p_share_exploration"] as? Bool ?? false
             hasProfile = true
-            value = profileJSON(avatar: body["p_avatar"] as? String ?? "globe")
+            profileAvatar = body["p_avatar"] as? String ?? "globe"
+            value = profileJSON()
+        case "/rest/v1/rpc/set_profile_check_consent":
+            guard hasProfile else { return (400, Data(#"{"error":"profile required"}"#.utf8)) }
+            profileCheckConsent = body["p_enabled"] as? Bool
+            value = profileJSON()
         case "/rest/v1/rpc/set_profile_avatar" where moderatingPhotos:
             pendingPhoto = body["p_path"] as? String
             if pendingPhoto == nil { approvedPhoto = nil }
@@ -181,8 +189,12 @@ private final class SocialFixture: @unchecked Sendable {
         return (200, try! JSONSerialization.data(withJSONObject: value, options: [.fragmentsAllowed]))
     }
 
-    private func profileJSON(avatar: String = "globe") -> [String: Any] {
-        var value: [String: Any] = ["id": account.uuidString, "display_name": name, "avatar": avatar, "share_exploration": sharing]
+    private func profileJSON() -> [String: Any] {
+        var value: [String: Any] = ["id": account.uuidString, "display_name": name, "avatar": profileAvatar, "share_exploration": sharing]
+        if let profileCheckConsent {
+            value["automatic_profile_checks_enabled"] = profileCheckConsent
+            value["profile_check_consent_recorded"] = true
+        }
         if moderatingPhotos {
             value["avatar_path"] = approvedPhoto as Any? ?? NSNull()
             value["pending_avatar_path"] = pendingPhoto as Any? ?? NSNull()
@@ -767,8 +779,8 @@ private final class CheckSuite {
         await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Mira Apple")
         check(store.isSignedIn && store.profile?.id == userA && store.profile?.displayName == "Mira Apple",
               "Initial Apple consent name should initialize the new profile without another form")
-        check(store.profile?.shareExploration == false && fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty,
-              "Apple sign-in must keep exploration sharing off by default")
+        check(store.profile?.shareExploration == true && !fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty,
+              "New Apple accounts use the disclosed sharing-on default")
         check(!journal.visitedIDs.contains("FR"), "Apple sign-in must not merge a guest journal into the online account")
         await store.signOut()
         check(journal.visitedIDs == ["FR"], "Signing out of Apple account must restore the private guest journal")
@@ -1062,21 +1074,22 @@ private final class CheckSuite {
             let restored = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults, photoDirectory: photoDirectory, configuration: configuration, api: service)
             check(restored.hasPendingInvitation && restored.presentsInvitation, "Pending invitation survives process restart before sign-in")
             if apple {
-                await restored.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Apple Explorer")
+                await restored.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Apple Explorer",
+                                               shareExplorationForNewAccount: false)
             } else {
                 await restored.requestCode(email: "test@example.test")
                 fixture.fail("/auth/v1/verify", statuses: [401])
-                await restored.verifyCode(code: "123456")
+                await restored.verifyCode(code: "123456", shareExplorationForNewAccount: false)
                 check(restored.hasPendingInvitation && fixture.observed("/rest/v1/rpc/accept_invite").isEmpty,
                       "Rejected email code keeps invitation available without creating friendship")
-                await restored.verifyCode(code: "123456")
+                await restored.verifyCode(code: "123456", shareExplorationForNewAccount: false)
             }
             check(restored.invitationConnected && fixture.observed("/rest/v1/rpc/accept_invite").count == 1,
                   "\(apple ? "Apple" : "Email") sign-in automatically resumes invitation once")
             let paths = fixture.observed().map(\.path)
             check((paths.firstIndex(of: "/rest/v1/rpc/update_my_profile") ?? 999) < (paths.firstIndex(of: "/rest/v1/rpc/accept_invite") ?? 0),
                   "New account profile exists before redeeming the friend link")
-            check(restored.profile?.shareExploration == false, "Connecting a friend never opts into discovery sharing")
+            check(restored.profile?.shareExploration == false, "Connecting a friend preserves the explicitly off signup choice")
             let afterSuccess = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults, photoDirectory: photoDirectory, configuration: configuration, api: service)
             await afterSuccess.refresh()
             check(!afterSuccess.hasPendingInvitation && fixture.observed("/rest/v1/rpc/accept_invite").count == 1,
@@ -1353,6 +1366,295 @@ private final class CheckSuite {
               "Explicit device data erasure must also remove inactive private workspace snapshots")
     }
 
+    func profilePreviewAndChecks() async {
+        let approvedPhoto = "\(userA.uuidString.lowercased())/55555555-5555-4555-8555-555555555555.jpg"
+        let pendingPhoto = "\(userA.uuidString.lowercased())/66666666-6666-4666-8666-666666666666.jpg"
+        var approved = ExplorerProfile(id: userA, displayName: "Mira", avatar: "globe", shareExploration: false,
+                                       avatarPath: approvedPhoto, automaticProfileChecksEnabled: true,
+                                       profileCheckConsentRecorded: true)
+        var pending = approved
+        pending.pendingDisplayName = "Mira Rose"; pending.nameModerationStatus = .pending; pending.nameCheckState = .queued
+        pending.pendingAvatarPath = pendingPhoto; pending.photoModerationStatus = .pending; pending.photoCheckState = .queued
+        check(pending.ownerDisplayName == "Mira Rose" && pending.ownerAvatarPath == pendingPhoto,
+              "Owner immediately previews a saved pending name and photo")
+        check(pending.displayName == "Mira" && pending.avatarPath == approvedPhoto,
+              "Owner preview must never replace the approved friend-facing fields")
+        var rejected = pending
+        rejected.nameModerationStatus = .rejected; rejected.photoModerationStatus = .rejected
+        check(rejected.ownerDisplayName == "Mira" && rejected.ownerAvatarPath == approvedPhoto,
+              "Rejected content falls back to the approved owner profile")
+        check(rejected.editableDisplayName == "Mira Rose" && rejected.editableAvatarPath == pendingPhoto,
+              "Rejected edits remain available to correct in the editor")
+        let encoder = JSONEncoder(); encoder.keyEncodingStrategy = .convertToSnakeCase
+        func respond(_ path: String, _ profile: ExplorerProfile) { fixture.respond(path, data: try! encoder.encode(profile)) }
+
+        fixture.reset()
+        var manual = pending; manual.automaticProfileChecksEnabled = false
+        manual.nameCheckState = .review; manual.photoCheckState = .review
+        respond("/rest/v1/rpc/get_my_profile", manual)
+        let defaults = isolatedDefaults()
+        let service = api(vault: MemoryVault(savedSession()))
+        let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                photoDirectory: photoDirectory, configuration: configuration, api: service)
+        await store.refresh()
+        await store.retryProfileCheck()
+        check(fixture.observed("/functions/v1/moderate-profile").isEmpty,
+              "Existing pending content without consent must never go to automatic checks")
+        check(store.profile?.ownerDisplayName == "Mira Rose", "A manual review still preserves the owner's saved preview")
+        respond("/rest/v1/rpc/set_profile_check_consent", pending)
+        approved.displayName = "Mira Rose"; approved.avatarPath = pendingPhoto
+        respond("/functions/v1/moderate-profile", approved)
+        responseGate.arm("/functions/v1/moderate-profile")
+        await store.setProfileCheckConsent(enabled: true)
+        guard await waitForHeldResponse() else {
+            check(false, "Explicit consent must resume the pending profile check")
+            responseGate.release(); return
+        }
+        check(!store.isBusy && store.isCheckingProfile && store.profile?.ownerAvatarPath == pendingPhoto,
+              "Automatic checks run separately from save and keep the owner preview visible")
+        let request = fixture.observed("/functions/v1/moderate-profile").last
+        check(request?.method == "POST" && request?.authorization == "Bearer \(accessSecret)" && request?.json().isEmpty == true,
+              "Automatic checks use the authenticated current revision endpoint without resending client content")
+        respond("/rest/v1/rpc/set_profile_check_consent", manual)
+        await store.setProfileCheckConsent(enabled: false)
+        responseGate.release()
+        for _ in 0..<10 { await Task.yield() }
+        check(store.profile?.automaticProfileChecksEnabled == false && store.profile?.displayName == "Mira",
+              "A late check response after consent revocation must not publish or restore the prior consent")
+        check(!store.isCheckingProfile && store.profile?.ownerDisplayName == "Mira Rose",
+              "Revocation stops the in-flight check without losing the saved owner edit")
+
+        fixture.clearRequests()
+        var retry = pending; retry.nameCheckState = .retry; retry.photoCheckState = .retry
+        respond("/rest/v1/rpc/set_profile_check_consent", retry)
+        await store.setProfileCheckConsent(enabled: true)
+        fixture.fail("/functions/v1/moderate-profile", statuses: [503])
+        await store.retryProfileCheck()
+        check(store.profileCheckFailed && !store.isCheckingProfile && store.profile?.ownerDisplayName == "Mira Rose",
+              "A provider outage preserves saved edits and exposes a retry state")
+        await store.retryProfileCheck()
+        check(!store.profileCheckFailed && store.profile?.displayName == "Mira Rose" && store.profile?.pendingDisplayName == nil,
+              "A successful retry atomically applies the approved server profile")
+
+        fixture.clearRequests()
+        var flagged = pending; flagged.nameCheckState = .review; flagged.photoCheckState = .review
+        respond("/rest/v1/rpc/set_profile_check_consent", flagged)
+        await store.setProfileCheckConsent(enabled: true)
+        await store.retryProfileCheck()
+        check(fixture.observed("/functions/v1/moderate-profile").isEmpty,
+              "A flagged review cannot be repeatedly submitted as a transient failure retry")
+        respond("/rest/v1/rpc/update_my_profile", manual)
+        await store.saveProfile(name: "Mira Rose", avatar: "globe", sharing: false)
+        check(store.profile?.ownerDisplayName == "Mira Rose" && store.profileSaveMessage == "Saved to your profile." && !store.isBusy,
+              "Saving a pending edit confirms it immediately without waiting for manual review")
+        check(fixture.observed("/functions/v1/moderate-profile").isEmpty,
+              "Saving a profile without automatic-check consent does not contact the provider endpoint")
+    }
+
+    func profileSetupConsentRecovery() async {
+        for automaticChecks in [false, true] {
+            fixture.reset(profile: false)
+            let defaults = isolatedDefaults()
+            let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                    configuration: configuration, api: api(vault: MemoryVault()))
+            fixture.fail("/rest/v1/rpc/update_my_profile", statuses: [503])
+            await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Initial Apple Name")
+            check(store.isSignedIn && store.profile == nil && store.errorMessage != nil,
+                  "Successful authentication with failed profile setup retains a retryable signed-in session")
+            fixture.clearRequests()
+            await store.saveProfile(name: "Chosen Retry Name", avatar: "leaf", sharing: false, automaticChecks: automaticChecks)
+            let paths = fixture.observed().map(\.path)
+            check((paths.firstIndex(of: "/rest/v1/rpc/update_my_profile") ?? 999)
+                  < (paths.firstIndex(of: "/rest/v1/rpc/set_profile_check_consent") ?? 0),
+                  "First editor retry must create the missing profile before recording consent=\(automaticChecks)")
+            check(store.profile?.displayName == "Chosen Retry Name" && store.profile?.avatar == "leaf" && store.profile?.shareExploration == false,
+                  "Profile setup retry preserves the editor's name, symbol and sharing choice")
+            check(store.profile?.automaticProfileChecksEnabled == automaticChecks && store.profile?.profileCheckConsentRecorded == true,
+                  "Both automatic and human review choices are saved after interrupted profile setup")
+            check(store.errorMessage == nil && store.profileSaveMessage != nil && !store.isBusy,
+                  "Successful editor recovery clears onboarding failure and confirms the save")
+            check(defaults.dictionaryRepresentation().keys.allSatisfy {
+                !$0.hasPrefix("niche.pendingAppleName.") && !$0.hasPrefix("niche.pendingProfileSharing.")
+            }, "Explicit editor save removes old onboarding defaults so they cannot replace the new choices")
+        }
+
+        fixture.reset(profile: false)
+        let defaults = isolatedDefaults()
+        let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                configuration: configuration, api: api(vault: MemoryVault()))
+        fixture.fail("/rest/v1/rpc/update_my_profile", statuses: [503])
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Initial")
+        fixture.fail("/rest/v1/rpc/set_profile_check_consent", statuses: [503])
+        await store.saveProfile(name: "Saved Despite Outage", avatar: "sun", sharing: true, automaticChecks: false)
+        check(store.profile?.displayName == "Saved Despite Outage" && store.profile?.shareExploration == true
+              && store.errorMessage != nil && !store.isBusy,
+              "Failed consent after initial profile save retains the saved data and exposes a retryable error")
+        await store.saveProfile(name: "Saved Despite Outage", avatar: "sun", sharing: true, automaticChecks: false)
+        check(store.errorMessage == nil && store.profile?.profileCheckConsentRecorded == true,
+              "Retrying the editor completes consent after a transient consent failure")
+        fixture.clearRequests()
+        fixture.fail("/rest/v1/rpc/set_profile_check_consent", statuses: [503])
+        await store.saveProfile(name: "Unsent Edit", avatar: "moon", sharing: false, automaticChecks: true)
+        check(store.errorMessage != nil && fixture.observed("/rest/v1/rpc/update_my_profile").isEmpty,
+              "Existing-profile consent failures stop the new edit before it is submitted under the wrong choice")
+    }
+
+    func visibleProfileRefresh() async {
+        fixture.reset()
+        let defaults = isolatedDefaults()
+        let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                photoDirectory: photoDirectory, configuration: configuration,
+                                api: api(vault: MemoryVault(savedSession())))
+        await store.refresh()
+        fixture.clearRequests()
+        await store.refreshVisibleProfiles()
+        check(fixture.observed().isEmpty, "Visible refresh is throttled after a full foreground refresh")
+        let fresh = #"[{"id":"33333333-3333-4333-8333-333333333333","display_name":"Jun Updated","avatar":"leaf","share_exploration":false,"country_ids":[],"explored_count":0,"avatar_path":"33333333-3333-4333-8333-333333333333/77777777-7777-4777-8777-777777777777.jpg"}]"#
+        fixture.respond("/rest/v1/rpc/list_friends", json: fresh)
+        await store.refreshVisibleProfiles(force: true)
+        check(store.friends.first?.displayName == "Jun Updated" && store.friends.first?.avatarPath != nil,
+              "Visible friends refresh replaces approved names and immutable photo references")
+        check(store.friends.count == 1 && store.friends.first?.countryIds == [],
+              "Refresh removes inaccessible friends and revoked exploration access")
+        check(fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty && fixture.observed("/rest/v1/rpc/get_my_profile").isEmpty,
+              "Visible friend refresh avoids journal uploads and unnecessary owner profile calls")
+        responseGate.arm("/rest/v1/rpc/list_friends")
+        let held = Task { await store.refreshVisibleProfiles(force: true) }
+        guard await waitForHeldResponse() else { responseGate.release(); held.cancel(); check(false, "Refresh race fixture must hold response"); return }
+        await store.signOut()
+        responseGate.release(); await held.value
+        check(!store.isSignedIn && store.friends.isEmpty,
+              "Late friend refresh must not restore private friends after sign-out")
+    }
+
+    func appleNameRecoveryAndLinking() async {
+        fixture.reset(profile: false)
+        let defaults = isolatedDefaults()
+        let journal = DiscoveryJournal(defaults: defaults)
+        let vault = MemoryVault()
+        let service = api(vault: vault)
+        let store = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory,
+                                configuration: configuration, api: service)
+        await store.saveProfile(name: "Explorer", avatar: "globe", sharing: false)
+        fixture.fail("/rest/v1/rpc/update_my_profile", statuses: [503])
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "  Apple First Name  ")
+        check(fixture.observed("/rest/v1/rpc/update_my_profile").first?.json()["p_display_name"] as? String == "Apple First Name",
+              "Apple's first authorization name takes precedence over an Explorer placeholder")
+        let relaunched = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory,
+                                     configuration: configuration, api: service)
+        await relaunched.refresh()
+        check(relaunched.profile?.displayName == "Apple First Name",
+              "Apple's one-time name survives a failed profile save and app relaunch")
+        check(defaults.dictionaryRepresentation().keys.allSatisfy { !$0.hasPrefix("niche.pendingAppleName.") },
+              "Successful server save removes the temporary Apple name copy")
+
+        fixture.reset(profile: false)
+        let offlineDefaults = isolatedDefaults()
+        let offlineAPI = api(vault: MemoryVault())
+        let offlineStore = SocialStore(journal: DiscoveryJournal(defaults: offlineDefaults), defaults: offlineDefaults,
+                                       configuration: configuration, api: offlineAPI)
+        fixture.fail("/auth/v1/token", statuses: [503])
+        await offlineStore.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "One Time Name",
+                                          appleUserID: "apple-fixture-user-\(userA.uuidString)")
+        check(!offlineStore.isSignedIn, "Failed initial Apple exchange must not fabricate an account")
+        await offlineStore.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil,
+                                          appleUserID: "apple-fixture-user-\(userA.uuidString)")
+        check(offlineStore.profile?.displayName == "One Time Name",
+              "A later verified Apple login recovers the name from first authorization after a failed exchange")
+
+        fixture.reset()
+        await offlineStore.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Different Apple Name")
+        check(offlineStore.profile?.displayName == "Mira" && fixture.observed("/rest/v1/rpc/update_my_profile").isEmpty,
+              "Apple authorization must never overwrite a meaningful existing profile name")
+
+        fixture.reset()
+        let linkVault = MemoryVault(savedSession())
+        let linkService = api(vault: linkVault)
+        do {
+            try await linkService.linkAppleIdentity(identityToken: appleIdentityToken, nonce: appleNonce)
+            let link = fixture.observed("/auth/v1/token").last
+            check(link?.query == "grant_type=id_token" && link?.authorization == "Bearer \(accessSecret)"
+                  && link?.json()["link_identity"] as? Bool == true,
+                  "Native Apple linking explicitly authenticates the existing account and sets link_identity")
+            let linkedApple = await linkService.hasAppleIdentity()
+            check(await linkService.currentUserID() == userA && linkedApple,
+                  "Linking preserves account identity and securely records Apple authorization")
+        } catch { check(false, "Native Apple linking should succeed for current owner: \(error)") }
+
+        fixture.reset(user: userB)
+        let mismatchVault = MemoryVault(savedSession())
+        let mismatch = api(vault: mismatchVault)
+        do { try await mismatch.linkAppleIdentity(identityToken: appleIdentityToken, nonce: appleNonce); check(false, "Linking cannot switch the account") }
+        catch { check(await mismatch.currentUserID() == userA, "A mismatched link response leaves the existing account signed in") }
+        fixture.reset()
+        let failure = api(vault: MemoryVault(savedSession()))
+        fixture.fail("/auth/v1/token", statuses: [422], code: "identity_already_exists")
+        do { try await failure.linkAppleIdentity(identityToken: appleIdentityToken, nonce: appleNonce); check(false, "Conflicting identity must reject linking") }
+        catch { check(await failure.currentUserID() == userA, "An already-linked Apple identity must not merge or sign out the existing account") }
+
+        fixture.reset()
+        let racingLink = api(vault: MemoryVault(savedSession()))
+        responseGate.arm("/auth/v1/token")
+        let linkTask = Task {
+            do { try await racingLink.linkAppleIdentity(identityToken: appleIdentityToken, nonce: appleNonce); return true }
+            catch { return false }
+        }
+        guard await waitForHeldResponse() else { responseGate.release(); linkTask.cancel(); check(false, "Link fixture must hold response"); return }
+        try? await racingLink.forgetSession()
+        responseGate.release()
+        check(!(await linkTask.value), "A native link response after sign-out must be cancelled")
+        check(await racingLink.currentUserID() == nil, "Late linking must not restore a cleared secure session")
+
+        fixture.reset()
+        let recoveryDefaults = isolatedDefaults()
+        let recovery = SocialStore(journal: DiscoveryJournal(defaults: recoveryDefaults), defaults: recoveryDefaults,
+                                   configuration: configuration, api: api(vault: MemoryVault()))
+        await recovery.requestCode(email: "existing@example.test", existingAccountOnly: true)
+        check(fixture.observed("/auth/v1/otp").first?.json()["create_user"] as? Bool == false,
+              "Email recovery cannot create new passwordless accounts")
+    }
+
+    func newAccountSharingChoices() async {
+        for (hasExistingProfile, existingSharing, selectedSharing, expected) in [
+            (false, false, true, true), (false, false, false, false),
+            (true, false, true, false), (true, true, false, true)
+        ] {
+            fixture.reset(profile: hasExistingProfile, sharing: existingSharing)
+            let defaults = isolatedDefaults()
+            let journal = DiscoveryJournal(defaults: defaults)
+            journal.visit(CountryRepository.country(id: "MA")!)
+            let store = SocialStore(journal: journal, defaults: defaults, configuration: configuration,
+                                    api: api(vault: MemoryVault()))
+            await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "New Explorer",
+                                        shareExplorationForNewAccount: selectedSharing)
+            check(store.profile?.shareExploration == expected,
+                  "Sharing respects new/explicit/existing choice: existing=\(hasExistingProfile), old=\(existingSharing), selected=\(selectedSharing)")
+            let writes = fixture.observed("/rest/v1/rpc/update_my_profile")
+            if hasExistingProfile {
+                check(writes.isEmpty, "Sign-in never silently rewrites an existing sharing preference")
+            } else {
+                check(writes.last?.json()["p_share_exploration"] as? Bool == selectedSharing,
+                      "New profile creation sends the choice shown before Apple authorization")
+            }
+            let uploads = fixture.observed("/rest/v1/rpc/sync_explorations")
+            check(uploads.allSatisfy { !($0.json()["p_country_ids"] as? [String] ?? []).contains("MA") },
+                  "New sharing defaults and later sign-ins must never upload prior guest exploration")
+            if !expected { check(uploads.isEmpty, "Sharing off must prevent all exploration uploads") }
+        }
+        fixture.reset(profile: false)
+        let defaults = isolatedDefaults()
+        let service = api(vault: MemoryVault())
+        let journal = DiscoveryJournal(defaults: defaults)
+        let interrupted = SocialStore(journal: journal, defaults: defaults, configuration: configuration, api: service)
+        fixture.fail("/rest/v1/rpc/update_my_profile", statuses: [503])
+        await interrupted.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil,
+                                          shareExplorationForNewAccount: false)
+        let restored = SocialStore(journal: journal, defaults: defaults, configuration: configuration, api: service)
+        await restored.refresh()
+        check(restored.profile?.shareExploration == false && fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty,
+              "An interrupted signup restores the explicitly off sharing choice even without an Apple name or invite")
+    }
+
     func staleStoreRefresh() async {
         fixture.reset()
         let defaults = isolatedDefaults()
@@ -1405,6 +1707,11 @@ private final class CheckSuite {
         await suite.invitationFailuresAndReplay()
         await suite.invitationRecoveryAndExpiry()
         await suite.profileModeration()
+        await suite.profilePreviewAndChecks()
+        await suite.profileSetupConsentRecovery()
+        await suite.visibleProfileRefresh()
+        await suite.appleNameRecoveryAndLinking()
+        await suite.newAccountSharingChoices()
         await suite.profilePhotosAndPrivacy()
         await suite.invitationRaces()
         await suite.authenticationRaces()

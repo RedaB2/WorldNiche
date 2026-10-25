@@ -38,8 +38,19 @@ struct ExploreView: View {
                             .multilineTextAlignment(.center)
                             .foregroundStyle(Palette.pine)
                             .accessibilityAddTraits(.isHeader)
+                            .accessibilityIdentifier("discoverHeadline")
                             .frame(maxWidth: .infinity)
                             .padding(.top, 30)
+
+                        HStack(spacing: 6) {
+                            Image(systemName: "hand.draw").accessibilityHidden(true)
+                            Text("Turn the globe. Tap a country. Stay curious.")
+                                .accessibilityIdentifier("discoverGuidance")
+                        }
+                        .scaledFont(size: 11)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(Palette.muted)
+                        .padding(.top, 12)
 
                         globe(height: max(200, min(geometry.size.width - 30, 355)))
                             .padding(.horizontal, -24)
@@ -77,15 +88,7 @@ struct ExploreView: View {
                             .foregroundStyle(Palette.muted)
                             .padding(.top, 13)
 
-                        localPreview.padding(.top, 32)
-                        HStack {
-                            Image(systemName: "hand.draw")
-                            Text("Turn the globe. Tap a country. Stay curious.")
-                        }
-                        .scaledFont(size: 11)
-                        .foregroundStyle(Palette.muted)
-                        .padding(.top, 22)
-                        .padding(.bottom, 28)
+                        localPreview.padding(.top, 32).padding(.bottom, 28)
                     }
                     .padding(.horizontal, 26)
                     .frame(maxWidth: 620)
@@ -102,8 +105,8 @@ struct ExploreView: View {
                 dailyReading = nil
                 readingMessage = nil
                 readingLoaded = false
-                let result = await LiveCultureService.shared.fetch(for: selected)
-                if !Task.isCancelled {
+                for await result in LiveCultureService.shared.updates(for: selected, forceRefresh: refreshID > 0) {
+                    guard !Task.isCancelled else { break }
                     dailyReading = result.reading
                     readingMessage = result.message
                     readingLoaded = true
@@ -142,6 +145,7 @@ struct ExploreView: View {
             }
             .accessibilityLabel("Interactive world globe")
             .accessibilityHint("Drag to rotate. Use the Atlas tab for an accessible country list.")
+            .accessibilityIdentifier("interactiveGlobe")
             .frame(height: height)
 
             Button { detail = selected } label: {

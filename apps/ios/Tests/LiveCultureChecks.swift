@@ -16,11 +16,13 @@ final class ScriptedTransport: @unchecked Sendable {
         let headers: [String: String]
         let data: Data
         let delayNanoseconds: UInt64
-        init(status: Int = 200, headers: [String: String] = [:], data: Data, delayNanoseconds: UInt64 = 0) {
+        let path: String?
+        init(status: Int = 200, headers: [String: String] = [:], data: Data, delayNanoseconds: UInt64 = 0, path: String? = nil) {
             self.status = status
             self.headers = headers
             self.data = data
             self.delayNanoseconds = delayNanoseconds
+            self.path = path
         }
     }
 
@@ -40,7 +42,8 @@ final class ScriptedTransport: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         requests.append(request)
         guard !replies.isEmpty else { return nil }
-        return replies.removeFirst()
+        guard let index = replies.firstIndex(where: { $0.path == nil || $0.path == request.url?.path }) else { return nil }
+        return replies.remove(at: index)
     }
 
     func didStop() {
@@ -109,6 +112,10 @@ struct LiveCultureChecks {
 
     static func main() async {
         do {
+            if CommandLine.arguments.contains("--performance") {
+                try await firstReadingLatency()
+                return
+            }
             if CommandLine.arguments.contains("--probe") {
                 try await liveDiscoveryProbe()
                 return
@@ -128,11 +135,38 @@ struct LiveCultureChecks {
             try await attributedImages()
             try await redirectDeduplication()
             try await CultureDiscoveryChecks.run()
+            try await firstReadingLatency()
+            try await progressiveEnrichment()
+            try await independentEnrichment()
+            try await interruptedEnrichmentResumes()
+            try await persistentReadingRefresh()
+            try await sharedEnrichmentAndCancellation()
+            try await lateEnrichmentPreservesNewerSelection()
+            try await lateSummaryPreservesNewerSelection()
             print("PASS: all deterministic live-culture checks (no network)")
         } catch {
             FileHandle.standardError.write(Data("FAIL: \(error)\n".utf8))
             exit(1)
         }
+    }
+
+    static func firstReadingLatency() async throws {
+        let text = "Faire la bise is a French greeting custom involving cheek kisses. The number of kisses varies between regions and social situations, and people often follow the convention of the person they are greeting."
+        MockCultureURLProtocol.transport.reset([
+            .init(data: try CultureDiscoveryChecks.payload([CultureDiscoveryChecks.valid[0]]), delayNanoseconds: 10_000_000, path: "/w/api.php"),
+            .init(data: try CultureDiscoveryChecks.payload([]), delayNanoseconds: 220_000_000, path: "/w/api.php"),
+            .init(data: try CultureDiscoveryChecks.payload([]), delayNanoseconds: 220_000_000, path: "/w/api.php"),
+            .init(data: try summary(title: "Faire la bise", excerpt: text, source: "https://en.wikipedia.org/wiki/Faire_la_bise"), delayNanoseconds: 10_000_000, path: "/api/rest_v1/page/summary/Faire_la_bise")
+        ])
+        let session = makeSession(); defer { session.invalidateAndCancel() }
+        let start = ContinuousClock.now
+        let result = await LiveCultureService(session: session, allowsGeneration: false).fetch(for: CultureDiscoveryChecks.france)
+        let elapsed = start.duration(to: .now)
+        try require(result.reading?.title == "Faire la bise", "First local reading lost its validated source.")
+        print("First validated France reading: \(elapsed)")
+        try require(elapsed < .milliseconds(300), "A usable local reading waited for unrelated search top-ups: \(elapsed)")
+        try require(MockCultureURLProtocol.transport.snapshot().requests.count == 2, "The first reading overfetched search facets before displaying useful content.")
+        print("PASS: first validated reading does not wait for spare search candidates")
     }
 
     static func makeSession() -> URLSession {
@@ -263,7 +297,9 @@ struct LiveCultureChecks {
         try require(MockCultureURLProtocol.transport.snapshot().requests.count == 3, "A consumed pool generated repeat network requests.")
         let relaunched = LiveCultureService(session: session, topics: index, persistsHistory: true, historySuiteName: suite)
         let afterRestart = await relaunched.fetch(for: country)
-        try require(afterRestart.reading == nil && afterRestart.message?.contains("end of") == true, "Persistent history was lost across service instances.")
+        try require(afterRestart.reading?.title == "Highlife" && afterRestart.message == nil, "The ready reading was lost across service instances.")
+        let nextAfterRestart = await relaunched.fetch(for: country, rotation: 1)
+        try require(nextAfterRestart.reading?.title == "Highlife" && nextAfterRestart.message?.contains("end of") == true, "Persistent history repeated a consumed topic after restart.")
         print("PASS: stable selection, view-reopen nonrepeat, honest exhaustion, and persistent history")
     }
 
@@ -351,6 +387,230 @@ struct LiveCultureChecks {
         let nonfree = await LiveCultureService(session: session, topics: topics).fetch(for: country)
         try require(nonfree.reading?.image == nil && MockCultureURLProtocol.transport.snapshot().requests.count == 1, "A nonfree local-Wikipedia image was accepted.")
         print("PASS: Commons image metadata, author/license attribution, and nonfree-image rejection")
+    }
+
+    static func progressiveEnrichment() async throws {
+        var article = try JSONSerialization.jsonObject(with: summary()) as! [String: Any]
+        article["originalimage"] = ["source": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Azonto.jpg"]
+        let image: [String: Any] = ["query": ["pages": [["imageinfo": [[
+            "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Azonto.jpg",
+            "descriptionurl": "https://commons.wikimedia.org/wiki/File:Azonto.jpg",
+            "extmetadata": ["Artist": ["value": "Example photographer"], "LicenseShortName": ["value": "CC BY-SA 4.0"]]
+        ]]]]]]
+        MockCultureURLProtocol.transport.reset([
+            .init(data: try JSONSerialization.data(withJSONObject: article)),
+            .init(data: try JSONSerialization.data(withJSONObject: image), delayNanoseconds: 180_000_000)
+        ])
+        let session = makeSession(); defer { session.invalidateAndCancel() }
+        let service = LiveCultureService(session: session, topics: topics, factGenerator: { _, source, _ in
+            try? await Task.sleep(for: .milliseconds(400))
+            return CultureFact(title: "A local dance", body: source, conversationStarter: "Where is this dance performed?")
+        })
+        let start = ContinuousClock.now
+        var updates: [(CultureReading, Duration)] = []
+        for await update in service.updates(for: country) {
+            if let reading = update.reading { updates.append((reading, start.duration(to: .now))) }
+        }
+        try require(updates.count >= 3 && updates[0].0.generatedFact == nil && updates[0].0.image == nil,
+                    "The validated source waited for optional image or wording enrichment.")
+        try require(updates[0].1 < .milliseconds(150), "First readable content was blocked by enrichment: \(updates[0].1)")
+        try require(updates[1].0.image?.attribution == "Example photographer" && updates[1].0.generatedFact == nil,
+                    "The licensed image waited for on-device generation or lost attribution.")
+        try require(updates.last?.0.generatedFact?.title == "A local dance" && updates.last?.0.image != nil,
+                    "Progressive presentation discarded the image or final fact quality.")
+        print("PASS: source appears before slow image/model work; photo attribution and final fact are retained")
+    }
+
+    static func independentEnrichment() async throws {
+        var article = try JSONSerialization.jsonObject(with: summary()) as! [String: Any]
+        article["originalimage"] = ["source": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Azonto.jpg"]
+        let image: [String: Any] = ["query": ["pages": [["imageinfo": [[
+            "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Azonto.jpg",
+            "descriptionurl": "https://commons.wikimedia.org/wiki/File:Azonto.jpg",
+            "extmetadata": ["Artist": ["value": "Example photographer"], "LicenseShortName": ["value": "CC BY-SA 4.0"]]
+        ]]]]]]
+        MockCultureURLProtocol.transport.reset([
+            .init(data: try JSONSerialization.data(withJSONObject: article)),
+            .init(data: try JSONSerialization.data(withJSONObject: image), delayNanoseconds: 350_000_000)
+        ])
+        let session = makeSession(); defer { session.invalidateAndCancel() }
+        let service = LiveCultureService(session: session, topics: topics, factGenerator: { _, source, _ in
+            try? await Task.sleep(for: .milliseconds(30))
+            return CultureFact(title: "A fast local detail", body: source, conversationStarter: "How do you learn it?")
+        })
+        var readings: [CultureReading] = []
+        for await update in service.updates(for: country) {
+            if let reading = update.reading { readings.append(reading) }
+        }
+        try require(readings.contains { $0.generatedFact?.title == "A fast local detail" && $0.image == nil },
+                    "A ready fact waited for slower image licensing.")
+        try require(readings.last?.generatedFact?.title == "A fast local detail" && readings.last?.image?.attribution == "Example photographer",
+                    "An image arriving after the fact discarded one of the enriched fields.")
+        print("PASS: either image or model can arrive first without blocking or overwriting the other")
+    }
+
+    static func interruptedEnrichmentResumes() async throws {
+        var article = try JSONSerialization.jsonObject(with: summary()) as! [String: Any]
+        article["originalimage"] = ["source": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Azonto.jpg"]
+        let image: [String: Any] = ["query": ["pages": [["imageinfo": [[
+            "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Azonto.jpg",
+            "descriptionurl": "https://commons.wikimedia.org/wiki/File:Azonto.jpg",
+            "extmetadata": ["Artist": ["value": "Example photographer"], "LicenseShortName": ["value": "CC BY-SA 4.0"]]
+        ]]]]]]
+        let imageData = try JSONSerialization.data(withJSONObject: image)
+        let suite = "WorldNiche.InterruptedEnrichment." + UUID().uuidString
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        MockCultureURLProtocol.transport.reset([
+            .init(data: try JSONSerialization.data(withJSONObject: article)),
+            .init(data: imageData, delayNanoseconds: 30_000_000_000)
+        ])
+        let session = makeSession(); defer { session.invalidateAndCancel() }
+        let service = LiveCultureService(session: session, topics: topics, persistsHistory: true, historySuiteName: suite,
+                                         factGenerator: { _, source, _ in
+            try? await Task.sleep(for: .seconds(30))
+            return CultureFact(title: "Interrupted detail", body: source, conversationStarter: "Where is it performed?")
+        })
+        let first = Task { for await _ in service.updates(for: country) {} }
+        try await waitUntil("The initial source did not reach photo enrichment.") { MockCultureURLProtocol.transport.snapshot().requests.count == 2 }
+        first.cancel()
+        _ = await first.value
+        try await waitUntil("Leaving the only reader did not cancel its image request.") { MockCultureURLProtocol.transport.snapshot().stopped > 0 }
+        MockCultureURLProtocol.transport.reset([.init(data: imageData, path: "/w/api.php")])
+        let relaunched = LiveCultureService(session: session, topics: topics, persistsHistory: true, historySuiteName: suite,
+                                            factGenerator: { _, source, _ in
+            CultureFact(title: "Resumed detail", body: source, conversationStarter: "Where is it performed?")
+        })
+        var readings: [CultureReading] = []
+        for await update in relaunched.updates(for: country) {
+            if let reading = update.reading { readings.append(reading) }
+        }
+        try require(readings.first?.title == "Azonto" && readings.first?.image == nil,
+                    "Reopening did not immediately restore the verified source.")
+        try require(readings.last?.image?.attribution == "Example photographer" && readings.last?.generatedFact?.title == "Resumed detail",
+                    "A partial cached reading prevented image and fact work from resuming after relaunch.")
+        try require(MockCultureURLProtocol.transport.snapshot().requests.count == 1,
+                    "Resuming unfinished enrichment unnecessarily fetched the same source again.")
+        print("PASS: cancelling after source arrival persists unfinished enrichment and resumes it on relaunch")
+    }
+
+    static func sharedEnrichmentAndCancellation() async throws {
+        MockCultureURLProtocol.transport.reset([.init(data: try summary())])
+        let session = makeSession(); defer { session.invalidateAndCancel() }
+        let service = LiveCultureService(session: session, topics: topics, factGenerator: { _, source, _ in
+            try? await Task.sleep(for: .milliseconds(350))
+            return CultureFact(title: "A shared discovery", body: source, conversationStarter: "How is this dance learned?")
+        })
+        let first = Task { () -> [CultureReading] in
+            var readings: [CultureReading] = []
+            for await result in service.updates(for: country) {
+                if let reading = result.reading { readings.append(reading) }
+            }
+            return readings
+        }
+        try await waitUntil("The shared reading did not start.") { MockCultureURLProtocol.transport.snapshot().requests.count == 1 }
+        let second = Task { () -> [CultureReading] in
+            var readings: [CultureReading] = []
+            for await result in service.updates(for: country, discoverySessionID: UUID()) {
+                if let reading = result.reading { readings.append(reading) }
+            }
+            return readings
+        }
+        for _ in 0..<100 {
+            if await service.pendingUpdateSubscriberCount(for: country.id) == 2 { break }
+            try await Task.sleep(for: .milliseconds(1))
+        }
+        try require(await service.pendingUpdateSubscriberCount(for: country.id) == 2, "Home and detail did not join the same discovery.")
+        first.cancel()
+        let readings = await second.value
+        _ = await first.value
+        try require(readings.first?.generatedFact == nil && readings.last?.generatedFact?.title == "A shared discovery",
+                    "Opening details during enrichment lost the final fact or cancellation interrupted another reader.")
+        try require(MockCultureURLProtocol.transport.snapshot().requests.count == 1,
+                    "Opening details duplicated source work while the home card was loading.")
+        try require(await service.pendingUpdateSubscriberCount(for: country.id) == 0, "Completed discovery kept subscribers alive.")
+        print("PASS: home/detail share progressive updates and independent cancellation without duplicate source work")
+    }
+
+    static func lateEnrichmentPreservesNewerSelection() async throws {
+        MockCultureURLProtocol.transport.reset([
+            .init(data: try summary(title: "Azonto")),
+            .init(data: try summary(title: "Kpanlogo", source: "https://en.wikipedia.org/wiki/Kpanlogo"))
+        ])
+        let session = makeSession(); defer { session.invalidateAndCancel() }
+        let service = LiveCultureService(session: session, topics: ["GH": ["Azonto", "Kpanlogo"]], factGenerator: { title, source, _ in
+            if title == "Azonto" { try? await Task.sleep(for: .milliseconds(200)) }
+            return CultureFact(title: title, body: source, conversationStarter: "How do you learn it?")
+        })
+        let (ready, signal) = AsyncStream<Void>.makeStream()
+        let home = Task {
+            for await reading in service.updates(for: country) {
+                if reading.reading != nil { signal.yield(()); signal.finish() }
+            }
+        }
+        for await _ in ready { break }
+        let next = await service.fetch(for: country, rotation: 1, discoverySessionID: UUID())
+        try require(next.reading?.title == "Kpanlogo", "The second discovery did not consume an unseen topic.")
+        await home.value
+        let reopened = await service.fetch(for: country, discoverySessionID: UUID())
+        try require(reopened.reading?.title == "Kpanlogo", "Late enrichment replaced the user's newer discovery with an older selection.")
+        print("PASS: slow older enrichment cannot replace a more recently selected discovery")
+    }
+
+    static func lateSummaryPreservesNewerSelection() async throws {
+        MockCultureURLProtocol.transport.reset([.init(data: try summary(title: "Azonto"))])
+        let session = makeSession(); defer { session.invalidateAndCancel() }
+        let suite = "WorldNiche.LateSummaryChecks." + UUID().uuidString
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let service = LiveCultureService(session: session, topics: ["GH": ["Azonto", "Kpanlogo"]],
+                                         persistsHistory: true, historySuiteName: suite, allowsGeneration: false)
+        _ = await service.fetch(for: country)
+        MockCultureURLProtocol.transport.reset([
+            .init(data: try summary(title: "Azonto", excerpt: "Old refresh eventually returns."), delayNanoseconds: 250_000_000, path: "/api/rest_v1/page/summary/Azonto"),
+            .init(data: try summary(title: "Kpanlogo", source: "https://en.wikipedia.org/wiki/Kpanlogo"), path: "/api/rest_v1/page/summary/Kpanlogo")
+        ])
+        let oldRefresh = Task { for await _ in service.updates(for: country, forceRefresh: true) {} }
+        try await waitUntil("The delayed refresh did not start.") { MockCultureURLProtocol.transport.snapshot().requests.count == 1 }
+        let next = await service.fetch(for: country, rotation: 1, discoverySessionID: UUID())
+        try require(next.reading?.title == "Kpanlogo", "The newer selection did not load.")
+        await oldRefresh.value
+        let reopened = await service.fetch(for: country, discoverySessionID: UUID())
+        try require(reopened.reading?.title == "Kpanlogo", "An older request's late summary replaced the newer selection.")
+        let relaunched = LiveCultureService(session: session, topics: topics, persistsHistory: true, historySuiteName: suite)
+        let persisted = await relaunched.fetch(for: country)
+        try require(persisted.reading?.title == "Kpanlogo", "A late old summary overwrote the persisted current discovery.")
+        print("PASS: delayed older summaries cannot replace a newer discovery in memory or after relaunch")
+    }
+
+    static func persistentReadingRefresh() async throws {
+        let suite = "WorldNiche.CultureReadingChecks." + UUID().uuidString
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let session = makeSession(); defer { session.invalidateAndCancel() }
+        let oldDay = Date().addingTimeInterval(-86_400)
+        MockCultureURLProtocol.transport.reset([.init(data: try summary())])
+        let old = LiveCultureService(session: session, topics: ["GH": ["Azonto", "Kpanlogo"]], persistsHistory: true, historySuiteName: suite)
+        _ = await old.fetch(for: country, now: oldDay)
+        MockCultureURLProtocol.transport.reset([
+            .init(data: try summary(title: "Kpanlogo", source: "https://en.wikipedia.org/wiki/Kpanlogo"), delayNanoseconds: 200_000_000)
+        ])
+        let new = LiveCultureService(session: session, topics: ["GH": ["Azonto", "Kpanlogo"]], persistsHistory: true, historySuiteName: suite)
+        var seen: [CultureReading] = []
+        let start = ContinuousClock.now
+        for await result in new.updates(for: country) {
+            if let reading = result.reading {
+                if seen.isEmpty {
+                    try require(reading.title == "Azonto" && start.duration(to: .now) < .milliseconds(100),
+                                "The previous source was not immediately restored while today's reading loads.")
+                }
+                seen.append(reading)
+            }
+        }
+        try require(seen.last?.title == "Kpanlogo", "A new day did not replace the saved reading with an unseen source.")
+        await new.clearHistory()
+        try require(defaults.data(forKey: "worldniche.culture.reading.GH") == nil, "Device clear retained the persistent reading.")
+        print("PASS: persisted source is immediate after relaunch, renews daily, and is removed by device clear")
     }
 
     static func cancellation() async throws {

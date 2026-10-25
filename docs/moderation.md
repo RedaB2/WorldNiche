@@ -2,6 +2,12 @@
 
 WorldNiche holds custom names and photos for human review before friends can see them. There is no external AI moderation provider or automatic photo approval. Symbols and the default Explorer name are available immediately. Existing approved content stays visible while an edit is pending. Links, control characters, and invisible formatting in names are rejected before review.
 
+## Automatic checks in development
+
+The next app update adds immediate private previews for saved names and photos, visible review states, and refreshes for approved friend profiles. Automatic checks require a separate, revocable permission to send submitted profile content to the named provider. Exploration sharing does not grant that permission. Existing submissions are not sent automatically.
+
+The new database migration provides revision-specific jobs, exclusive claims, retry backoff, and consent, restriction, and deletion checks before publication. It does not supply the moderation provider. The `moderate-profile` Edge function, provider credential, worker secret, hosted scheduling, and revised public provider disclosures must be completed and verified before this feature ships. `configure_profile_checks.sql` refuses to configure retries without the required hosted extensions and Vault entries. Keep the existing human queue monitored until the complete service is deployed.
+
 The database enforces this for every client. Pending content is owner-only, and review RPCs require the server role. Approval applies to an exact submission revision. Selected or queued photos cannot be deleted and replaced underneath a review. Blocking and moderator restrictions remove app-managed friend access. Native photo reads use a fresh cache nonce so a previous CDN response cannot bypass the current access check. Independently cached or downloaded copies cannot be recalled. Restricted users can still export and delete their accounts.
 
 ## Operator workflow

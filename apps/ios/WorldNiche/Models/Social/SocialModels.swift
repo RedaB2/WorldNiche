@@ -11,6 +11,10 @@ struct ExplorerProfile: Codable, Sendable {
     var pendingAvatarPath: String? = nil
     var nameModerationStatus: ProfileModerationStatus? = nil
     var photoModerationStatus: ProfileModerationStatus? = nil
+    var nameCheckState: ProfileContentCheckState? = nil
+    var photoCheckState: ProfileContentCheckState? = nil
+    var automaticProfileChecksEnabled: Bool? = nil
+    var profileCheckConsentRecorded: Bool? = nil
     var nameModerationNote: String? = nil
     var photoModerationNote: String? = nil
     var communityRestricted: Bool? = nil
@@ -18,6 +22,17 @@ struct ExplorerProfile: Codable, Sendable {
 
     var editableDisplayName: String { pendingDisplayName ?? displayName }
     var editableAvatarPath: String? { pendingAvatarPath ?? avatarPath }
+    var ownerDisplayName: String { nameModerationStatus == .pending ? pendingDisplayName ?? displayName : displayName }
+    var ownerAvatarPath: String? { photoModerationStatus == .pending ? pendingAvatarPath ?? avatarPath : avatarPath }
+    var hasPendingContent: Bool { nameModerationStatus == .pending || photoModerationStatus == .pending }
+    var needsAutomaticCheck: Bool {
+        (nameModerationStatus == .pending && nameCheckState?.shouldResume != false)
+            || (photoModerationStatus == .pending && photoCheckState?.shouldResume != false)
+    }
+    var canRetryCheck: Bool {
+        (nameModerationStatus == .pending && nameCheckState == .retry)
+            || (photoModerationStatus == .pending && photoCheckState == .retry)
+    }
     var hasModerationNotice: Bool {
         communityRestricted == true || nameModerationStatus == .pending || nameModerationStatus == .rejected
             || photoModerationStatus == .pending || photoModerationStatus == .rejected
@@ -28,6 +43,11 @@ struct ExplorerProfile: Codable, Sendable {
 
 enum ProfileModerationStatus: String, Codable, Sendable {
     case pending, approved, rejected
+}
+
+enum ProfileContentCheckState: String, Codable, Sendable {
+    case queued, checking, retry, review, complete
+    var shouldResume: Bool { self == .queued || self == .checking }
 }
 
 struct ExplorerFriend: Codable, Identifiable, Sendable {

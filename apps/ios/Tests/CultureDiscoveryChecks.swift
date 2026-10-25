@@ -98,10 +98,6 @@ enum CultureDiscoveryChecks {
                 ("Snake charming", "Practice of appearing to hypnotise a snake", 0),
                 ("Gnawa music", "Moroccan music genre and type of dance", 0)
             ])),
-            .init(data: try payload([
-                ("Fez Festival of World Sacred Music", "Annual music festival held in Fez, Morocco", 0),
-                ("Mawazine", "Annual Moroccan music festival", 0)
-            ])),
             .init(data: try LiveCultureChecks.summary(title: "Gnawa music", excerpt: "Gnawa music is a Moroccan music genre and type of dance. The tradition includes ritual poetry and music, and combines music and acrobatic dancing in its performances.", source: "https://en.wikipedia.org/wiki/Gnawa_music"))
         ])
         let session = LiveCultureChecks.makeSession(); defer { session.invalidateAndCancel() }
