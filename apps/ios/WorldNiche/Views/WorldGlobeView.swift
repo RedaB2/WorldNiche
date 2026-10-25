@@ -50,7 +50,8 @@ struct WorldGlobeView: UIViewRepresentable {
         private let cameraNode = SCNNode()
         private var selectedID: String?
         private var lastSpinToken: Int?
-        private var pinchScale: Double = 1.18
+        private static let initialZoomScale = 1.18
+        private var pinchScale = Coordinator.initialZoomScale
         private let atlas = GlobeAtlas.shared
 
         init(onSelect: @escaping (Country) -> Void) { self.onSelect = onSelect }
@@ -64,7 +65,7 @@ struct WorldGlobeView: UIViewRepresentable {
 
             cameraNode.camera = SCNCamera()
             cameraNode.camera?.usesOrthographicProjection = true
-            cameraNode.camera?.orthographicScale = pinchScale
+            updateZoom()
             cameraNode.camera?.zNear = 0.1
             cameraNode.camera?.zFar = 30
             cameraNode.position = SCNVector3(0, 0, 4.5)
@@ -202,9 +203,16 @@ struct WorldGlobeView: UIViewRepresentable {
 
         @objc private func pinch(_ recognizer: UIPinchGestureRecognizer) {
             if recognizer.state == .began { stopRotation() }
-            pinchScale = min(1.65, max(0.76, pinchScale / Double(recognizer.scale)))
-            cameraNode.camera?.orthographicScale = pinchScale
+            // Orthographic magnification is inverse scale: 0.76 to 0.60
+            // adds about 27% more maximum zoom without changing the starting view.
+            pinchScale = min(1.65, max(0.60, pinchScale / Double(recognizer.scale)))
+            updateZoom()
             recognizer.scale = 1
+        }
+
+        private func updateZoom() {
+            cameraNode.camera?.orthographicScale = pinchScale
+            view?.accessibilityValue = "\(Int((Self.initialZoomScale / pinchScale * 100).rounded()))% zoom"
         }
 
         @objc private func tap(_ recognizer: UITapGestureRecognizer) {
