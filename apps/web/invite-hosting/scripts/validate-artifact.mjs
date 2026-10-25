@@ -38,7 +38,7 @@ const html = await landing.text();
 assert.match(html, /WorldNiche/);
 assert.match(html, /\/landing\/assets\/app-demo\.mp4/);
 assert.doesNotMatch(html, /__INSTALL_ACTION__|codex-preview|apps\.apple\.com\/[^"'\s]*id0\b/);
-for (const match of html.matchAll(/(?:src|href|poster)="(\/[^"#]*)(?:#[^"]*)?"/g)) {
+for (const match of html.matchAll(/(?:src|data-src|href|poster)="(\/[^"#]*)(?:#[^"]*)?"/g)) {
   const path = match[1];
   assert.equal((await fetch(path, { method: "HEAD" })).status, 200, `Missing landing asset: ${path}`);
 }
@@ -65,10 +65,16 @@ for (const page of ["privacy", "security", "support", "community", "delete-accou
   assert.equal((await head.arrayBuffer()).byteLength, 0);
 }
 
-for (const [name, type] of [["app-demo.mp4", "video/mp4"], ["app-poster.jpg", "image/jpeg"], ["hand-phone.png", "image/png"], ["logo.png", "image/png"], ["logo-dark.png", "image/png"]]) {
+const expectedMedia = [["app-demo.mp4", "video/mp4"], ["app-poster.jpg", "image/jpeg"], ["hand-phone.png", "image/png"], ["logo.png", "image/png"], ["logo-dark.png", "image/png"]];
+if (/\/landing\/assets\/(?:hand-duo\.png|duo-demo\.mp4|duo-poster\.jpg)(?:[?#"'\s]|$)/.test(html)) {
+  expectedMedia.push(["hand-duo.png", "image/png"], ["duo-demo.mp4", "video/mp4"], ["duo-poster.jpg", "image/jpeg"]);
+}
+for (const [name, type] of expectedMedia) {
   const expected = await readFile(resolve(projectRoot, "content/landing/assets", name));
+  assert.ok(expected.length, `${name} must contain actual media`);
   const path = `/landing/assets/${name}`;
   const response = await fetch(path);
+  assert.equal(response.status, 200, `Missing packaged media: ${name}`);
   assert.equal(response.headers.get("content-type"), type);
   assert.equal(Number(response.headers.get("content-length")), expected.length);
   const actual = Buffer.from(await response.arrayBuffer());

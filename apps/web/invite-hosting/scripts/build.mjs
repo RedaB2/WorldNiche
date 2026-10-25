@@ -35,8 +35,14 @@ async function walk(directory, prefix) {
 await walk(resolve(root, "content/landing"), "/landing");
 routes["/"] = routes["/landing/index.html"];
 if (!routes["/"]) throw new Error("Missing landing index.html");
-for (const media of ["app-demo.mp4", "app-poster.jpg"]) {
-  if (!routes[`/landing/assets/${media}`]) throw new Error(`Missing actual app media: ${media}. Import it before publishing.`);
+const landingHTML = await readFile(resolve(root, "content/landing/index.html"), "utf8");
+const requiredMedia = ["app-demo.mp4", "app-poster.jpg"];
+if (/\/landing\/assets\/(?:hand-duo\.png|duo-demo\.mp4|duo-poster\.jpg)(?:[?#"'\s]|$)/.test(landingHTML)) {
+  requiredMedia.push("hand-duo.png", "duo-demo.mp4", "duo-poster.jpg");
+}
+for (const media of requiredMedia) {
+  const route = routes[`/landing/assets/${media}`];
+  if (!route || !blobs[route.blob]?.size) throw new Error(`Missing actual app media: ${media}. Import it before publishing.`);
 }
 for (const page of ["privacy", "security", "support", "community", "delete-account"]) {
   const route = routes[`/landing/${page}.html`];
