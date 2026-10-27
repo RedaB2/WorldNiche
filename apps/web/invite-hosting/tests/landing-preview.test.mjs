@@ -352,8 +352,6 @@ test('without IntersectionObserver the native preview remains operable', async (
 
 test('phone registration remains unchanged and Duo uses a separate mask and touch targets', () => {
   assert.match(css, /left:27\.76%;top:3%;width:43\.85%;height:61\.44%/);
-  assert.match(css, /\.device-preview-duo \.phone\{[^}]*left:8\.20%/);
-  assert.match(css, /\.device-preview-duo \.app-video\{object-fit:contain/);
   assert.match(css, /\.app-stage:has\(\.device-preview-duo:not\(\[hidden\]\)\) \.handheld\{width:min\(660px,calc\(100vw - 24px\)\)/);
   const duoMask = css.match(/\.device-preview-duo \.phone\{[^}]*width:([\d.]+)%;height:([\d.]+)%/);
   assert.ok(duoMask);
@@ -361,4 +359,23 @@ test('phone registration remains unchanged and Duo uses a separate mask and touc
   assert.match(css, /\.device-selector button\{[^}]*min-height:44px/);
   assert.match(css, /object-fit:cover/);
   assert.doesNotMatch(script + css + html, /\u2014/);
+});
+
+test('the Duo recording fills its registered screen without bars, stretching or meaningful cropping', () => {
+  assert.match(css, /\.device-preview-duo \.app-video\{object-fit:cover/);
+  const frame = css.match(/\.device-preview-duo \.hand-frame\{transform:scaleX\(([\d.]+)\)/);
+  const mask = css.match(/\.device-preview-duo \.phone\{left:([\d.]+)%;top:([\d.]+)%;width:([\d.]+)%;height:([\d.]+)%/);
+  assert.ok(frame);
+  assert.ok(mask);
+  const scale = Number(frame[1]);
+  const [left, top, width, height] = mask.slice(1).map(Number);
+  const expectedLeft = (0.5 + (0.082 - 0.5) * scale) * 1024;
+  const expectedWidth = 0.832 * scale * 1024;
+  assert.ok(Math.abs(left / 100 * 1024 - expectedLeft) < 0.01, 'The mask must follow the resized generated frame');
+  assert.ok(Math.abs(width / 100 * 1024 - expectedWidth) < 0.01, 'The mask must span the entire generated screen');
+  assert.equal(top, 15.23);
+  assert.equal(height, 36.85);
+  const screenRatio = width * 1024 / (height * 1536);
+  const recordingRatio = 960 / 676;
+  assert.ok(Math.abs(screenRatio / recordingRatio - 1) < 0.0001, 'The full recording, including top controls and source credits, must fit');
 });

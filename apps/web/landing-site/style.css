@@ -28,8 +28,11 @@
 .phone{position:absolute;left:27.76%;top:3%;width:43.85%;height:61.44%;aspect-ratio:auto;border:0;border-radius:13.5% / 6.4%;box-shadow:none;background:#17231f;overflow:hidden;z-index:1;transform:translateZ(.1px)}
 .app-video{object-fit:cover;border-radius:inherit}
 .device-preview{position:relative;width:100%;height:100%}
-.device-preview-duo .phone{left:8.20%;top:15.23%;width:83.20%;height:36.85%;border-radius:5.7% / 8.6%;background:#101714}
-.device-preview-duo .app-video{object-fit:contain;background:#101714}
+/* Match the generated frame to the real inner display's 960:676 ratio.
+   Only the decorative frame narrows; the full recording keeps its proportions. */
+.device-preview-duo .hand-frame{transform:scaleX(.943474);transform-origin:50% 50%}
+.device-preview-duo .phone{left:10.5628%;top:15.23%;width:78.4970%;height:36.85%;border-radius:5.7% / 8.6%;background:#101714}
+.device-preview-duo .app-video{object-fit:cover;background:#101714}
 .app-stage:has(.device-preview-duo:not([hidden])) .handheld{width:min(660px,calc(100vw - 24px))}
 @media(max-width:740px){.app-stage:has(.device-preview-duo:not([hidden])){height:min(820px,calc(150vw + 44px))}}
 .device-selector{display:flex;justify-content:center;width:fit-content;max-width:calc(100% - 44px);margin:10px auto 0;padding:4px;border:1px solid var(--line);border-radius:30px;background:#ebeee5;gap:3px}
