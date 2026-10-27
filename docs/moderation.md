@@ -1,6 +1,6 @@
 # Moderation
 
-The currently deployed release holds custom names and photos for human review before friends can see them. Database migrations 005, 006 and 007, including upload quotas and provider reservation controls, and the guarded worker were installed on October 27. The scoped worker credential and schedules are configured. Provider processing and the retry job are paused until the OpenAI key and live checks are ready; reservation retention is active. The deployed worker rejects unauthenticated callers and stays unavailable while provider configuration is missing. Do not describe automatic checks as live until provider access, scheduling, and public disclosures have been verified together.
+Automatic profile checks are live in the backend as of October 27. Database migrations 005, 006 and 007, upload quotas, provider reservations and the guarded worker are installed. Cloud secrets are configured, provider processing is enabled, and the minute-based retry job is active. A hosted test verified approval, friend visibility, held unsafe content, cooldown recovery and deletion, then removed all four disposable accounts. Matching privacy, security and community disclosures are published in site version 10. See the [public beta notes](testflight.md) for build availability.
 
 Symbols and the default Explorer name are available immediately. Existing approved content stays visible to friends while an edit is pending. Links, control characters, and invisible formatting in names are rejected before review. The next app release also shows submitted names and photos immediately in the owner's private profile.
 
@@ -24,7 +24,7 @@ Migration `202610270007_moderation_abuse_limits.sql` puts an atomic reservation 
 | Provider requests across the app | 30 | 300 | 1,000 |
 | Accepted photo uploads per account | 6 | 20 | 40 |
 
-These are initial beta limits. Each submitted revision gets at most five provider attempts before human review. Names and photos count separately. Replacing a pending edit or toggling permission does not reset the account or shared quota. Deleting an account removes its identity from reservation records but leaves the anonymous usage charge until it expires, so account recreation cannot reset the shared budget. Daily maintenance removes reservation records older than 25 hours.
+These are initial beta limits. Each submitted revision gets at most five provider attempts before human review. Names and photos count separately. Replacing a pending edit or toggling permission does not reset the account or shared quota. Deleting an account removes its identity from reservation records but leaves the anonymous usage charge until it expires, so account recreation cannot reset the shared budget. Daily reservation cleanup is scheduled to remove records older than 25 hours; its first scheduled execution is still pending.
 
 When a provider limit is reached, the saved submission stays private and is scheduled for the earliest eligible time. The minute-based worker checks it after the cooldown without needing the app open. New edits replace the pending revision, so only the latest accepted version can publish. Friends keep seeing the previous approved content. Flagged content and revisions that exhaust their attempts need human review; those are not automatically retried forever.
 
@@ -32,7 +32,7 @@ The upload limit is separate: a rejected upload is not saved or queued. The app 
 
 The worker accepts no arbitrary prompts, models or URLs and calls only the fixed moderation endpoint. A missing, malformed or unavailable reservation response never permits a provider call. Limits are server-owned; authenticated clients cannot change them or approve their own content.
 
-Use a dedicated project key restricted to the moderation endpoint, and configure a project hard spend limit as an additional safeguard. A spend alert alone does not stop traffic, and hard spend enforcement can have a small delay. These provider settings still need verification when the key is provisioned. See [key permissions](https://help.openai.com/en/articles/9186755-managing-projects-in-the-api-platform) and [spend limits](https://developers.openai.com/api/docs/guides/spend-limits).
+The backend key is restricted to `api.model.moderations.request`. A direct moderation request succeeded, while a model-catalog request returned 403. Runtime credentials are stored in encrypted cloud secrets and stay out of the app, website and public repository. An operator-only local copy is kept outside the repository. The default OpenAI project currently contains only this key and has a verified $5 monthly hard spend limit with a 100% alert. The platform shows the limit as enforced, but enforcement can have a small delay and overshoot. The shared backend request limits remain independently enforced. See [key permissions](https://help.openai.com/en/articles/9186755-managing-projects-in-the-api-platform) and [spend limits](https://developers.openai.com/api/docs/guides/spend-limits).
 
 ### Classifier limits
 
@@ -68,8 +68,12 @@ Reports keep the visible name and photo reference at reporting time. The referen
 
 ## Verification
 
+On October 27, 124 database abuse assertions, 81 isolated handler tests, 348 native social checks, 54 avatar checks and all 18 iOS 27.0 simulator tests passed. The hosted moderation run passed eight groups with real provider processing: approved name/photo publication, friend photo access, subsequent profile updates, held threatening text, latest-edit recovery after cooldown, consent isolation and account deletion. Cleanup was confirmed for all four disposable accounts. Minute-based cron runs at 23:38 and 23:39 UTC succeeded, with corresponding HTTP 200 responses and no timeout or error. Only synthetic test content was submitted by that run. It did not test revoking a real Apple authorization.
+
 `backend/tests/run_database.sh` creates a disposable local cluster and checks quarantine, owner/friend isolation, immutable review, stale decisions, restrictions, report privacy, export, and deletion cascades. It also tests invitation, blocking, revocation, sharing races, the worker's permission to disclose a specific claimed revision, rolling quotas, cooldowns, replacement revisions, retry exhaustion and concurrent reservations.
 
 Run `node --test backend/tests/moderate_profile.mjs` for isolated Edge-handler tests. These exercise the production handler with synthetic Auth, Storage, and OpenAI responses. They cover caller scope, worker credentials, malformed input, photo limits, modality coverage, stale claims, withdrawal before disclosure, provider failures, manual review, fresh owner responses, denied allowances, replayed claims and budget-store failures. They never contact OpenAI or use a person's content. `npm exec --yes --package=deno -- deno check backend/supabase/functions/moderate-profile/index.ts` checks the actual deployment entry point.
 
 `backend/tests/hosted_social.mjs --live --project-ref PROJECT` creates three disposable accounts through admin-generated links, sends no emails, exercises normal authenticated APIs, and cleans up only the exact accounts created in that run. Keys come from process environment; `WORLDNICHE_TEST_PHOTO` points to a harmless JPEG. Never use a person's account. Actual Apple revocation requires a separate consenting Apple test identity.
+
+`backend/tests/hosted_moderation.mjs --live --project-ref PROJECT --cooldown` exercises the deployed provider and scheduled recovery with four disposable identities. It requires explicitly supplied credentials and a harmless JPEG, never sends email, and verifies cleanup in its final step. Use `--dry-run` without live credentials to inspect its planned scenarios.
