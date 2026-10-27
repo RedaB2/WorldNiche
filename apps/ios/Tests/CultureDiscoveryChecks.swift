@@ -19,6 +19,7 @@ enum CultureDiscoveryChecks {
     static func run() async throws {
         try await filteringAndExpiry()
         try await moroccoCountrySpecificPriority()
+        try await rotatePastRegionalCandidatesToLocalMusic()
         try await topUpAndBackoff()
         try await paginationAndExclusions()
         try await coalescingAndCancellation()
@@ -109,6 +110,41 @@ enum CultureDiscoveryChecks {
         try require(!CultureTopicDiscovery.isCulturalSummary(geographicSummary, country: morocco, hasCountryContext: true), "A traditional region was accepted as a cultural practice.")
         print("PASS: Morocco prioritizes explicitly local culture and rejects generic geographic regions")
     }
+    static func rotatePastRegionalCandidatesToLocalMusic() async throws {
+        let morocco = Country(id: "MA", name: "Morocco", capital: "Rabat", region: "Africa", latitude: 32, longitude: -5)
+        let suite = "WorldNiche.MusicRotationChecks." + UUID().uuidString
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        defaults.set(["Briouat", "Gnawa music", "Mawazine", "Fez Festival of World Sacred Music"], forKey: "worldniche.culture.history.MA")
+        // The live discovery chain after the earlier Moroccan sources were read.
+        let butter = "Smen is a salted, fermented butter native to North African cuisine, as well as a traditional Yemeni dish. In countries like Jordan and Lebanon, samneh is a type of butter similar to clarified butter."
+        let performance = "Snake charming is the practice of appearing to hypnotize a snake by playing and waving around an instrument called a pungi. The traditional performance is associated with ancient Egypt, North Africa, the Middle East, and South Asia."
+        let music = "Moroccan hip-hop is a Moroccan musical style related to rap and hip hop culture. Hip-hop emerged in Morocco during the mid-1980s as an underground movement among urban youth, mostly in cities like Casablanca, Rabat and Meknes. Moroccan rap was influenced by French and American hip-hop and often integrated local musical traditions and sounds."
+        let empty = try payload([])
+        MockCultureURLProtocol.transport.reset([
+            .init(data: try payload([("Smen", "Salted, fermented butter used in Middle Eastern and North African cuisine", 0)])),
+            .init(data: empty), .init(data: empty),
+            .init(data: try LiveCultureChecks.summary(title: "Smen", excerpt: butter)),
+            .init(data: try payload([("Snake charming", "Practice of appearing to hypnotise a snake", 0)])),
+            .init(data: empty), .init(data: empty),
+            .init(data: try LiveCultureChecks.summary(title: "Snake charming", excerpt: performance)),
+            .init(data: try payload([("Moroccan hip-hop", "Music genre in Morocco", 0)])),
+            .init(data: try LiveCultureChecks.summary(title: "Moroccan hip-hop", excerpt: music, source: "https://en.wikipedia.org/wiki/Moroccan_hip-hop"))
+        ])
+        let session = LiveCultureChecks.makeSession(); defer { session.invalidateAndCancel() }
+        let service = LiveCultureService(session: session, persistsHistory: true, historySuiteName: suite, allowsGeneration: false)
+        var result: CultureReadingResult?
+        for await update in service.updates(for: morocco, rotation: 1, discoverySessionID: UUID()) { result = update }
+        try require(result?.reading?.title == "Moroccan hip-hop" && result?.message == nil,
+                    "Another discovery rejected a local music practice after two correctly rejected regional candidates.")
+        try require(!CultureTopicDiscovery.isCulturalSummary(butter, country: morocco), "Local music support weakened country evidence.")
+        let foreignMusic = music.replacingOccurrences(of: "Moroccan", with: "Japanese").replacingOccurrences(of: "Morocco", with: "Japan")
+        try require(!CultureTopicDiscovery.isCulturalSummary(foreignMusic, country: morocco), "Another country's music was attributed to Morocco.")
+        let plural = "Moroccan family traditions vary among regions and communities. " + String(repeating: "People pass down the details of these social occasions within their own families. ", count: 2)
+        try require(CultureTopicDiscovery.isCulturalSummary(plural, country: morocco), "Plural traditions lost their cultural meaning.")
+        print("PASS: another discovery accepts local music and plural traditions while preserving country validation")
+    }
+
     static func paginationAndExclusions() async throws {
         // Walk all facets, then revisit the first at its continuation offset.
         var replies = [ScriptedTransport.Reply(data: try payload(valid, offset: 24))]

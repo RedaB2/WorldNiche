@@ -77,6 +77,7 @@ private final class SocialFixture: @unchecked Sendable {
     private var pendingPhoto: String?
     private var losePhotoCommitResponse = false
     private var profileCheckConsent: Bool?
+    private var nextPhotoUploadFailure: (Int, Data)?
 
     func reset(user: UUID = userA, profile: Bool = true, sharing: Bool = false) {
         lock.lock(); defer { lock.unlock() }
@@ -84,12 +85,16 @@ private final class SocialFixture: @unchecked Sendable {
         self.sharing = sharing; name = user == userA ? "Mira" : "Noah"; profileAvatar = "globe"
         syncedIDs = ["JP"]; deletionAcknowledged = true; overrides = [:]; appleAccount = false
         moderatingPhotos = false; approvedPhoto = nil; pendingPhoto = nil; losePhotoCommitResponse = false
-        profileCheckConsent = nil
+        profileCheckConsent = nil; nextPhotoUploadFailure = nil
     }
     func reviewPhotos(approved: String?, pending: String? = nil, loseCommitResponse: Bool = false) {
         lock.lock(); defer { lock.unlock() }
         moderatingPhotos = true; approvedPhoto = approved; pendingPhoto = pending
         losePhotoCommitResponse = loseCommitResponse
+    }
+    func rejectNextPhotoUpload(status: Int, json: String) {
+        lock.lock(); defer { lock.unlock() }
+        nextPhotoUploadFailure = (status, Data(json.utf8))
     }
     func fail(_ path: String, statuses: [Int], code: String? = nil) {
         lock.lock(); defer { lock.unlock() }
@@ -123,6 +128,11 @@ private final class SocialFixture: @unchecked Sendable {
         requests.append(observed)
         guard request.url!.host == "social.example.test" else {
             return (599, Data("unexpected host".utf8))
+        }
+        if observed.method == "POST", observed.path.hasPrefix("/storage/v1/object/profile-photos/"),
+           let failure = nextPhotoUploadFailure {
+            nextPhotoUploadFailure = nil
+            return failure
         }
         if var queue = failures[observed.path], !queue.isEmpty {
             let status = queue.removeFirst()
@@ -1150,6 +1160,41 @@ private final class CheckSuite {
         }
     }
 
+    func profileUploadCooldown() async {
+        let approved = "\(userA.uuidString.lowercased())/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg"
+        let jpeg = Data([0xff, 0xd8, 0x10, 0x20, 0xff, 0xd9])
+        let failures: [(Int, String, SocialError)] = [
+            (429, #"{"error":"too_many_requests"}"#, .rateLimited),
+            (500, #"{"code":"DatabaseError","message":"database error, code: PT429"}"#, .rateLimited),
+            (500, #"{"code":"DatabaseError","message":"database error, code: P0001"}"#, .unavailable)
+        ]
+        for (index, failure) in failures.enumerated() {
+            fixture.reset()
+            fixture.reviewPhotos(approved: approved)
+            let defaults = isolatedDefaults()
+            let service = api(vault: MemoryVault(savedSession()))
+            let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                    photoDirectory: photoDirectory, configuration: configuration, api: service)
+            await store.refresh()
+            await store.saveProfile(name: "Saved name", avatar: "globe", sharing: false)
+            check(store.profileSaveMessage != nil, "Upload failure \(index) starts after an earlier successful save")
+            fixture.clearRequests()
+            fixture.rejectNextPhotoUpload(status: failure.0, json: failure.1)
+            await store.saveProfile(name: "Saved name", avatar: "globe", sharing: false, photoData: jpeg)
+            check(store.errorMessage == failure.2.localizedDescription && store.profileSaveMessage == nil && !store.isBusy,
+                  "Upload failure \(index) clears stale success and leaves the editor open with a retryable error")
+            check(store.profile?.avatarPath == approved && store.profile?.pendingAvatarPath == nil,
+                  "Upload failure \(index) never displays the rejected image as saved or pending")
+            check(fixture.observed("/rest/v1/rpc/set_profile_avatar").isEmpty &&
+                  fixture.observed("/functions/v1/moderate-profile").isEmpty,
+                  "Upload failure \(index) never submits rejected content for moderation")
+            await store.saveProfile(name: "Saved name", avatar: "globe", sharing: false, photoData: jpeg)
+            check(store.errorMessage == nil && store.profileSaveMessage != nil && store.profile?.pendingAvatarPath != nil &&
+                  store.profile?.avatarPath == approved,
+                  "Upload failure \(index) saves a later explicit retry while retaining the approved friend photo")
+        }
+    }
+
     func profileModeration() async {
         let approved = "\(userA.uuidString.lowercased())/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg"
         let oldPending = "\(userA.uuidString.lowercased())/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.jpg"
@@ -1798,6 +1843,7 @@ private final class CheckSuite {
         await suite.invitationAuthenticationPersistence()
         await suite.invitationFailuresAndReplay()
         await suite.invitationRecoveryAndExpiry()
+        await suite.profileUploadCooldown()
         await suite.profileModeration()
         await suite.profilePreviewAndChecks()
         await suite.profileSetupConsentRecovery()

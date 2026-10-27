@@ -241,7 +241,7 @@ actor CultureTopicDiscovery {
         return text.range(of: pattern, options: .regularExpression) != nil
     }
     private static let culturalTerms = [
-        "custom", "customs", "ritual", "rituals", "etiquette", "greeting", "subculture", "practice", "ceremony", "ceremonial", "celebration", "celebrate", "festival", "festivals", "tradition", "traditional", "dance", "dances", "dancing", "folk music", "music genre", "genre", "musical instrument", "game", "craft", "weaving", "textile", "clothing", "garment", "headdress", "bathing", "bath", "communal", "festive", "seasonal", "gifting", "market", "costume", "mask", "folklore", "cuisine", "culinary", "food", "dish", "bread", "soup", "cake", "noodles", "tea", "coffee", "rice", "cheese", "stew", "dessert", "meal", "snack", "pastry", "dumpling", "drink", "beverage", "beer", "wine"
+        "custom", "customs", "ritual", "rituals", "etiquette", "greeting", "subculture", "practice", "ceremony", "ceremonial", "celebration", "celebrate", "festival", "festivals", "tradition", "traditions", "traditional", "dance", "dances", "dancing", "folk music", "music genre", "musical style", "genre", "musical instrument", "game", "craft", "weaving", "textile", "clothing", "garment", "headdress", "bathing", "bath", "communal", "festive", "seasonal", "gifting", "market", "costume", "mask", "folklore", "cuisine", "culinary", "food", "dish", "bread", "soup", "cake", "noodles", "tea", "coffee", "rice", "cheese", "stew", "dessert", "meal", "snack", "pastry", "dumpling", "drink", "beverage", "beer", "wine"
     ]
     private enum DiscoveryError: Error { case invalidResponse, rateLimited }
     private struct SearchResponse: Decodable {

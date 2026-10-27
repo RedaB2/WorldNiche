@@ -18,7 +18,9 @@ private final class AvatarFixture: @unchecked Sendable {
     private var calls = 0
     private var mode = "normal"
     private var committed = false
-    func reset(_ mode: String = "normal") { lock.lock(); defer { lock.unlock() }; current=oldPhotoPath; objects=[oldPhotoPath:fixtureJPEG]; calls=0; self.mode=mode; committed=false }
+    private var uploadFailure: (Int, Data)?
+    func reset(_ mode: String = "normal") { lock.lock(); defer { lock.unlock() }; current=oldPhotoPath; objects=[oldPhotoPath:fixtureJPEG]; calls=0; self.mode=mode; committed=false; uploadFailure=nil }
+    func rejectNextUpload(status: Int, json: String) { lock.lock(); defer { lock.unlock() }; uploadFailure=(status,Data(json.utf8)) }
     func snapshot() -> (path:String?, objects:[String:Data],calls:Int) { lock.lock(); defer { lock.unlock() }; return(current,objects,calls) }
     func reply(_ request: URLRequest) -> (Int,Data) {
         lock.lock(); defer { lock.unlock() }; calls += 1
@@ -41,6 +43,7 @@ private final class AvatarFixture: @unchecked Sendable {
         }
         let uploadPrefix="/storage/v1/object/profile-photos/"
         if path.hasPrefix(uploadPrefix),request.httpMethod == "POST" {
+            if let failure=uploadFailure { uploadFailure=nil; return failure }
             guard request.value(forHTTPHeaderField:"Content-Type") == "image/jpeg", request.value(forHTTPHeaderField:"x-upsert") == "false", bytes == fixtureJPEG else { return(400,Data()) }
             objects[String(path.dropFirst(uploadPrefix.count))]=bytes
             return(200,encoded(["Key":"uploaded"]))
@@ -102,6 +105,28 @@ private final class AvatarProtocol: URLProtocol, @unchecked Sendable {
         check(AvatarProtocol.fixture.snapshot().calls == 0,"Invalid path never contacts network")
         do {_ = try await guarded.updateProfilePhoto(Data("invalid".utf8));fatalError("Invalid upload accepted")}catch{count+=1;print("PASS Invalid upload rejected")}
         check(AvatarProtocol.fixture.snapshot().objects == [oldPhotoPath:fixtureJPEG],"Invalid upload leaves old photo intact")
+        let uploadFailures: [(Int,String,SocialError)] = [
+            (429,#"{"error":"too_many_requests"}"#,.rateLimited),
+            (500,#"{"code":"DatabaseError","error":"DatabaseError","message":"database error, code: PT429"}"#,.rateLimited),
+            (500,#"{"error":"DatabaseError","message":"database error, code: PT429"}"#,.rateLimited),
+            (400,#"{"code":"PT429","message":"Please wait before trying again."}"#,.rateLimited),
+            (500,#"{"code":"DatabaseError","message":"database error, code: P0001"}"#,.unavailable),
+            (500,#"{"code":"DatabaseError","message":"connection failed"}"#,.unavailable),
+            (403,#"{"code":"AccessDenied","message":"database error, code: PT429"}"#,.rejected)
+        ]
+        for (index,failure) in uploadFailures.enumerated() {
+            AvatarProtocol.fixture.reset()
+            AvatarProtocol.fixture.rejectNextUpload(status:failure.0,json:failure.1)
+            let limited=api()
+            do { _ = try await limited.updateProfilePhoto(fixtureJPEG); fatalError("Rejected upload succeeded") }
+            catch { check((error as? SocialError)?.localizedDescription == failure.2.localizedDescription,"Upload failure \(index) uses the specific safe error") }
+            let state=AvatarProtocol.fixture.snapshot()
+            check(state.path == oldPhotoPath && state.objects == [oldPhotoPath:fixtureJPEG] && state.calls == 2,
+                  "Upload failure \(index) retains the old photo and never submits or deletes an object")
+            let retried=try await limited.updateProfilePhoto(fixtureJPEG)
+            check(retried.avatarPath != oldPhotoPath && AvatarProtocol.fixture.snapshot().objects.count == 1,
+                  "Upload failure \(index) allows an explicit later retry")
+        }
         return count
     }
 }

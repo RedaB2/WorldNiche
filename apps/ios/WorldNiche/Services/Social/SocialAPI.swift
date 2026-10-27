@@ -416,6 +416,7 @@ actor SocialAPI {
             return data
         } catch let error as HTTPFailure {
             try checkIdentity()
+            if error.isQuotaFailure(path: path, method: method) { throw SocialError.rateLimited }
             switch error.status {
             case 401: throw SocialError.signInRequired
             case 429: throw SocialError.rateLimited
@@ -425,7 +426,19 @@ actor SocialAPI {
         }
     }
 
-    private struct HTTPFailure: Error { let status: Int; let code: String? }
+    private struct HTTPFailure: Error {
+        let status: Int
+        let code: String?
+        let message: String?
+
+        func isQuotaFailure(path: String, method: String) -> Bool {
+            if code == "PT429" { return true }
+            // Storage wraps custom SQLSTATEs. Match our dedicated quota code,
+            // since a generic P0001 can also mean an unrelated database error.
+            return method == "POST" && path.hasPrefix("storage/v1/object/profile-photos/") &&
+                code == "DatabaseError" && message == "database error, code: PT429"
+        }
+    }
 
     private static func authenticationError(_ error: HTTPFailure, invalidCredential: SocialError = .rejected) -> SocialError {
         switch error.status {
@@ -459,7 +472,9 @@ actor SocialAPI {
             guard data.count <= 2_000_000 else { throw SocialError.invalidResponse }
             guard (200..<300).contains(response.statusCode) else {
                 let error = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
-                throw HTTPFailure(status: response.statusCode, code: error?["error_code"] as? String ?? error?["error"] as? String)
+                throw HTTPFailure(status: response.statusCode,
+                                  code: error?["error_code"] as? String ?? error?["code"] as? String ?? error?["error"] as? String,
+                                  message: error?["message"] as? String)
             }
             return data
         } catch let error as URLError where error.code != .cancelled { throw SocialError.unavailable }
