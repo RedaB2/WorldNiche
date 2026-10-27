@@ -1,6 +1,6 @@
 # Profile checks release
 
-This work is on the development branch. Database migrations 005, 006 and 007, the guarded worker, its scoped credential and the schedules were installed in Supabase on October 27. Automatic moderation and its minute-based retry job are paused pending the OpenAI key and live verification. Daily reservation retention is active. The signed build 3 is prepared locally and has not been distributed through TestFlight.
+This work is on the development branch. Database migrations 005, 006 and 007, the guarded worker, cloud secrets and the schedules were installed in Supabase on October 27. Automatic moderation and its minute-based retry job are active. Hosted verification passed all eight groups and confirmed cleanup of four disposable accounts. Daily reservation retention is scheduled but has not yet had its first scheduled execution. The separate general maintenance job is not installed. Matching legal disclosures are published in site version 10. Build 1.0 (3) is approved and available in the existing public TestFlight group. Fresh App Store Connect reads verified processing, approval, group membership, and external testing availability.
 
 ## Intended behavior
 
@@ -16,8 +16,11 @@ This work is on the development branch. Database migrations 005, 006 and 007, th
 
 - 81 moderation handler tests passed, including allowance denials, malformed budget responses, scheduled work and concurrent claim replay.
 - 124 database abuse assertions passed, including concurrent reservations, all rolling limits, account deletion, upload churn and latest-photo/name cooldown recovery.
-- Hosted schema checks confirmed the limits and server-only reservation permissions. The deployed worker returned 401 for anonymous and forged-worker requests, and 503 for missing provider configuration.
-- A manual scheduled-worker dispatch authenticated through Vault and reached the deployed worker, which returned the expected 503 while the provider key is missing. Only managed database login roles were present, and the Data API exposed only `public` and `graphql_public`.
+- Hosted schema checks confirmed the limits and server-only reservation permissions. The deployed worker returned 401 for anonymous and forged-worker requests. Before the provider key was installed, it also failed closed with 503.
+- The cloud key is restricted to `api.model.moderations.request`. Direct moderation returned 200 and an unrelated model-catalog request returned 403. The scoped worker credential is configured in Edge secrets and Vault.
+- The default OpenAI project currently contains only the WorldNiche key. Its $5 monthly hard spend limit was saved and displayed as enforced, with a 100% alert. Enforcement can have a small delay and overshoot; backend quotas are separate safeguards.
+- All eight hosted moderation groups passed with synthetic content: approval, friend name/photo access, later updates, held threatening text, latest-edit recovery after cooldown, consent isolation and deletion. Read-only polling after cooldown confirmed background processing without another foreground check. Cleanup was confirmed for all four disposable accounts.
+- Only managed database login roles were present, and the Data API exposed only `public` and `graphql_public`. Scheduled work authenticates through the scoped Vault credential. Minute-based runs at 23:38 and 23:39 UTC on October 27 succeeded, with corresponding HTTP 200 responses and no timeout or error.
 - All 8 isolated database test groups passed, including friend access, blocking, deletion, consent and concurrent changes.
 - The Edge function passed Deno type checking.
 - 348 native social checks and 54 avatar checks passed, including rejected uploads, preserved approved photos and explicit retry.
@@ -26,26 +29,25 @@ This work is on the development branch. Database migrations 005, 006 and 007, th
 - All 3 globe and adaptive layout tests passed on iOS 26.5. The new pinch test also passed on the open Duo.
 - The photo recovery test passed on both the open landscape Duo and regular iPhone after its navigation helper was updated for the native sidebar.
 - 29 website behavior and packaging tests passed, including empty lazy video sources and the Duo screen fit regression.
+- Site version 10 published the matching privacy, security and community disclosures, and the live pages were verified. The legal update is recorded in public commit `29194ed`.
 - Repository secret scanning passed without findings.
-- Build 1.0 (3) was archived and exported with App Store distribution signing. Signature, production entitlements, Apple sign-in, Universal Links, icon and privacy manifest checks passed. No upload was performed.
+- Build 1.0 (3) was archived and exported with App Store distribution signing. Signature, production entitlements, Apple sign-in, Universal Links, icon and privacy manifest checks passed. Fresh App Store Connect reads confirmed `VALID`, `APPROVED`, and `IN_BETA_TESTING`, with build 3 assigned to WorldNiche Public Beta. The existing public link, saved test notes, and automatic notification are enabled. The build declares that it does not use non-exempt encryption.
 
-The actual on-device companion response test passed twice on iOS 27.0. The iOS 26.5 simulator reports a host model compatibility failure. Duo photo recovery and landscape layout were verified directly in Device Hub. Local mocks establish behavior, not connectivity to the deployed provider.
+The actual on-device companion response test passed twice on iOS 27.0. The iOS 26.5 simulator reports a host model compatibility failure. Duo photo recovery and landscape layout were verified directly in Device Hub. The isolated tests establish behavior; the separate hosted run verified connectivity to the deployed moderation provider. Actual Apple authorization revocation still requires a consenting disposable Apple identity and was not exercised by these synthetic email accounts.
 
 XCTest on the Duo inner display accepted rotation commands without rotating its active interface. Its full-screen captures were black, and row captures were upside down despite upright orientation metadata. The assertions remain intact; the photo check samples both possible row-end avatar positions. The final landscape photo run passed with adaptive navigation. Rotation tooling failures are recorded separately from the passing iOS 27.0 suite. Closing the Duo also left XCTest unable to locate its tab bar, so that earlier attempted outer-display run is not passing evidence.
 
 ## Deployment gates
 
-1. Provision the backend-only key through secure setup. Verify moderation-only key permissions and project spend protection.
-2. Configure the provider and enable `wn_private.profile_check_limits.enabled` for controlled live verification. The scoped credential, Vault entries and daily retention are installed.
-3. Verify the deployed flow using disposable identities and synthetic content, including friend visibility and cleanup. Then activate the `worldniche-profile-checks` cron job and verify a scheduled run.
-4. Publish the matching privacy, security and community disclosures.
-5. Upload the verified signed build and verify its availability in the public TestFlight group.
+No deployment gate remains for build 1.0 (3). It is approved and available through the [public TestFlight link](https://testflight.apple.com/join/kqpQhYFw).
 
-No real profile content has been sent to OpenAI by these local tests. No provider credential belongs in the app, website or repository.
+Operational follow-up: confirm the first scheduled reservation cleanup and configure the separate general retention job. Provider log and backup retention still need verification before publishing exact periods.
+
+The isolated tests sent no network traffic. The hosted test sent only synthetic profile text and a harmless fixture image to OpenAI. No provider credential belongs in the app, website or repository.
 
 ## iPhone Duo
 
-The published landing page pairs a separate, unfolded landscape mockup with a real 29.53-second landscape simulator recording. The original iPhone preview remains available. Desktop and 390-pixel mobile browser checks confirmed both screen masks, switching, keyboard selection, playback and no horizontal overflow. The hosting artifact passed exact-byte and video range validation. The live legal pages retain the existing disclosures until the new moderation backend is deployed.
+The published landing page pairs a separate, unfolded landscape mockup with a real 29.53-second landscape simulator recording. The original iPhone preview remains available. Desktop and 390-pixel mobile browser checks confirmed both screen masks, switching, keyboard selection, playback and no horizontal overflow. The hosting artifact passed exact-byte and video range validation. Site version 10 also published the matching automatic-moderation disclosures, with live verification of the privacy, security and community pages.
 
 Site version 9 fixes the Duo's black side edges by matching its decorative frame and screen mask to the recording. The full app image is preserved without cropping or stretching. Live desktop and mobile checks passed.
 
