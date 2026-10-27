@@ -33,3 +33,7 @@ trap finish EXIT HUP INT TERM
 PGUSER=wn_test python3 "$project_root/tests/automatic_check_race.py" --psql "$pg_bin/psql" --socket "$scratch"
 PGUSER=wn_test python3 "$project_root/tests/consent_race.py" --psql "$pg_bin/psql" --socket "$scratch"
 PGUSER=wn_test python3 "$project_root/tests/invitation_race.py" --psql "$pg_bin/psql" --socket "$scratch"
+"$pg_bin/psql" -h "$scratch" -p 55433 -U wn_test -d postgres -v ON_ERROR_STOP=1 -q \
+  -f "$project_root/supabase/migrations/202610270007_moderation_abuse_limits.sql"
+PGUSER=wn_test python3 "$project_root/tests/moderation_abuse.py" --psql "$pg_bin/psql" --socket "$scratch"
+PGUSER=wn_test python3 "$project_root/tests/automatic_check_race.py" --psql "$pg_bin/psql" --socket "$scratch"

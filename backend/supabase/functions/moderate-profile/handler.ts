@@ -147,14 +147,21 @@ export function createHandler(configuration: Configuration, fetcher: Fetch = fet
     return dataURL(bytes);
   }
 
-  async function check(claim: Claim): Promise<{applied: boolean; outcome: Outcome | "stale"}> {
+  async function check(claim: Claim): Promise<{applied: boolean; outcome: Outcome | "stale" | "deferred"}> {
     let outcome: Outcome = "retry";
     try {
       if (!await current(claim)) return {applied: false, outcome: "stale"};
       const input = claim.kind === "name" ? [{type: "text", text: claim.text}] : [{type: "image_url", image_url: {url: await imageInput(claim)}}];
-      // Consent can change while the photo is downloading. Check again at the
-      // external disclosure boundary, then verify once more during publication.
-      if (!await current(claim)) return {applied: false, outcome: "stale"};
+      // The database rechecks consent and the revision, then atomically charges
+      // a single-use allowance shared by native requests and scheduled workers.
+      // Charge before sending, even if the provider times out or this worker dies.
+      const permit = await rpc("reserve_profile_check", parameters(claim));
+      if (!record(permit) || typeof permit.allowed !== "boolean" ||
+        !["allowed", "stale", "budget", "attempts", "disabled", "reserved"].includes(String(permit.reason)) ||
+        permit.allowed !== (permit.reason === "allowed")) throw new UpstreamFailure(503);
+      // A denial already defers or holds the job. Finishing here would overwrite
+      // its cooldown or invalidate another worker's reservation.
+      if (!permit.allowed) return {applied: false, outcome: permit.reason === "stale" ? "stale" : "deferred"};
       const response = await fetcher(providerURL, {
         method: "POST", headers: {Authorization: `Bearer ${openaiKey}`, "Content-Type": "application/json"},
         body: JSON.stringify({model, input}), signal: AbortSignal.timeout(20000), redirect: "error",

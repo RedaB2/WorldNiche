@@ -27,10 +27,15 @@ select cron.schedule('worldniche-profile-checks','* * * * *',$job$
   end if;
  end $retry$;
 $job$);
+-- Retention is independent of reservations, so cleanup never locks accounts.
+-- A failed cleanup retains history and cannot restore anyone's quota early.
+select cron.schedule('worldniche-profile-check-retention','17 3 * * *',$job$
+ select wn_private.prune_profile_check_reservations();
+$job$);
 commit;
 
 -- A row with active=true confirms scheduling, not successful provider processing.
-select jobid,jobname,schedule,active from cron.job where jobname='worldniche-profile-checks';
+select jobid,jobname,schedule,active from cron.job where jobname in ('worldniche-profile-checks','worldniche-profile-check-retention');
 -- After at least one minute, confirm a completed invocation and a successful
 -- HTTP response in net._http_response. Do not print request headers or Vault data.
 select d.status,d.start_time,d.end_time from cron.job_run_details d

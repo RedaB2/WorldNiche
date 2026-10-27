@@ -39,6 +39,8 @@ def claim():
     return json.loads(run(worker + f"select public.claim_profile_checks('{user_id}',2);"))
 
 def decide(job):
+    if run("select to_regprocedure('public.reserve_profile_check(uuid,text,uuid,uuid)') is not null;") == 't':
+        run(worker + f"select public.reserve_profile_check('{user_id}','name','{job['revision']}','{job['claim_token']}');")
     return json.loads(run(worker + f"select public.finish_profile_check('{user_id}','name','{job['revision']}','{job['claim_token']}','approve');"))
 
 run(claims + "select public.update_my_profile('Alice Initial','globe',false); select public.set_profile_check_consent(true);")

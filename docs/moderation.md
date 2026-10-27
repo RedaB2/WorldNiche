@@ -1,6 +1,6 @@
 # Moderation
 
-The currently deployed release holds custom names and photos for human review before friends can see them. The next release adds the automatic checks below. Do not describe those checks as live until the provider, database migrations, worker, scheduling, and public disclosures have been deployed and verified together.
+The currently deployed release holds custom names and photos for human review before friends can see them. Database migrations 005, 006 and 007, including upload quotas and provider reservation controls, were installed on October 27. The worker, provider key and retry schedule are still pending. Do not describe automatic checks as live until the provider, worker, scheduling, and public disclosures have been deployed and verified together.
 
 Symbols and the default Explorer name are available immediately. Existing approved content stays visible to friends while an edit is pending. Links, control characters, and invisible formatting in names are rejected before review. The next app release also shows submitted names and photos immediately in the owner's private profile.
 
@@ -14,13 +14,33 @@ The function accepts no client-supplied user IDs, content, or media URLs. Native
 
 The database supplies revision-specific jobs, exclusive claims, retry backoff, and consent, restriction, and deletion checks. Migration `202610240006_profile_check_disclosure.sql` adds a service-only claim check immediately before external disclosure. A withdrawal after a request has started cannot recall that request, but its result cannot publish content after consent is withdrawn. No credentials, submitted content, or provider response bodies are logged by the worker.
 
+### Abuse controls
+
+Migration `202610270007_moderation_abuse_limits.sql` puts an atomic reservation immediately before every OpenAI request. Native requests, upload-triggered work and scheduled retries share the same rolling limits. A database lock serializes reservations across workers and accounts; a claim can reserve only once. Timeouts, provider errors and crashed workers still consume their allowance.
+
+| Limit | Per minute | Per hour | Per 24 hours |
+| --- | ---: | ---: | ---: |
+| Provider requests per account | 4 | 12 | 30 |
+| Provider requests across the app | 30 | 300 | 1,000 |
+| Accepted photo uploads per account | 6 | 20 | 40 |
+
+These are initial beta limits. Each submitted revision gets at most five provider attempts before human review. Names and photos count separately. Replacing a pending edit or toggling permission does not reset the account or shared quota. Deleting an account removes its identity from reservation records but leaves the anonymous usage charge until it expires, so account recreation cannot reset the shared budget. Daily maintenance removes reservation records older than 25 hours.
+
+When a provider limit is reached, the saved submission stays private and is scheduled for the earliest eligible time. The minute-based worker checks it after the cooldown without needing the app open. New edits replace the pending revision, so only the latest accepted version can publish. Friends keep seeing the previous approved content. Flagged content and revisions that exhaust their attempts need human review; those are not automatically retried forever.
+
+The upload limit is separate: a rejected upload is not saved or queued. The app keeps the selected photo available for the person to retry and shows an error. Deleting and uploading again does not refund accepted-upload usage. Restricted accounts cannot upload. The private JPEG size and stored-object limits still apply.
+
+The worker accepts no arbitrary prompts, models or URLs and calls only the fixed moderation endpoint. A missing, malformed or unavailable reservation response never permits a provider call. Limits are server-owned; authenticated clients cannot change them or approve their own content.
+
+Use a dedicated project key restricted to the moderation endpoint, and configure a project hard spend limit as an additional safeguard. A spend alert alone does not stop traffic, and hard spend enforcement can have a small delay. These provider settings still need verification when the key is provisioned. See [key permissions](https://help.openai.com/en/articles/9186755-managing-projects-in-the-api-platform) and [spend limits](https://developers.openai.com/api/docs/guides/spend-limits).
+
 ### Classifier limits
 
 The worker uses the provider's boolean flags, with no custom confidence-score threshold. It validates the complete response and expected modality coverage before approving anything. Confidence scores are not proof that a photo is safe. OpenAI documents that image-only inputs do not support hate, harassment, illicit activity, or the sexual/minors category. The image classifier covers sexual content, self-harm, and violence categories. It also does not establish identity, consent to a photograph, copyright ownership, or authenticity. Reports, blocking, manual enforcement, and appeals remain part of moderation. Do not advertise this as comprehensive image safety or a guarantee of App Store approval. See the [OpenAI moderation guide](https://developers.openai.com/api/docs/guides/moderation).
 
 ### Deployment gate
 
-Apply migrations `202610240005_automatic_profile_checks.sql` and `202610240006_profile_check_disclosure.sql` before deploying `moderate-profile`. Set `OPENAI_API_KEY` and `WORLDNICHE_MODERATION_WORKER_SECRET` only as backend secrets. Supabase supplies its project URL, public API key, and server API key. Disable the Edge gateway JWT check for this function because scheduled calls use the scoped worker secret; the function itself verifies either the worker secret or the native caller through the session-checking RPC.
+Apply migrations `202610240005_automatic_profile_checks.sql`, `202610240006_profile_check_disclosure.sql` and `202610270007_moderation_abuse_limits.sql` before deploying `moderate-profile`. Set `OPENAI_API_KEY` and `WORLDNICHE_MODERATION_WORKER_SECRET` only as backend secrets. Supabase supplies its project URL, public API key, and server API key. Disable the Edge gateway JWT check for this function because scheduled calls use the scoped worker secret; the function itself verifies either the worker secret or the native caller through the session-checking RPC.
 
 Enable pg_net, pg_cron, and Vault. Store `worldniche_moderation_url` and `worldniche_moderation_worker_secret` in Vault, with the same scoped worker secret used by the Edge function. `configure_profile_checks.sql` refuses to configure retries without those dependencies. It installs a minute-based retry schedule. Verify a successful cron invocation, a successful worker response, a passing opted-in synthetic name/photo, a held flagged submission, and friend visibility before release. Keep the human queue and support inbox monitored.
 
@@ -31,6 +51,8 @@ The database enforces this for every client. Pending content is owner-only, and 
 Reda Boutayeb is the published support contact. Before inviting public testers, establish a daily queue review routine and monitor the support inbox. Review urgent safety reports promptly. This code does not replace a human operator or send automatic email alerts.
 
 Use Supabase's protected SQL editor with `select public.moderation_queue(200);`, or run `backend/scripts/moderate.mjs` from a trusted terminal. Set `WORLDNICHE_SERVICE_URL` and `WORLDNICHE_SERVICE_KEY` only in the operator's local session. Never place a server key in source, the app, a browser page, or a screenshot. The tool does not store credentials.
+
+To pause new provider requests, run `update wn_private.profile_check_limits set enabled = false where singleton;` in the protected SQL editor. Requests already sent cannot be recalled. Set it back to `true` to resume pending work through the normal schedule. Review hourly and daily reservation counts and pending jobs when investigating abuse. Changing limits must be an operator decision, never a response to client input. The shared cap protects API usage; it is not a promise of uninterrupted service during an account-creation attack.
 
 1. `node backend/scripts/moderate.mjs queue` lists pending submissions and reports, oldest first. Process batches until the counts reach zero.
 2. Read each submitted name. For photos, use `photo USER PATH OUTPUT` to download a private review copy, inspect it, and remove that local copy afterward. Never approve an image from its filename or MIME type alone.
@@ -44,8 +66,8 @@ Reports keep the visible name and photo reference at reporting time. The referen
 
 ## Verification
 
-`backend/tests/run_database.sh` creates a disposable local cluster and checks quarantine, owner/friend isolation, immutable review, stale decisions, restrictions, report privacy, export, and deletion cascades. It also tests invitation, blocking, revocation, sharing races, and the worker's permission to disclose a specific claimed revision.
+`backend/tests/run_database.sh` creates a disposable local cluster and checks quarantine, owner/friend isolation, immutable review, stale decisions, restrictions, report privacy, export, and deletion cascades. It also tests invitation, blocking, revocation, sharing races, the worker's permission to disclose a specific claimed revision, rolling quotas, cooldowns, replacement revisions, retry exhaustion and concurrent reservations.
 
-Run `node --test backend/tests/moderate_profile.mjs` for isolated Edge-handler tests. These exercise the production handler with synthetic Auth, Storage, and OpenAI responses. They cover caller scope, worker credentials, malformed input, photo limits, modality coverage, stale claims, withdrawal before disclosure, provider failures, manual review, and fresh owner responses. They never contact OpenAI or use a person's content. `npm exec --yes --package=deno -- deno check backend/supabase/functions/moderate-profile/index.ts` checks the actual deployment entry point.
+Run `node --test backend/tests/moderate_profile.mjs` for isolated Edge-handler tests. These exercise the production handler with synthetic Auth, Storage, and OpenAI responses. They cover caller scope, worker credentials, malformed input, photo limits, modality coverage, stale claims, withdrawal before disclosure, provider failures, manual review, fresh owner responses, denied allowances, replayed claims and budget-store failures. They never contact OpenAI or use a person's content. `npm exec --yes --package=deno -- deno check backend/supabase/functions/moderate-profile/index.ts` checks the actual deployment entry point.
 
 `backend/tests/hosted_social.mjs --live --project-ref PROJECT` creates three disposable accounts through admin-generated links, sends no emails, exercises normal authenticated APIs, and cleans up only the exact accounts created in that run. Keys come from process environment; `WORLDNICHE_TEST_PHOTO` points to a harmless JPEG. Never use a person's account. Actual Apple revocation requires a separate consenting Apple test identity.

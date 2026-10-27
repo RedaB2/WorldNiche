@@ -27,7 +27,8 @@ function fixture(overrides = {}, configuration = {}) {
   const state = {claims: [nameClaim()], profile: {id: alice, display_name: "Explorer", pending_display_name: "Alice", name_moderation_status: "pending"},
     authStatus: 200, authCode: null, authID: alice, current: true, applied: true, finishes: [], calls: [], providerBodies: [],
     providerStatus: 200, providerResponse: null, providerThrow: false, storageStatus: 200, image: new Uint8Array([0xff, 0xd8, 0xff, 0xd9]),
-    imageType: "image/jpeg", imageLength: null, currentChecks: 0, finishStatus: 200, ...overrides};
+    imageType: "image/jpeg", imageLength: null, currentChecks: 0, finishStatus: 200,
+    reservations: [], reservedClaims: new Set(), reservationStatus: 200, ...overrides};
   const fetcher = async (url, init) => {
     const body = init.body ? JSON.parse(init.body) : null;
     state.calls.push({url, body});
@@ -64,6 +65,18 @@ function fixture(overrides = {}, configuration = {}) {
       assert.equal(body.p_claim_token, claimToken);
       return json(state.currentUntil ? state.currentChecks < state.currentUntil : state.current);
     }
+    if (url.endsWith("/reserve_profile_check")) {
+      state.reservations.push(body);
+      state.currentChecks++;
+      assert.equal(body.p_claim_token, claimToken);
+      if (state.reservationStatus !== 200) return json({code: "fixture_unavailable"}, state.reservationStatus);
+      if ("reservationResponse" in state) return json(state.reservationResponse);
+      if (!(state.currentUntil ? state.currentChecks < state.currentUntil : state.current)) return json({allowed: false, reason: "stale"});
+      const key = `${body.p_user_id}/${body.p_kind}/${body.p_revision}/${body.p_claim_token}`;
+      if (state.reservedClaims.has(key)) return json({allowed: false, reason: "reserved"});
+      state.reservedClaims.add(key);
+      return json({allowed: true, reason: "allowed"});
+    }
     if (url.endsWith("/finish_profile_check")) {
       state.finishes.push(body);
       if (state.finishStatus !== 200) return json({code: "fixture_failure"}, state.finishStatus);
@@ -95,6 +108,65 @@ test("approved name returns fresh owner profile and publishes only the claimed r
   assert.deepEqual(state.providerBodies[0].input, [{type: "text", text: "Alice"}]);
   assert.deepEqual(state.finishes, [{p_user_id: alice, p_kind: "name", p_revision: revision, p_claim_token: claimToken, p_outcome: "approve"}]);
   assert.equal(state.currentChecks, 2);
+  assert.equal(state.reservations.length, 1);
+});
+
+for (const reason of ["stale", "budget", "attempts", "disabled", "reserved"]) {
+  test(`a database ${reason} denial cannot call the provider or finish the deferred job`, async () => {
+    const {request, state} = fixture({reservationResponse: {allowed: false, reason}});
+    const response = await request();
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).display_name, "Explorer");
+    assert.equal(state.reservations.length, 1);
+    assert.equal(state.providerBodies.length, 0);
+    assert.equal(state.finishes.length, 0);
+  });
+}
+
+for (const reservationResponse of [null, true, "allowed", {}, {allowed: "true", reason: "allowed"},
+  {allowed: true, reason: "budget"}, {allowed: false, reason: "allowed"}, {allowed: true, reason: "unknown"}]) {
+  test(`malformed allowance fails closed (${JSON.stringify(reservationResponse)})`, async () => {
+    const {request, state} = fixture({reservationResponse});
+    await request();
+    assert.equal(state.providerBodies.length, 0);
+    assert.equal(state.finishes[0].p_outcome, "retry");
+  });
+}
+
+for (const reservationStatus of [404, 503]) {
+  test(`missing or unavailable budget store never calls the provider (${reservationStatus})`, async () => {
+    const {request, state} = fixture({reservationStatus});
+    await request();
+    assert.equal(state.providerBodies.length, 0);
+    assert.equal(state.finishes[0].p_outcome, "retry");
+  });
+}
+
+test("concurrent replay of one claim can consume only one provider allowance", async () => {
+  const {request, state} = fixture();
+  const responses = await Promise.all(Array.from({length: 20}, () => request()));
+  assert.ok(responses.every(response => response.status === 200));
+  assert.equal(state.providerBodies.length, 1);
+  assert.equal(state.finishes.length, 1);
+});
+
+test("photo validation precedes reservation, which precedes the external request", async () => {
+  const {request, state} = fixture({claims: [photoClaim()]});
+  await request();
+  const storage = state.calls.findIndex(call => call.url.includes("/storage/"));
+  const reserve = state.calls.findIndex(call => call.url.endsWith("/reserve_profile_check"));
+  const provider = state.calls.findIndex(call => call.url === "https://api.openai.com/v1/moderations");
+  assert.ok(storage >= 0 && reserve > storage && provider > reserve);
+});
+
+test("scheduled worker shares the budget and does not finish quota-deferred work", async () => {
+  const {request, state} = fixture({claims: [nameClaim(), photoClaim()], reservationResponse: {allowed: false, reason: "budget"}});
+  const response = await request({headers: {"x-worldniche-worker-secret": config.workerSecret}});
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {processed: 0});
+  assert.equal(state.reservations.length, 2);
+  assert.equal(state.providerBodies.length, 0);
+  assert.equal(state.finishes.length, 0);
 });
 
 test("photo sends bounded private bytes, never a storage URL or user identity", async () => {
@@ -145,7 +217,7 @@ for (const [status, code, expected] of [[401, "PGRST301", 401], [400, "28000", 4
   });
 }
 
-for (const body of ['{"user_id":"spoofed"}', `{"photo_url":"https://example.com"}`, "null", "[]", "bad JSON", "x".repeat(513)]) {
+for (const body of ['{"user_id":"spoofed"}', `{"photo_url":"https://example.com"}`, '{"model":"other-model"}', '{"input":"arbitrary prompt"}', "null", "[]", "bad JSON", "x".repeat(513)]) {
   test(`client parameters are never accepted (${body.slice(0, 25)})`, async () => {
     const {request, state} = fixture();
     assert.equal((await request({body})).status, 400);
@@ -260,6 +332,7 @@ for (const override of [{imageType: "text/html"}, {imageLength: "300001"}, {imag
     const {request, state} = fixture({claims: [photoClaim()], ...override});
     await request();
     assert.equal(state.providerBodies.length, 0);
+    assert.equal(state.reservations.length, 0);
     assert.equal(state.finishes[0].p_outcome, "review");
   });
 }
