@@ -1,15 +1,61 @@
 import SwiftUI
 
 struct RootView: View {
+    @Environment(SocialStore.self) private var social
+    @Environment(DiscoveryJournal.self) private var journal
+    @State private var selectedTab = RootTab.discover
+    @State private var introResolved = false
+    @State private var presentsIntro = false
+    @State private var presentsIntroSignIn = false
+    private let introProgress = IntroProgress.appProgress()
+
     var body: some View {
-        TabView {
-            Tab("Discover", systemImage: "globe.europe.africa") { ExploreView() }
-            Tab("Atlas", systemImage: "square.grid.2x2") { AtlasView() }
-            Tab("Journal", systemImage: "bookmark") { JournalView() }
-            Tab("Profile", systemImage: "person.crop.circle") { ProfileView() }
+        Group {
+            if !introResolved {
+                Palette.paper.ignoresSafeArea()
+            } else if presentsIntro {
+                IntroView(explore: { finishIntro() }, createProfile: {
+                    finishIntro()
+                    selectedTab = .profile
+                    presentsIntroSignIn = true
+                })
+            } else {
+                TabView(selection: $selectedTab) {
+                    Tab("Discover", systemImage: "globe.europe.africa", value: RootTab.discover) { ExploreView() }
+                    Tab("Atlas", systemImage: "square.grid.2x2", value: RootTab.atlas) { AtlasView() }
+                    Tab("Journal", systemImage: "bookmark", value: RootTab.journal) { JournalView() }
+                    Tab("Profile", systemImage: "person.crop.circle", value: RootTab.profile) { ProfileView() }
+                }
+                .tabBarMinimizeBehavior(.onScrollDown)
+            }
         }
-        .tabBarMinimizeBehavior(.onScrollDown)
+        .sheet(isPresented: $presentsIntroSignIn) { ProfileSignInView() }
+        .onAppear {
+            guard !introResolved else { return }
+            introProgress.prepareFirstAppearance()
+            presentsIntro = introProgress.shouldPresent(hasProfile: social.profile != nil || social.isSignedIn,
+                                                       hasJournal: !journal.visitedIDs.isEmpty || !journal.savedIDs.isEmpty,
+                                                       hasInvitation: social.presentsInvitation)
+            if !presentsIntro, !introProgress.skipsPresentation { introProgress.complete() }
+            introResolved = true
+        }
+        .onChange(of: social.presentsInvitation) { _, presenting in
+            if presenting {
+                finishIntro()
+                presentsIntroSignIn = false
+            }
+        }
+        .onChange(of: social.isSignedIn) { _, signedIn in
+            if signedIn, presentsIntro, !introProgress.ignoresExistingActivity { finishIntro() }
+        }
     }
+
+    private func finishIntro() {
+        introProgress.complete()
+        presentsIntro = false
+    }
+
+    private enum RootTab: Hashable { case discover, atlas, journal, profile }
 }
 
 struct ExploreView: View {

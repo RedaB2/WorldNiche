@@ -2,6 +2,10 @@
 
 The external **WorldNiche Public Beta** group has a [public signup link](https://testflight.apple.com/join/kqpQhYFw) with 100 places. Apple approved build 1.0 (3), and it is available to external testers with automatic profile checks, friend updates, closer globe zoom, and the discovery fix.
 
+The next update adds the optional intro, chosen names, optional photos with initials, and one-time profile-check permission. The matching website copy is live in site version 11. This app update has not been uploaded yet; the final protected-storage checks and unfolded-layout verification are release gates. Build 3 remains the public beta.
+
+Validation covers 26 unique simulator scenarios across the full run and a focused rerun. All five profile-setup scenarios passed twice after the test was changed to dismiss the keyboard with Done before interacting with the form. The 12 intro state checks and 29 website checks also pass. The final host social-suite run cannot reopen protected export and photo files while the Mac is locked; rerun it after protected data becomes available before uploading build 4.
+
 Apple currently requires an internal group before an external group can be created. If needed, create that prerequisite without adding testers, then use the external group for public distribution. Do not upload the build as TestFlight Internal Only. [Apple's external testing instructions](https://developer.apple.com/help/app-store-connect/test-a-beta-version/invite-external-testers/).
 
 ## Beta description
@@ -13,7 +17,8 @@ A little more world, every day. Spin the globe, find a song, catch up on local n
 - Explore Morocco, spin to another country, search the Atlas, and save a place.
 - Refresh music, news, and local discoveries independently. Tell us when a source fails or a discovery repeats too often.
 - Try Sign in with Apple. Existing email users can recover their account with a six-digit code. Close and reopen the app to check that you stay signed in.
-- Change your name or photo and try automatic checks. Your private preview should appear immediately; friends should see approved updates without reopening the app. Human review remains an option.
+- Try the optional intro, then create a profile with your chosen name and an optional photo. Skipping the photo should show your initials.
+- Check the sharing switch during signup and choose whether to allow automatic profile checks. Normal edits should remember that choice without asking again. Friends should see approved updates without reopening the app.
 - Zoom closer on the globe to tap smaller countries, and try Show me another for new cultural discoveries.
 - Share a friend invitation, open it from Messages, and check that it connects both accounts. Try exploration sharing, removing a friend, reporting, and blocking.
 - If you create a disposable account specifically for testing, try data export and account deletion. Deletion is permanent, so use an account you intend to remove.
@@ -22,9 +27,9 @@ Send feedback through TestFlight or the contact at [worldniche.app/support](http
 
 ## Review notes
 
-Exploration works without an account. Sign-in is optional for friends and cloud sharing. New users can use native Sign in with Apple; existing email users can recover their account with a six-digit code. There are no passwords, purchases, ads, or tracking SDKs. Exploration sharing starts on for new profiles and can be turned off in Settings.
+Exploration works without an account. The short intro can be skipped and ends with an optional invitation to create a profile. New users can use native Sign in with Apple; existing email users can recover their account with a six-digit code. Profile setup asks for a chosen display name and an optional photo, with initials when no photo is selected. There are no passwords, purchases, ads, or tracking SDKs. Exploration sharing is visibly on for new profiles during setup and can be turned off there or in Settings. Existing choices stay unchanged.
 
-Profile edits appear privately to their owner immediately. Automatic checks send the submitted name and selected photo to OpenAI only after the user explicitly chooses that option. Approved changes become visible to friends automatically. Human review remains available. Flagged or unapproved changes stay private, while friends see the previously approved profile or a neutral Explorer profile. Settings contains the privacy policy, support, community guidelines, export, device clear, and account deletion.
+Profile edits appear privately to their owner immediately. Setup offers one-time permission to send the submitted name and selected photo to OpenAI, with a clear option to continue without automatic checks. That choice is remembered for normal edits and can be changed in Settings. Approved changes become visible to friends automatically. Human review remains available. Flagged or unapproved changes stay private, while friends see the previously approved profile or a neutral New friend placeholder. Normal edits show no review status card; rejected content and restrictions show actionable feedback. Settings contains the privacy policy, support, community guidelines, export, device clear, and account deletion.
 
 Provide any private reviewer access details only in App Store Connect. Do not commit credentials or a real user's friend invitation. Keep the hosted service, SMTP delivery, moderation queue, and support inbox available during review.
 

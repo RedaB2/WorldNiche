@@ -20,9 +20,20 @@ struct ExplorerProfile: Codable, Sendable {
     var communityRestricted: Bool? = nil
     var communityRestrictionNote: String? = nil
 
+    var hasChosenDisplayName: Bool {
+        let candidate = nameModerationStatus == .rejected ? displayName : editableDisplayName
+        let name = candidate.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !name.isEmpty && name.caseInsensitiveCompare("Explorer") != .orderedSame
+    }
     var editableDisplayName: String { pendingDisplayName ?? displayName }
     var editableAvatarPath: String? { pendingAvatarPath ?? avatarPath }
-    var ownerDisplayName: String { nameModerationStatus == .pending ? pendingDisplayName ?? displayName : displayName }
+    var ownerDisplayName: String {
+        if nameModerationStatus == .pending, let pendingDisplayName { return pendingDisplayName }
+        if displayName.trimmingCharacters(in: .whitespacesAndNewlines).caseInsensitiveCompare("Explorer") != .orderedSame {
+            return displayName
+        }
+        return pendingDisplayName ?? "Your profile"
+    }
     var ownerAvatarPath: String? { photoModerationStatus == .pending ? pendingAvatarPath ?? avatarPath : avatarPath }
     var hasPendingContent: Bool { nameModerationStatus == .pending || photoModerationStatus == .pending }
     var needsAutomaticCheck: Bool {
@@ -39,6 +50,23 @@ struct ExplorerProfile: Codable, Sendable {
     }
 
     func referencesPhoto(_ path: String) -> Bool { avatarPath == path || pendingAvatarPath == path }
+}
+
+enum ProfileIdentity {
+    static func displayName(for name: String) -> String {
+        let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return name.isEmpty || name.caseInsensitiveCompare("Explorer") == .orderedSame ? "New friend" : name
+    }
+
+    static func initials(for name: String) -> String {
+        let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty, name.caseInsensitiveCompare("Explorer") != .orderedSame,
+              name != "New friend" else { return "?" }
+        let words = name.split(whereSeparator: \.isWhitespace)
+        guard let first = words.first?.first else { return "?" }
+        let initials = words.count > 1 ? String(first) + String(words.last!.first!) : String(first)
+        return String(initials.uppercased().prefix(2))
+    }
 }
 
 enum ProfileModerationStatus: String, Codable, Sendable {

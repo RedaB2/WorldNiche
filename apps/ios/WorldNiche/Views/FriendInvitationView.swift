@@ -10,10 +10,10 @@ struct FriendInvitationView: View {
             VStack(spacing: 24) {
                 Spacer()
                 if social.invitationConnected, let preview = social.pendingInvitation {
-                    ExplorerAvatar(avatar: preview.avatar, size: 80)
-                    Text("You’re friends with \(preview.displayName)")
+                    ProfilePhotoAvatar(symbol: preview.avatar, displayName: preview.displayName, size: 80)
+                    Text("You’re friends with \(ProfileIdentity.displayName(for: preview.displayName))")
                         .scaledFont(size: 32, design: .serif).multilineTextAlignment(.center)
-                    Text("Explore the world together. Your discoveries stay private until you turn on sharing in Settings.")
+                    Text("Explore the world together. You can change what you share in Settings.")
                         .font(.body).foregroundStyle(Palette.muted).multilineTextAlignment(.center)
                     Button("Done") { social.dismissInvitation() }
                         .buttonStyle(.glassProminent).tint(Palette.forest)
@@ -25,11 +25,29 @@ struct FriendInvitationView: View {
                 } else if !social.isSignedIn && social.hasPendingInvitation {
                     Image(systemName: "person.2.circle").font(.system(size: 66, weight: .ultraLight))
                     Text("A friend invited you").scaledFont(size: 32, design: .serif)
-                    Text("Sign in and you’ll be connected automatically. Your discoveries stay private unless you choose to share them.")
+                    Text("Sign in, set up your profile, and you’ll be connected automatically. You choose what to share.")
                         .foregroundStyle(Palette.muted).multilineTextAlignment(.center)
                     Button("Sign in to connect") { showSignIn = true }
                         .buttonStyle(.glassProminent).tint(Palette.forest)
                         .accessibilityIdentifier("signInForInvitation")
+                } else if social.isSignedIn && !social.hasLoadedProfile && social.hasPendingInvitation {
+                    if social.isBusy || social.errorMessage == nil {
+                        ProgressView("Loading your profile…")
+                    } else {
+                        Text("We couldn’t load your profile yet.")
+                            .foregroundStyle(Palette.muted).multilineTextAlignment(.center)
+                        Button("Try again") { Task { await social.refresh() } }
+                            .buttonStyle(.glassProminent).tint(Palette.forest)
+                            .accessibilityIdentifier("retryInvitationProfile")
+                    }
+                } else if social.needsProfileSetup && social.hasPendingInvitation {
+                    Text("Let your friend know it’s you.")
+                        .scaledFont(size: 32, design: .serif).multilineTextAlignment(.center)
+                    Text("Choose your name and an optional photo to connect.")
+                        .foregroundStyle(Palette.muted).multilineTextAlignment(.center)
+                    Button("Finish your profile") { showSignIn = true }
+                        .buttonStyle(.glassProminent).tint(Palette.forest)
+                        .accessibilityIdentifier("finishProfileForInvitation")
                 } else if social.isConnectingInvitation || (social.hasPendingInvitation && social.invitationMessage == nil) {
                     ProgressView("Connecting you…").accessibilityIdentifier("connectingFriendInvitation")
                 }
@@ -73,9 +91,9 @@ struct CountryFriendsView: View {
                 } else {
                     HStack(spacing: 10) {
                         ForEach(explorers.prefix(4)) { friend in
-                            ProfilePhotoAvatar(symbol: friend.avatar, path: friend.avatarPath, size: 34).accessibilityLabel(friend.displayName)
+                            ProfilePhotoAvatar(symbol: friend.avatar, displayName: friend.displayName, path: friend.avatarPath, size: 34).accessibilityLabel(friend.displayName)
                         }
-                        Text(explorers.prefix(3).map(\.displayName).joined(separator: ", ") + (explorers.count > 3 ? " and \(explorers.count - 3) more" : ""))
+                        Text(explorers.prefix(3).map { ProfileIdentity.displayName(for: $0.displayName) }.joined(separator: ", ") + (explorers.count > 3 ? " and \(explorers.count - 3) more" : ""))
                             .font(.subheadline).lineLimit(2)
                     }
                     Text("Opened \(country.name) in WorldNiche. This doesn’t indicate a physical visit.")

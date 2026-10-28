@@ -7,6 +7,7 @@ final class WorldNicheUITests: XCTestCase {
     @MainActor
     func testDiscoverGuidanceAppearsAboveInteractiveGlobe() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro"]
         app.launch()
         app.tabBars.buttons["Discover"].tap()
         assertDiscoverGuidanceOrdering(app)
@@ -27,7 +28,8 @@ final class WorldNicheUITests: XCTestCase {
     @MainActor
     func testDiscoverGuidanceLargeTextKeepsCountryControlsAccessible() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
+        app.launchArguments = ["-worldniche-skip-intro"]
+        app.launchArguments = ["-worldniche-skip-intro", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
         app.launch()
         app.tabBars.buttons["Discover"].tap()
         assertDiscoverGuidanceOrdering(app)
@@ -71,28 +73,9 @@ final class WorldNicheUITests: XCTestCase {
     }
 
     @MainActor
-    func testNewAccountSharingStartsOnAndCanBeDisabled() throws {
-        let app = XCUIApplication()
-        openSignedOutSignIn(app)
-        let sharing = app.switches["signUpSharingToggle"]
-        XCTAssertTrue(sharing.waitForExistence(timeout: 5))
-        XCTAssertEqual(sharing.value as? String, "1")
-        for _ in 0..<3 where !sharing.isHittable { app.swipeUp() }
-        XCTAssertTrue(sharing.isHittable)
-        // SwiftUI can expose the entire labeled row as the switch frame.
-        // Tap its trailing control and wait for the native value transition.
-        sharing.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
-        expectation(for: NSPredicate(format: "value == %@", "0"), evaluatedWith: sharing)
-        waitForExpectations(timeout: 5)
-        XCTAssertEqual(sharing.value as? String, "0")
-        capture("New account sharing disabled before sign-in", app: app)
-        app.navigationBars["Sign in"].buttons["Cancel"].tap()
-        XCTAssertTrue(app.navigationBars["Profile"].waitForExistence(timeout: 5))
-    }
-
-    @MainActor
     func testAppleSignInIsVisibleAndEmailRecoveryIsOptIn() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro"]
         openSignedOutSignIn(app)
         let apple = app.buttons["signInWithApple"]
         XCTAssertTrue(apple.waitForExistence(timeout: 5))
@@ -128,46 +111,52 @@ final class WorldNicheUITests: XCTestCase {
     }
 
     @MainActor
-    func testProfileSaveShowsPrivatePreviewThenAutomaticApproval() throws {
+    func testProfileSaveShowsChosenNameWithoutReviewPrompts() throws {
         let app = openProfileFixture("approval")
         editFixtureName(app, name: "Mira Rose", allowChecks: true)
         XCTAssertTrue(app.staticTexts["profileName"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts["profileName"].label, "Mira Rose")
-        XCTAssertTrue(app.staticTexts["Checking before sharing with friends…"].exists)
-        capture("Saved name during automatic check", app: app)
+        XCTAssertFalse(app.staticTexts["Checking before sharing with friends…"].exists)
+        XCTAssertFalse(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "OpenAI")).firstMatch.exists)
         XCTAssertTrue(app.staticTexts["profileSaveConfirmation"].waitForExistence(timeout: 15))
         XCTAssertEqual(app.staticTexts["profileSaveConfirmation"].label, "Profile saved.")
         XCTAssertEqual(app.staticTexts["profileName"].label, "Mira Rose")
         XCTAssertFalse(app.staticTexts["Checking before sharing with friends…"].exists)
-        capture("Approved profile update", app: app)
+        capture("Saved profile without review prompts", app: app)
     }
 
     @MainActor
-    func testProfileCheckFailureKeepsSavedNameAndCanRetry() throws {
+    func testProfileCheckFailureKeepsSavedNameWithoutExtraPrompts() throws {
         let app = openProfileFixture("retry")
         editFixtureName(app, name: "Mira Rose", allowChecks: true)
-        let retry = app.buttons["retryProfileCheck"]
-        let retryAppeared = retry.waitForExistence(timeout: 10)
-        capture("Profile check recovery state", app: app)
-        XCTAssertTrue(retryAppeared, app.debugDescription)
         XCTAssertEqual(app.staticTexts["profileName"].label, "Mira Rose")
-        XCTAssertTrue(retry.isEnabled)
-        capture("Saved profile after temporary check failure", app: app)
-        retry.tap()
-        XCTAssertTrue(app.staticTexts["profileSaveConfirmation"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["retryProfileCheck"].exists)
+        XCTAssertFalse(app.staticTexts["Checking before sharing with friends…"].exists)
+        let confirmation = app.staticTexts["profileSaveConfirmation"]
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
+        XCTAssertEqual(confirmation.label, "Profile saved.")
+        app.buttons["profileSettings"].tap()
+        app.navigationBars["Settings"].buttons["Done"].tap()
         XCTAssertEqual(app.staticTexts["profileName"].label, "Mira Rose")
-        XCTAssertFalse(retry.exists)
+        XCTAssertEqual(confirmation.label, "Profile saved.")
+        XCTAssertFalse(app.buttons["retryProfileCheck"].exists)
+        capture("Saved profile survives a failed check without extra prompts", app: app)
     }
 
     @MainActor
-    func testHumanReviewChoiceKeepsPrivateNameVisible() throws {
+    func testRememberedPrivacyChoiceDoesNotPromptOnEdits() throws {
         let app = openProfileFixture("manual")
         editFixtureName(app, name: "Mira Rose", allowChecks: false)
-        XCTAssertTrue(app.staticTexts["Name saved for review"].waitForExistence(timeout: 8))
         XCTAssertEqual(app.staticTexts["profileName"].label, "Mira Rose")
         XCTAssertFalse(app.buttons["retryProfileCheck"].exists)
-        XCTAssertTrue(app.buttons["Use quick safety checks"].exists)
-        capture("Explicit human review retains private preview", app: app)
+        XCTAssertFalse(app.buttons["Use quick safety checks"].exists)
+        XCTAssertFalse(app.staticTexts["Name saved for review"].exists)
+        app.buttons["profileSettings"].tap()
+        let choice = app.switches["automaticProfileChecks"]
+        for _ in 0..<4 where !choice.isHittable { app.swipeUp() }
+        XCTAssertTrue(choice.exists)
+        XCTAssertEqual(choice.value as? String, "0")
+        capture("Remembered profile privacy choice", app: app)
     }
 
     @MainActor
@@ -238,7 +227,8 @@ final class WorldNicheUITests: XCTestCase {
     @MainActor
     private func openProfileFixture(_ mode: String) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-worldniche-social-fixture", mode]
+        app.launchArguments = ["-worldniche-skip-intro"]
+        app.launchArguments = ["-worldniche-skip-intro", "-worldniche-social-fixture", mode]
         app.launch()
         let tab = app.tabBars.buttons["Profile"]
         let destination = tab.exists ? tab : app.buttons.matching(NSPredicate(format: "label == %@", "Profile")).firstMatch
@@ -258,16 +248,15 @@ final class WorldNicheUITests: XCTestCase {
         field.tap()
         field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: (field.value as? String ?? "").count) + name)
         app.buttons["saveProfile"].tap()
-        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "OpenAI")).firstMatch.waitForExistence(timeout: 5))
-        let choice = app.buttons[allowChecks ? "Allow quick checks and save" : "Use human review and save"]
-        XCTAssertTrue(choice.isHittable)
-        choice.tap()
         XCTAssertTrue(app.navigationBars["Profile"].waitForExistence(timeout: 8))
+        XCTAssertFalse(app.buttons["Allow quick checks and save"].exists)
+        XCTAssertFalse(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "OpenAI")).firstMatch.exists)
     }
 
     @MainActor
     func testInvitationSheetFromWarmAndColdURLLaunch() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro"]
         // Invalid input still presents the real invitation sheet, without
         // touching a hosted invitation or requiring an authenticated account.
         let url = try XCTUnwrap(URL(string: "worldniche://invite/not-a-valid-token"))
@@ -293,6 +282,7 @@ final class WorldNicheUITests: XCTestCase {
     @MainActor
     func testCountryDiscoveryAndSavedJournal() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro"]
         app.launch()
         let landing = app.buttons["landingCountry"]
         XCTAssertTrue(landing.waitForExistence(timeout: 15))
@@ -328,6 +318,7 @@ final class WorldNicheUITests: XCTestCase {
     @MainActor
     func testAtlasSearch() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro"]
         app.launch()
         app.tabBars.buttons["Atlas"].tap()
         let search = app.searchFields.firstMatch
@@ -345,7 +336,8 @@ final class WorldNicheUITests: XCTestCase {
     @MainActor
     func testAtlasRegionFiltersAndLargeText() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
+        app.launchArguments = ["-worldniche-skip-intro"]
+        app.launchArguments = ["-worldniche-skip-intro", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
         app.launch()
         app.tabBars.buttons["Atlas"].tap()
         let america = app.buttons["Americas"]
@@ -361,6 +353,7 @@ final class WorldNicheUITests: XCTestCase {
     @MainActor
     func testCompanionRespondsWhenModelIsAvailable() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro"]
         app.launch()
         app.buttons["landingCountry"].tap()
         waitForCompanion(app)
@@ -383,6 +376,7 @@ final class WorldNicheUITests: XCTestCase {
     @MainActor
     func testLiveDiscoveryCanRotate() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro"]
         app.launch()
         app.buttons["landingCountry"].tap()
         let title = app.staticTexts["liveCultureTitle"]

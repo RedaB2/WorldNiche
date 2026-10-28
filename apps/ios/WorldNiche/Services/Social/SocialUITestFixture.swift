@@ -9,7 +9,7 @@ enum SocialUITestFixture {
     static func make() -> (journal: DiscoveryJournal, social: SocialStore)? {
         let arguments = ProcessInfo.processInfo.arguments
         guard let index = arguments.firstIndex(of: "-worldniche-social-fixture"), arguments.indices.contains(index + 1),
-              ["approval", "retry", "manual", "friend", "photo"].contains(arguments[index + 1]) else { return nil }
+              ["approval", "retry", "manual", "friend", "photo", "signup", "signup-photo-failure", "existing-private"].contains(arguments[index + 1]) else { return nil }
         let mode = arguments[index + 1]
         let suite = "io.worldniche.app.simulator-ui-fixture"
         guard let defaults = UserDefaults(suiteName: suite) else { return nil }
@@ -47,6 +47,12 @@ private final class SocialUIResponses: @unchecked Sendable {
     private var mode = "approval"
     private var name = "Mira"
     private var pendingName: String?
+    private var hasProfile = true
+    private var sharing = false
+    private var ownerPhotoPath: String?
+    private var pendingOwnerPhotoPath: String?
+    private var rejectedPhoto = false
+    private var automaticApprovalAt = Date.distantFuture
     private var consent: Bool?
     private var checkCount = 0
     private var friendUpdateAt = Date.distantFuture
@@ -57,7 +63,11 @@ private final class SocialUIResponses: @unchecked Sendable {
 
     func reset(mode: String) {
         lock.lock(); defer { lock.unlock() }
-        self.mode = mode; name = "Mira"; pendingName = nil; consent = nil
+        self.mode = mode
+        hasProfile = !mode.hasPrefix("signup")
+        name = hasProfile ? "Mira" : "Explorer"
+        pendingName = nil; consent = hasProfile ? (mode != "manual" && mode != "existing-private") : nil
+        sharing = false; ownerPhotoPath = nil; pendingOwnerPhotoPath = nil; rejectedPhoto = false; automaticApprovalAt = .distantFuture
         checkCount = 0; friendUpdateAt = Date().addingTimeInterval(15); retrying = false
         photoReadCount = 0
         photo = UIGraphicsImageRenderer(size: CGSize(width: 44, height: 44)).image { context in
@@ -76,19 +86,39 @@ private final class SocialUIResponses: @unchecked Sendable {
         let value: Any
         var delay: TimeInterval = 0
         switch request.url?.path {
-        case "/rest/v1/rpc/get_my_profile": value = profile()
+        case "/rest/v1/rpc/get_my_profile":
+            if consent == true, Date() >= automaticApprovalAt {
+                if let pendingName { name = pendingName }
+                pendingName = nil; ownerPhotoPath = pendingOwnerPhotoPath ?? ownerPhotoPath
+                pendingOwnerPhotoPath = nil; retrying = false; automaticApprovalAt = .distantFuture
+            }
+            value = hasProfile ? profile() : NSNull()
         case "/rest/v1/rpc/list_friends":
             let updated = mode == "friend" && Date() >= friendUpdateAt
             var friend: [String: Any] = ["id": "33333333-3333-4333-8333-333333333333", "display_name": updated ? "Jun Updated" : "Jun",
                                          "avatar": updated ? "leaf" : "wave", "share_exploration": false, "country_ids": [], "explored_count": 0]
             if mode == "photo" { friend["avatar_path"] = photoPath }
-            value = [friend]
+            value = mode.hasPrefix("signup") ? [] : [friend]
         case "/storage/v1/object/authenticated/profile-photos/\(photoPath)":
             photoReadCount += 1
             return photoReadCount <= 2 ? (503, Data("{}".utf8), 0) : (200, photo, 0)
         case "/rest/v1/rpc/update_my_profile":
+            hasProfile = true
+            sharing = body["p_share_exploration"] as? Bool ?? sharing
             if let submitted = body["p_display_name"] as? String, submitted != name { pendingName = submitted }
             value = profile()
+        case "/rest/v1/rpc/set_profile_avatar":
+            pendingOwnerPhotoPath = body["p_path"] as? String
+            if pendingOwnerPhotoPath == nil { ownerPhotoPath = nil }
+            value = profile()
+        case let path? where path.hasPrefix("/storage/v1/object/profile-photos"):
+            if mode == "signup-photo-failure", request.httpMethod == "POST", !rejectedPhoto {
+                rejectedPhoto = true
+                return (429, Data(#"{"code":"PT429"}"#.utf8), 0)
+            }
+            value = ["ok": true]
+        case let path? where path.hasPrefix("/storage/v1/object/authenticated/profile-photos/"):
+            return (200, photo, 0)
         case "/rest/v1/rpc/set_profile_check_consent":
             consent = body["p_enabled"] as? Bool
             value = profile()
@@ -97,22 +127,32 @@ private final class SocialUIResponses: @unchecked Sendable {
             checkCount += 1
             if mode == "retry", checkCount == 1 {
                 retrying = true
+                automaticApprovalAt = Date().addingTimeInterval(8)
                 return (503, Data("{}".utf8), 1)
             }
             if let pendingName { name = pendingName }
-            pendingName = nil; retrying = false
+            pendingName = nil; ownerPhotoPath = pendingOwnerPhotoPath ?? ownerPhotoPath
+            pendingOwnerPhotoPath = nil; retrying = false
             value = profile()
             delay = 5
         case "/rest/v1/rpc/sync_explorations": value = ["country_ids": [], "count": 0] as [String: Any]
         default: return (404, Data("{}".utf8), 0)
         }
-        return (200, (try? JSONSerialization.data(withJSONObject: value)) ?? Data("{}".utf8), delay)
+        return (200, (try? JSONSerialization.data(withJSONObject: value, options: [.fragmentsAllowed])) ?? Data("{}".utf8), delay)
     }
 
     private func profile() -> [String: Any] {
         var value: [String: Any] = ["id": Self.owner.uuidString, "display_name": name, "avatar": "globe",
-                                    "share_exploration": false, "profile_check_consent_recorded": consent != nil,
+                                    "share_exploration": sharing, "profile_check_consent_recorded": consent != nil,
                                     "automatic_profile_checks_enabled": consent == true]
+        if let ownerPhotoPath {
+            value["avatar_path"] = ownerPhotoPath
+        }
+        if let pendingOwnerPhotoPath {
+            value["pending_avatar_path"] = pendingOwnerPhotoPath
+            value["photo_moderation_status"] = "pending"
+            value["photo_check_state"] = consent == true ? "queued" : "review"
+        }
         if let pendingName {
             value["pending_display_name"] = pendingName
             value["name_moderation_status"] = "pending"

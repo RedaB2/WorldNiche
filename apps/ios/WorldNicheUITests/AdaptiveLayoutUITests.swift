@@ -16,6 +16,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
     func testCountryDetailPreservesSelectionAndBookmarkThroughRotation() throws {
         XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()
+        app.launchArguments += ["-worldniche-skip-intro"]
         app.launch()
         app.tabBars.buttons["Discover"].tap()
         let landing = app.buttons["landingCountry"]
@@ -57,6 +58,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
         XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()
         app.launchArguments = ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
+        app.launchArguments += ["-worldniche-skip-intro"]
         app.launch()
         app.tabBars.buttons["Atlas"].tap()
         rotate(.landscapeLeft, app: app)
@@ -100,6 +102,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
     func testGlobePinchExtendsZoomAndStillSelectsTheVisibleCountry() throws {
         XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()
+        app.launchArguments += ["-worldniche-skip-intro"]
         app.launch()
         app.tabBars.buttons["Discover"].tap()
         let globe = app.descendants(matching: .any)["interactiveGlobe"].firstMatch

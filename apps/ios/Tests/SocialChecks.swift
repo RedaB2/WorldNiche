@@ -85,7 +85,7 @@ private final class SocialFixture: @unchecked Sendable {
         self.sharing = sharing; name = user == userA ? "Mira" : "Noah"; profileAvatar = "globe"
         syncedIDs = ["JP"]; deletionAcknowledged = true; overrides = [:]; appleAccount = false
         moderatingPhotos = false; approvedPhoto = nil; pendingPhoto = nil; losePhotoCommitResponse = false
-        profileCheckConsent = nil; nextPhotoUploadFailure = nil
+        profileCheckConsent = profile ? false : nil; nextPhotoUploadFailure = nil
     }
     func reviewPhotos(approved: String?, pending: String? = nil, loseCommitResponse: Bool = false) {
         lock.lock(); defer { lock.unlock() }
@@ -787,8 +787,11 @@ private final class CheckSuite {
                                 api: api(vault: MemoryVault()))
         journal.visit(CountryRepository.country(id: "FR")!)
         await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Mira Apple")
-        check(store.isSignedIn && store.profile?.id == userA && store.profile?.displayName == "Mira Apple",
-              "Initial Apple consent name should initialize the new profile without another form")
+        check(store.isSignedIn && store.profile == nil && store.needsProfileSetup && store.suggestedProfileName == "Mira Apple",
+              "Apple's name prefills setup without publishing an unchosen profile")
+        check(fixture.observed("/rest/v1/rpc/update_my_profile").isEmpty,
+              "Authentication never submits a placeholder or Apple name without the profile choice")
+        await store.completeProfileSetup(name: "Mira Apple", sharing: store.suggestedProfileSharing, automaticChecks: false)
         check(store.profile?.shareExploration == true && !fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty,
               "New Apple accounts use the disclosed sharing-on default")
         check(!journal.visitedIDs.contains("FR"), "Apple sign-in must not merge a guest journal into the online account")
@@ -1094,8 +1097,11 @@ private final class CheckSuite {
                       "Rejected email code keeps invitation available without creating friendship")
                 await restored.verifyCode(code: "123456", shareExplorationForNewAccount: false)
             }
+            check(restored.needsProfileSetup && restored.hasPendingInvitation && fixture.observed("/rest/v1/rpc/accept_invite").isEmpty,
+                  "\(apple ? "Apple" : "Email") signup preserves its invitation until a real profile is chosen")
+            await restored.completeProfileSetup(name: "Chosen Friend Name", sharing: restored.suggestedProfileSharing, automaticChecks: false)
             check(restored.invitationConnected && fixture.observed("/rest/v1/rpc/accept_invite").count == 1,
-                  "\(apple ? "Apple" : "Email") sign-in automatically resumes invitation once")
+                  "Completing \(apple ? "Apple" : "Email") signup automatically resumes the invitation once")
             let paths = fixture.observed().map(\.path)
             check((paths.firstIndex(of: "/rest/v1/rpc/update_my_profile") ?? 999) < (paths.firstIndex(of: "/rest/v1/rpc/accept_invite") ?? 0),
                   "New account profile exists before redeeming the friend link")
@@ -1144,11 +1150,14 @@ private final class CheckSuite {
         await store.openInvitation(configuration.invitationURL(token: inviteToken)!)
         fixture.fail("/rest/v1/rpc/update_my_profile", statuses: [URLError.notConnectedToInternet.rawValue])
         await store.refresh()
-        check(store.hasPendingInvitation && store.invitationMessage != nil && store.profile == nil,
-              "Offline profile setup leaves a retryable invitation instead of an endless spinner")
+        await store.completeProfileSetup(name: "Chosen Friend", sharing: true, automaticChecks: false)
+        check(store.hasPendingInvitation && store.invitationMessage != nil && store.profile == nil && store.needsProfileSetup,
+              "Offline chosen-profile setup preserves the invitation and unfinished state")
         await store.acceptInvitation()
+        check(fixture.observed("/rest/v1/rpc/accept_invite").isEmpty, "An invitation retry never invents a profile")
+        await store.completeProfileSetup(name: "Chosen Friend", sharing: true, automaticChecks: false)
         check(store.invitationConnected && fixture.observed("/rest/v1/rpc/accept_invite").count == 1,
-              "Retry completes interrupted profile setup before automatically connecting")
+              "Retrying chosen-profile setup automatically connects once it succeeds")
         struct SavedLink: Encodable { let url: URL; let receivedAt: Date }
         for saved in [SavedLink(url: configuration.invitationURL(token: inviteToken)!, receivedAt: Date().addingTimeInterval(-8 * 86400)),
                       SavedLink(url: URL(string: "https://evil.test/invite/\(inviteToken)")!, receivedAt: Date())] {
@@ -1497,10 +1506,12 @@ private final class CheckSuite {
         await store.setProfileCheckConsent(enabled: true)
         fixture.fail("/functions/v1/moderate-profile", statuses: [503])
         await store.retryProfileCheck()
-        check(store.profileCheckFailed && !store.isCheckingProfile && store.profile?.ownerDisplayName == "Mira Rose",
+        check(store.profileCheckFailed && !store.isCheckingProfile && store.profile?.ownerDisplayName == "Mira Rose"
+              && store.profile?.displayName == "Mira" && store.profile?.avatarPath == approvedPhoto,
               "A provider outage preserves saved edits and exposes a retry state")
         await store.retryProfileCheck()
-        check(!store.profileCheckFailed && store.profile?.displayName == "Mira Rose" && store.profile?.pendingDisplayName == nil,
+        check(!store.profileCheckFailed && store.profile?.displayName == "Mira Rose" && store.profile?.pendingDisplayName == nil
+              && store.profile?.avatarPath == pendingPhoto && store.profile?.pendingAvatarPath == nil,
               "A successful retry atomically applies the approved server profile")
 
         fixture.clearRequests()
@@ -1512,7 +1523,8 @@ private final class CheckSuite {
               "A flagged review cannot be repeatedly submitted as a transient failure retry")
         respond("/rest/v1/rpc/update_my_profile", manual)
         await store.saveProfile(name: "Mira Rose", avatar: "globe", sharing: false)
-        check(store.profile?.ownerDisplayName == "Mira Rose" && store.profileSaveMessage == "Saved to your profile." && !store.isBusy,
+        check(store.profile?.ownerDisplayName == "Mira Rose" && store.profileSaveMessage == "Profile saved." && !store.isBusy
+              && store.profile?.displayName == "Mira" && store.profile?.avatarPath == approvedPhoto,
               "Saving a pending edit confirms it immediately without waiting for manual review")
         check(fixture.observed("/functions/v1/moderate-profile").isEmpty,
               "Saving a profile without automatic-check consent does not contact the provider endpoint")
@@ -1522,48 +1534,276 @@ private final class CheckSuite {
         for automaticChecks in [false, true] {
             fixture.reset(profile: false)
             let defaults = isolatedDefaults()
+            let service = api(vault: MemoryVault())
             let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
-                                    configuration: configuration, api: api(vault: MemoryVault()))
-            fixture.fail("/rest/v1/rpc/update_my_profile", statuses: [503])
+                                    configuration: configuration, api: service)
             await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Initial Apple Name")
-            check(store.isSignedIn && store.profile == nil && store.errorMessage != nil,
-                  "Successful authentication with failed profile setup retains a retryable signed-in session")
+            check(store.isSignedIn && store.profile == nil && store.needsProfileSetup && store.errorMessage == nil,
+                  "Authentication leaves an honest signed-in setup state without a fabricated profile")
+            fixture.fail("/rest/v1/rpc/update_my_profile", statuses: [503])
+            await store.completeProfileSetup(name: "Chosen Retry Name", sharing: false, automaticChecks: automaticChecks)
+            check(store.needsProfileSetup && store.errorMessage != nil,
+                  "Failed chosen-name save keeps setup unfinished")
             fixture.clearRequests()
-            await store.saveProfile(name: "Chosen Retry Name", avatar: "leaf", sharing: false, automaticChecks: automaticChecks)
+            await store.completeProfileSetup(name: "Chosen Retry Name", sharing: false, automaticChecks: automaticChecks)
             let paths = fixture.observed().map(\.path)
             check((paths.firstIndex(of: "/rest/v1/rpc/update_my_profile") ?? 999)
                   < (paths.firstIndex(of: "/rest/v1/rpc/set_profile_check_consent") ?? 0),
-                  "First editor retry must create the missing profile before recording consent=\(automaticChecks)")
-            check(store.profile?.displayName == "Chosen Retry Name" && store.profile?.avatar == "leaf" && store.profile?.shareExploration == false,
-                  "Profile setup retry preserves the editor's name, symbol and sharing choice")
+                  "First setup creates the real profile before recording its first consent")
+            check(store.profile?.displayName == "Chosen Retry Name" && store.profile?.shareExploration == false,
+                  "Profile setup preserves chosen name and sharing preference")
             check(store.profile?.automaticProfileChecksEnabled == automaticChecks && store.profile?.profileCheckConsentRecorded == true,
-                  "Both automatic and human review choices are saved after interrupted profile setup")
-            check(store.errorMessage == nil && store.profileSaveMessage != nil && !store.isBusy,
-                  "Successful editor recovery clears onboarding failure and confirms the save")
+                  "Both consent choices are persisted once during setup")
+            check(store.errorMessage == nil && !store.needsProfileSetup && !store.isBusy,
+                  "Successful recovery completes setup")
+            let relaunched = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                         configuration: configuration, api: service)
+            await relaunched.refresh()
+            check(!relaunched.needsProfileSetup && relaunched.profile?.automaticProfileChecksEnabled == automaticChecks,
+                  "Recorded signup choice survives session restoration")
+            fixture.clearRequests()
+            await relaunched.saveProfile(name: "Next Chosen Name", avatar: "globe", sharing: false)
+            check(fixture.observed("/rest/v1/rpc/set_profile_check_consent").isEmpty,
+                  "Normal edits never request or rewrite the remembered consent")
             check(defaults.dictionaryRepresentation().keys.allSatisfy {
                 !$0.hasPrefix("niche.pendingAppleName.") && !$0.hasPrefix("niche.pendingProfileSharing.")
-            }, "Explicit editor save removes old onboarding defaults so they cannot replace the new choices")
+                    && !$0.hasPrefix("niche.profileSetupPending.")
+            }, "Completed setup removes its temporary hints and unfinished marker")
         }
 
         fixture.reset(profile: false)
         let defaults = isolatedDefaults()
+        let service = api(vault: MemoryVault())
         let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
-                                configuration: configuration, api: api(vault: MemoryVault()))
-        fixture.fail("/rest/v1/rpc/update_my_profile", statuses: [503])
+                                configuration: configuration, api: service)
         await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Initial")
         fixture.fail("/rest/v1/rpc/set_profile_check_consent", statuses: [503])
-        await store.saveProfile(name: "Saved Despite Outage", avatar: "sun", sharing: true, automaticChecks: false)
+        await store.completeProfileSetup(name: "Saved Despite Outage", sharing: true, automaticChecks: false)
         check(store.profile?.displayName == "Saved Despite Outage" && store.profile?.shareExploration == true
-              && store.errorMessage != nil && !store.isBusy,
-              "Failed consent after initial profile save retains the saved data and exposes a retryable error")
-        await store.saveProfile(name: "Saved Despite Outage", avatar: "sun", sharing: true, automaticChecks: false)
-        check(store.errorMessage == nil && store.profile?.profileCheckConsentRecorded == true,
-              "Retrying the editor completes consent after a transient consent failure")
+              && store.errorMessage != nil && !store.isBusy && store.needsProfileSetup,
+              "Failed consent retains the chosen data but keeps setup unfinished")
+        let restored = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                   configuration: configuration, api: service)
+        await restored.refresh()
+        check(restored.needsProfileSetup && restored.suggestedProfileName == "Saved Despite Outage",
+              "Relaunch restores incomplete consent without an invented or overwritten name")
+        await restored.completeProfileSetup(name: "Saved Despite Outage", sharing: true, automaticChecks: false)
+        check(restored.errorMessage == nil && !restored.needsProfileSetup && restored.profile?.profileCheckConsentRecorded == true,
+              "Retrying setup completes consent after a transient failure")
         fixture.clearRequests()
         fixture.fail("/rest/v1/rpc/set_profile_check_consent", statuses: [503])
-        await store.saveProfile(name: "Unsent Edit", avatar: "moon", sharing: false, automaticChecks: true)
-        check(store.errorMessage != nil && fixture.observed("/rest/v1/rpc/update_my_profile").isEmpty,
-              "Existing-profile consent failures stop the new edit before it is submitted under the wrong choice")
+        await restored.saveProfile(name: "Unsent Edit", avatar: "moon", sharing: false, automaticChecks: true)
+        check(restored.errorMessage != nil && fixture.observed("/rest/v1/rpc/update_my_profile").isEmpty,
+              "An explicit Settings consent failure stops edits from using the wrong choice")
+    }
+
+    func profileSetupPhotoRecovery() async {
+        let jpeg = Data([0xff, 0xd8, 0x12, 0x34, 0xff, 0xd9])
+        fixture.reset(profile: false)
+        fixture.reviewPhotos(approved: nil)
+        let defaults = isolatedDefaults()
+        let service = api(vault: MemoryVault())
+        let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                photoDirectory: photoDirectory, configuration: configuration, api: service)
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Photo Prefill")
+        fixture.rejectNextPhotoUpload(status: 429, json: #"{"code":"PT429"}"#)
+        await store.completeProfileSetup(name: "Chosen Photo Name", sharing: true, photoData: jpeg, automaticChecks: true)
+        check(store.needsProfileSetup && store.profile?.displayName == "Chosen Photo Name" && store.errorMessage != nil,
+              "A rejected signup photo does not complete setup after the name succeeds")
+        check(fixture.observed("/rest/v1/rpc/set_profile_check_consent").isEmpty &&
+              fixture.observed("/functions/v1/moderate-profile").isEmpty,
+              "Signup records permission only after the chosen photo has been accepted")
+        check(fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty,
+              "Incomplete signup never starts exploration sharing")
+        let restored = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                   photoDirectory: photoDirectory, configuration: configuration, api: service)
+        await restored.refresh()
+        check(restored.needsProfileSetup && restored.suggestedProfileName == "Chosen Photo Name",
+              "Relaunch keeps the successful chosen name and unfinished photo setup")
+        fixture.clearRequests()
+        await restored.completeProfileSetup(name: "Chosen Photo Name", sharing: true, automaticChecks: false)
+        check(!restored.needsProfileSetup && restored.errorMessage == nil && restored.profile?.avatarPath == nil,
+              "Explicitly skipping the failed optional photo completes setup with initials")
+        check(!fixture.observed().contains { $0.path.hasPrefix("/storage/v1/object/profile-photos/") },
+              "Skipping a failed photo does not retry uploading its bytes")
+
+        fixture.reset(profile: false)
+        fixture.reviewPhotos(approved: nil)
+        let secondDefaults = isolatedDefaults()
+        let secondService = api(vault: MemoryVault())
+        let selected = SocialStore(journal: DiscoveryJournal(defaults: secondDefaults), defaults: secondDefaults,
+                                  configuration: configuration, api: secondService)
+        await selected.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil)
+        fixture.fail("/rest/v1/rpc/set_profile_check_consent", statuses: [503])
+        await selected.completeProfileSetup(name: "Selected Photo", sharing: false, photoData: jpeg, automaticChecks: true)
+        let acceptedPath = selected.profile?.pendingAvatarPath
+        check(selected.needsProfileSetup && acceptedPath != nil,
+              "Accepted photo remains available when the final consent save fails")
+        let secondRestored = SocialStore(journal: DiscoveryJournal(defaults: secondDefaults), defaults: secondDefaults,
+                                        configuration: configuration, api: secondService)
+        await secondRestored.refresh()
+        await secondRestored.completeProfileSetup(name: "Selected Photo", sharing: false, removePhoto: true, automaticChecks: false)
+        check(!secondRestored.needsProfileSetup && secondRestored.profile?.pendingAvatarPath == nil && secondRestored.profile?.avatarPath == nil,
+              "Recovered setup can remove its accepted photo and complete with initials")
+        check(fixture.observed("/storage/v1/object/profile-photos").contains { $0.method == "DELETE" &&
+            ($0.json()["prefixes"] as? [String]) == [acceptedPath].compactMap { $0 } },
+              "Removing the recovered photo removes only its no-longer-referenced object")
+
+        fixture.reset()
+        let thirdDefaults = isolatedDefaults()
+        let existing = SocialStore(journal: DiscoveryJournal(defaults: thirdDefaults), defaults: thirdDefaults,
+                                   configuration: configuration, api: api(vault: MemoryVault(savedSession())))
+        await existing.refresh()
+        fixture.clearRequests()
+        await existing.completeProfileSetup(name: "Existing Choice", sharing: false, automaticChecks: true)
+        check(existing.profile?.automaticProfileChecksEnabled == false && !existing.needsProfileSetup
+              && fixture.observed("/rest/v1/rpc/set_profile_check_consent").isEmpty,
+              "Completing an existing profile never silently replaces a recorded opt-out")
+        await existing.completeProfileSetup(name: " Explorer ", sharing: false, automaticChecks: true)
+        check(existing.profile?.displayName == "Existing Choice" && existing.errorMessage != nil,
+              "The former generic placeholder is rejected rather than trapping setup in a completion loop")
+    }
+
+    func profileSetupAccountIsolation() async {
+        fixture.reset(profile: false)
+        let defaults = isolatedDefaults()
+        let service = api(vault: MemoryVault())
+        let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                configuration: configuration, api: service)
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Account A Prefill",
+                                    shareExplorationForNewAccount: false)
+        fixture.fail("/rest/v1/rpc/update_my_profile", statuses: [503])
+        await store.completeProfileSetup(name: "Account A Chosen", sharing: false, automaticChecks: true)
+        check(store.needsProfileSetup, "Account A's failed setup remains unfinished")
+        await store.signOut()
+        fixture.reset(user: userB, sharing: false)
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Account B Apple", shareExplorationForNewAccount: true)
+        check(!store.needsProfileSetup && store.profile?.displayName == "Noah" && store.suggestedProfileSharing == false,
+              "Account A's unfinished setup and sharing choice cannot affect completed account B")
+        check(fixture.observed("/rest/v1/rpc/update_my_profile").isEmpty,
+              "Switching to an existing account never writes the previous signup's values")
+        await store.signOut()
+        fixture.reset(profile: false)
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil)
+        check(store.needsProfileSetup && store.suggestedProfileName == "Account A Prefill" && store.suggestedProfileSharing == false,
+              "Returning to account A resumes its own pending prefill and explicitly off sharing choice")
+    }
+
+    func profileSetupUnknownAccount() async {
+        fixture.reset(sharing: false)
+        let defaults = isolatedDefaults()
+        let service = api(vault: MemoryVault())
+        let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                configuration: configuration, api: service)
+        fixture.fail("/rest/v1/rpc/get_my_profile", statuses: [503])
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "New Apple Name")
+        check(store.isSignedIn && !store.hasLoadedProfile && !store.needsProfileSetup && store.errorMessage != nil,
+              "A failed account read is not mistaken for a new profile requiring signup")
+        fixture.clearRequests()
+        await store.completeProfileSetup(name: "Premature Name", sharing: true, automaticChecks: true)
+        check(fixture.observed("/rest/v1/rpc/update_my_profile").isEmpty && !store.hasLoadedProfile,
+              "Unknown account state cannot overwrite a remote sharing or consent choice")
+        await store.refresh()
+        check(store.hasLoadedProfile && !store.needsProfileSetup && store.profile?.displayName == "Mira"
+              && store.profile?.shareExploration == false && store.profile?.automaticProfileChecksEnabled == false,
+              "Retry restores the existing profile and both privacy choices without writes")
+        check(fixture.observed("/rest/v1/rpc/update_my_profile").isEmpty
+              && fixture.observed("/rest/v1/rpc/set_profile_check_consent").isEmpty,
+              "Restoring a known account makes no signup mutation")
+    }
+
+    func completedSetupSecondaryFailures() async {
+        fixture.reset(profile: false)
+        let defaults = isolatedDefaults()
+        let service = api(vault: MemoryVault())
+        let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                configuration: configuration, api: service)
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil)
+        fixture.fail("/rest/v1/rpc/sync_explorations", statuses: [503])
+        await store.completeProfileSetup(name: "Finished Profile", sharing: true, automaticChecks: false)
+        check(store.hasLoadedProfile && store.isSignedIn && !store.needsProfileSetup
+              && store.profile?.displayName == "Finished Profile" && store.errorMessage != nil,
+              "A secondary exploration sync failure does not reopen completed profile setup")
+        let relaunched = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                     configuration: configuration, api: service)
+        await relaunched.refresh()
+        check(!relaunched.needsProfileSetup && relaunched.errorMessage == nil,
+              "Normal refresh recovers secondary sharing failure without repeating consent")
+
+        fixture.reset(profile: false)
+        let secondDefaults = isolatedDefaults()
+        let invited = SocialStore(journal: DiscoveryJournal(defaults: secondDefaults), defaults: secondDefaults,
+                                  configuration: configuration, api: api(vault: MemoryVault()))
+        await invited.openInvitation(configuration.invitationURL(token: inviteToken)!)
+        await invited.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil)
+        fixture.fail("/rest/v1/rpc/accept_invite", statuses: [503])
+        await invited.completeProfileSetup(name: "Finished Invite Profile", sharing: false, automaticChecks: false)
+        check(!invited.needsProfileSetup && invited.hasPendingInvitation && invited.canRetryInvitation
+              && invited.invitationMessage != nil,
+              "A secondary invitation outage leaves completed signup and a separately retryable invite")
+        fixture.clearRequests()
+        await invited.acceptInvitation()
+        check(invited.invitationConnected && !invited.needsProfileSetup
+              && fixture.observed("/rest/v1/rpc/set_profile_check_consent").isEmpty,
+              "Invitation recovery never repeats completed signup or its privacy choice")
+    }
+
+    func rejectedSignupNames() async {
+        fixture.reset(profile: false)
+        let defaults = isolatedDefaults()
+        let service = api(vault: MemoryVault())
+        let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
+                                configuration: configuration, api: service)
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil)
+        let rejected = ExplorerProfile(id: userA, displayName: "Explorer", avatar: "globe", shareExploration: true,
+                                       pendingDisplayName: "Rejected Name", nameModerationStatus: .rejected,
+                                       automaticProfileChecksEnabled: false, profileCheckConsentRecorded: false)
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        fixture.respond("/rest/v1/rpc/update_my_profile", data: try! encoder.encode(rejected))
+        await store.completeProfileSetup(name: "Rejected Name", sharing: true, automaticChecks: true)
+        check(store.needsProfileSetup && store.errorMessage != nil && store.profileSaveMessage == nil,
+              "Immediate name rejection cannot finish signup or claim a successful profile")
+        check(fixture.observed("/rest/v1/rpc/set_profile_check_consent").isEmpty,
+              "Rejected first names remain in setup before optional automatic processing is enabled")
+        check(store.profile?.ownerDisplayName == "Rejected Name" && store.profile?.displayName == "Explorer",
+              "Owner retains their submitted value privately while the approved friend value is unchanged")
+
+        fixture.reset()
+        let secondDefaults = isolatedDefaults()
+        var pending = rejected
+        pending.nameModerationStatus = .pending
+        pending.profileCheckConsentRecorded = true
+        fixture.respond("/rest/v1/rpc/get_my_profile", data: try! encoder.encode(pending))
+        let reviewed = SocialStore(journal: DiscoveryJournal(defaults: secondDefaults), defaults: secondDefaults,
+                                   configuration: configuration, api: api(vault: MemoryVault(savedSession())))
+        await reviewed.refresh()
+        check(!reviewed.needsProfileSetup && reviewed.profile?.ownerDisplayName == "Rejected Name",
+              "A submitted first name can await review after a recorded signup choice")
+        pending.nameModerationStatus = .rejected
+        fixture.respond("/rest/v1/rpc/get_my_profile", data: try! encoder.encode(pending))
+        await reviewed.refresh()
+        check(reviewed.needsProfileSetup && reviewed.profile?.ownerDisplayName == "Rejected Name",
+              "Later rejection of a first name reopens name setup without showing Explorer to its owner")
+        pending.displayName = "Previously Approved"
+        fixture.respond("/rest/v1/rpc/get_my_profile", data: try! encoder.encode(pending))
+        await reviewed.refresh()
+        check(!reviewed.needsProfileSetup && reviewed.profile?.ownerDisplayName == "Previously Approved",
+              "A rejected later edit keeps an existing approved profile usable")
+        check(ExplorerProfile(id: userA, displayName: "Explorer", avatar: "globe", shareExploration: false).ownerDisplayName == "Your profile",
+              "A legacy placeholder never appears as the owner's chosen name")
+    }
+
+    func profileInitials() {
+        for (name, expected) in [("Mira Rose", "MR"), ("  Mira  ", "M"), ("Jun Wei Chen", "JC"),
+                                 ("مريم أحمد", "مأ"), ("森", "森"), ("Élodie Dupont", "ÉD"),
+                                 ("e\u{301}lise  dupré", "ÉD"), ("\n \t", "?"), ("Explorer", "?"), ("New friend", "?")] {
+            check(ProfileIdentity.initials(for: name).precomposedStringWithCanonicalMapping == expected,
+                  "Initials preserve human name graphemes: \(name.debugDescription)")
+        }
+        check(ProfileIdentity.displayName(for: " Explorer ") == "New friend" && ProfileIdentity.displayName(for: "") == "New friend",
+              "Unapproved generic names use a neutral friend label")
+        check(ProfileIdentity.displayName(for: "  Mira Rose ") == "Mira Rose", "Chosen friend names stay intact")
     }
 
     func visibleProfileRefresh() async {
@@ -1675,13 +1915,15 @@ private final class CheckSuite {
         await store.saveProfile(name: "Explorer", avatar: "globe", sharing: false)
         fixture.fail("/rest/v1/rpc/update_my_profile", statuses: [503])
         await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "  Apple First Name  ")
-        check(fixture.observed("/rest/v1/rpc/update_my_profile").first?.json()["p_display_name"] as? String == "Apple First Name",
-              "Apple's first authorization name takes precedence over an Explorer placeholder")
+        check(store.suggestedProfileName == "Apple First Name" && fixture.observed("/rest/v1/rpc/update_my_profile").isEmpty,
+              "Apple's first authorization name is only a prefill, never an automatic profile save")
+        await store.completeProfileSetup(name: store.suggestedProfileName, sharing: true, automaticChecks: false)
         let relaunched = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory,
                                      configuration: configuration, api: service)
         await relaunched.refresh()
-        check(relaunched.profile?.displayName == "Apple First Name",
-              "Apple's one-time name survives a failed profile save and app relaunch")
+        check(relaunched.suggestedProfileName == "Apple First Name" && relaunched.needsProfileSetup,
+              "Apple's one-time name survives failed chosen-profile save and relaunch as a prefill")
+        await relaunched.completeProfileSetup(name: relaunched.suggestedProfileName, sharing: true, automaticChecks: false)
         check(defaults.dictionaryRepresentation().keys.allSatisfy { !$0.hasPrefix("niche.pendingAppleName.") },
               "Successful server save removes the temporary Apple name copy")
 
@@ -1696,8 +1938,8 @@ private final class CheckSuite {
         check(!offlineStore.isSignedIn, "Failed initial Apple exchange must not fabricate an account")
         await offlineStore.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil,
                                           appleUserID: "apple-fixture-user-\(userA.uuidString)")
-        check(offlineStore.profile?.displayName == "One Time Name",
-              "A later verified Apple login recovers the name from first authorization after a failed exchange")
+        check(offlineStore.suggestedProfileName == "One Time Name" && offlineStore.profile == nil,
+              "Verified Apple login recovers first-authorization prefill after a failed exchange without auto-saving")
 
         fixture.reset()
         await offlineStore.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Different Apple Name")
@@ -1764,6 +2006,11 @@ private final class CheckSuite {
                                     api: api(vault: MemoryVault()))
             await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "New Explorer",
                                         shareExplorationForNewAccount: selectedSharing)
+            if !hasExistingProfile {
+                check(store.needsProfileSetup && store.suggestedProfileSharing == selectedSharing,
+                      "New account visibly starts with the selected sharing default before its first profile save")
+                await store.completeProfileSetup(name: "New Chosen Name", sharing: store.suggestedProfileSharing, automaticChecks: false)
+            }
             check(store.profile?.shareExploration == expected,
                   "Sharing respects new/explicit/existing choice: existing=\(hasExistingProfile), old=\(existingSharing), selected=\(selectedSharing)")
             let writes = fixture.observed("/rest/v1/rpc/update_my_profile")
@@ -1788,8 +2035,9 @@ private final class CheckSuite {
                                           shareExplorationForNewAccount: false)
         let restored = SocialStore(journal: journal, defaults: defaults, configuration: configuration, api: service)
         await restored.refresh()
-        check(restored.profile?.shareExploration == false && fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty,
-              "An interrupted signup restores the explicitly off sharing choice even without an Apple name or invite")
+        check(restored.needsProfileSetup && restored.suggestedProfileSharing == false && restored.profile == nil
+              && fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty,
+              "Interrupted signup restores explicitly off sharing without inventing a profile")
     }
 
     func staleStoreRefresh() async {
@@ -1847,6 +2095,12 @@ private final class CheckSuite {
         await suite.profileModeration()
         await suite.profilePreviewAndChecks()
         await suite.profileSetupConsentRecovery()
+        await suite.profileSetupPhotoRecovery()
+        await suite.profileSetupAccountIsolation()
+        suite.profileInitials()
+        await suite.profileSetupUnknownAccount()
+        await suite.completedSetupSecondaryFailures()
+        await suite.rejectedSignupNames()
         await suite.independentProfileRefresh()
         await suite.visibleProfileRefresh()
         await suite.appleNameRecoveryAndLinking()

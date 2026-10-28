@@ -4,7 +4,7 @@ import PhotosUI
 import SwiftUI
 import UIKit
 
-private let profileCheckDisclosure = "Allow WorldNiche to send your submitted name and profile photo to OpenAI for automatic safety checks? Otherwise, updates wait for human review. You can change this choice in Settings."
+private let profileCheckDisclosure = "Allow OpenAI to check your name and photo before sharing with friends. Your choice applies to future edits and can be changed in Settings."
 
 extension View {
     func refreshSocialProfiles(enabled: Bool = true) -> some View {
@@ -50,12 +50,44 @@ struct ProfileView: View {
     @State private var sharedItem: ProfileSharedItem?
 
     var body: some View {
+        if social.isSignedIn && !social.hasLoadedProfile && !showSignIn {
+            NavigationStack {
+                VStack(spacing: 18) {
+                    if social.isBusy || social.errorMessage == nil {
+                        ProgressView("Loading your profile…")
+                    } else {
+                        Text("Let’s reconnect.").scaledFont(size: 30, design: .serif)
+                        Text("We couldn’t load your profile. Your saved choices haven’t changed.")
+                            .multilineTextAlignment(.center).foregroundStyle(Palette.muted)
+                        Button("Try again") { Task { await social.refresh() } }
+                            .buttonStyle(.glassProminent).tint(Palette.forest)
+                            .accessibilityIdentifier("retryLoadProfile")
+                    }
+                }
+                .padding(24).frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Palette.paper)
+                .navigationTitle("Profile").navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Settings", systemImage: "gearshape") { showSettings = true }
+                    }
+                }
+                .sheet(isPresented: $showSettings) { ProfileSettingsView() }
+            }
+        } else if social.needsProfileSetup && !showSignIn {
+            ProfileSetupView()
+        } else {
+            profileContent
+        }
+    }
+
+    private var profileContent: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 30) {
                     if let profile = social.profile {
                         profileHeader(name: profile.ownerDisplayName, avatar: profile.avatar)
-                        if social.isSignedIn, profile.hasModerationNotice {
+                        if social.isSignedIn, profile.needsProfileAttention {
                             ProfileModerationNotice(profile: profile)
                                 .editorialCard()
                         } else if let message = social.profileSaveMessage {
@@ -98,7 +130,7 @@ struct ProfileView: View {
 
     private func profileHeader(name: String, avatar: String) -> some View {
         HStack(alignment: .center, spacing: 17) {
-            ProfilePhotoAvatar(symbol: avatar, path: social.profile?.ownerAvatarPath, localID: social.profile?.localAvatarID, size: 66)
+            ProfilePhotoAvatar(symbol: avatar, displayName: name, path: social.profile?.ownerAvatarPath, localID: social.profile?.localAvatarID, size: 66)
             VStack(alignment: .leading, spacing: 6) {
                 Text(name)
                     .scaledFont(size: 31, design: .serif)
@@ -146,19 +178,18 @@ struct ProfileView: View {
 
     private var welcome: some View {
         VStack(alignment: .leading, spacing: 18) {
-            ExplorerAvatar(avatar: "globe", size: 70)
             Text("A world to share.")
                 .scaledFont(size: 37, design: .serif)
                 .tracking(-1)
                 .foregroundStyle(Palette.pine)
-            Text("Keep your curiosity in one place. Add a name and a small symbol that feels like you.")
+            Text("Make discoveries together. Choose your name, add a photo if you like, and invite your friends.")
                 .font(.subheadline).foregroundStyle(Palette.muted)
-            Button("Create your profile") { showEditor = true }
+            Button("Create your profile") { showSignIn = true }
                 .buttonStyle(.glassProminent).tint(Palette.forest)
                 .controlSize(.large)
                 .disabled(social.deletionPending)
                 .accessibilityIdentifier("createProfile")
-            Text("Start on this device. An account is optional.")
+            Text("Keep exploring without an account, or join your friends when you’re ready.")
                 .font(.footnote).foregroundStyle(Palette.muted)
         }
     }
@@ -184,7 +215,7 @@ struct ProfileView: View {
                     .buttonStyle(.glass).controlSize(.large)
                     .accessibilityIdentifier("signInForFriends")
             } else if !social.isSignedIn {
-                Text("Sign in to add friends and see the places they’ve explored. Your exploration stays private until you choose to share it.")
+                Text("Sign in to add friends and see the places they’ve explored. You choose which discoveries your friends can see.")
                     .font(.subheadline).foregroundStyle(Palette.muted)
                 Button("Sign in to connect", systemImage: "person.crop.circle.badge.plus") { showSignIn = true }
                     .buttonStyle(.glass).controlSize(.large)
@@ -219,9 +250,9 @@ struct ProfileView: View {
                         ForEach(social.friends, id: \.id) { friend in
                             Button { selectedFriend = friend } label: {
                                 HStack(spacing: 13) {
-                                    ProfilePhotoAvatar(symbol: friend.avatar, path: friend.avatarPath, size: 44)
+                                    ProfilePhotoAvatar(symbol: friend.avatar, displayName: friend.displayName, path: friend.avatarPath, size: 44)
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text(friend.displayName).font(.headline).foregroundStyle(Palette.pine)
+                                        Text(ProfileIdentity.displayName(for: friend.displayName)).font(.headline).foregroundStyle(Palette.pine)
                                         Text(friend.sharesExploration ? "\(friend.exploredCountryIDs.count) countries explored" : "Exploration is private")
                                             .font(.caption).foregroundStyle(Palette.muted)
                                     }
@@ -241,59 +272,37 @@ struct ProfileView: View {
     }
 }
 
+private extension ExplorerProfile {
+    var needsProfileAttention: Bool {
+        communityRestricted == true || nameModerationStatus == .rejected || photoModerationStatus == .rejected
+    }
+}
+
 private struct ProfileModerationNotice: View {
     let profile: ExplorerProfile
     @Environment(SocialStore.self) private var social
-    @State private var showCheckConsent = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             if profile.communityRestricted == true {
                 Label("Sharing is paused", systemImage: "person.crop.circle.badge.exclamationmark")
                     .font(.headline)
-                Text(profile.communityRestrictionNote ?? "Sharing and invitations are paused. Contact support if you think this is a mistake.")
+                Text("Contact us for help with your profile.")
                 if let url = social.supportURL { Link("Contact support", destination: url) }
             }
-            reviewStatus("Name", status: profile.nameModerationStatus, check: profile.nameCheckState, note: profile.nameModerationNote)
-            reviewStatus("Photo", status: profile.photoModerationStatus, check: profile.photoCheckState, note: profile.photoModerationNote)
-            if profile.hasPendingContent, profile.automaticProfileChecksEnabled == true,
-               social.profileCheckFailed || profile.canRetryCheck {
-                Text("Your changes are saved. We couldn’t finish the safety check, so friends still see your previous profile.")
-                Button("Retry check") { Task { await social.retryProfileCheck() } }
-                    .disabled(social.isBusy || social.isCheckingProfile)
-                    .accessibilityIdentifier("retryProfileCheck")
-            } else if profile.hasPendingContent, profile.automaticProfileChecksEnabled != true,
-                      profile.communityRestricted != true {
-                Button("Use quick safety checks") { showCheckConsent = true }
-                    .disabled(social.isBusy)
+            if profile.nameModerationStatus == .rejected {
+                Text("Choose a different name.").font(.headline)
+                Text("This name doesn’t meet our community guidelines.")
+            }
+            if profile.photoModerationStatus == .rejected {
+                Text("Choose a different photo.").font(.headline)
+                Text("This photo doesn’t meet our community guidelines.")
             }
             Link("Community guidelines", destination: social.communityURL)
         }
         .font(.subheadline)
         .foregroundStyle(Palette.muted)
-        .confirmationDialog("Allow automatic profile checks?", isPresented: $showCheckConsent, titleVisibility: .visible) {
-            Button("Allow quick checks") { Task { await social.setProfileCheckConsent(enabled: true) } }
-            Button("Keep human review", role: .cancel) { Task { await social.setProfileCheckConsent(enabled: false) } }
-        } message: { Text(profileCheckDisclosure) }
-    }
-
-    @ViewBuilder
-    private func reviewStatus(_ label: String, status: ProfileModerationStatus?, check: ProfileContentCheckState?, note: String?) -> some View {
-        if status == .pending {
-            Label(check == .review ? "\(label) saved for review" : "\(label) saved", systemImage: "checkmark.circle")
-                .font(.headline).foregroundStyle(Palette.pine)
-            if check == .review {
-                Text(note ?? "This update needs a closer look. Only you can see it while it is reviewed.")
-            } else if social.isCheckingProfile || check == .checking || check == .queued {
-                Text("Checking before sharing with friends…")
-            } else if !social.profileCheckFailed, check != .retry {
-                Text("Only you can see this update until its safety check is complete.")
-            }
-        } else if status == .rejected {
-            Label("Choose another \(label.lowercased())", systemImage: "exclamationmark.circle")
-                .font(.headline).foregroundStyle(Palette.pine)
-            Text(note ?? "This change was not approved. Edit your profile to choose something that follows our community guidelines.")
-        }
+        .accessibilityIdentifier("profileNeedsAttention")
     }
 }
 
@@ -311,31 +320,56 @@ struct ExplorerAvatar: View {
     }
 }
 
+struct ProfileSetupView: View {
+    var onFinish: (() -> Void)? = nil
+    var onCancel: (() -> Void)? = nil
+
+    var body: some View {
+        ProfileEditorView(isSetup: true, onFinish: onFinish, onCancel: onCancel)
+    }
+}
+
 private struct ProfileEditorView: View {
+    var isSetup = false
+    var onFinish: (() -> Void)? = nil
+    var onCancel: (() -> Void)? = nil
     @Environment(SocialStore.self) private var social
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
-    @State private var avatar = "globe"
-    @State private var sharing = false
+    @State private var sharing = true
+    @State private var automaticChecks = false
     @State private var initialized = false
     @State private var attemptedSave = false
+    @State private var submitting = false
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var selectedPhotoData: Data?
     @State private var removePhoto = false
     @State private var photoLoading = false
     @State private var photoError: String?
-    @State private var showCheckConsent = false
+    @State private var showSettings = false
     @FocusState private var nameFocused: Bool
 
     private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
+    private var validName: Bool {
+        !trimmedName.isEmpty && trimmedName.caseInsensitiveCompare("Explorer") != .orderedSame
+    }
     private var hasPhoto: Bool {
         selectedPhotoData != nil || (!removePhoto && (social.profile?.editableAvatarPath != nil || social.profile?.localAvatarID != nil))
     }
 
     var body: some View {
+        let photoTitle = hasPhoto ? "Change photo" : "Add a photo"
         NavigationStack {
             Form {
-                if social.isSignedIn, let profile = social.profile, profile.hasModerationNotice {
+                if isSetup {
+                    Section {
+                        Text("Make yourself at home.")
+                            .scaledFont(size: 31, design: .serif).foregroundStyle(Palette.pine)
+                        Text("A name your friends know. A photo if you like.")
+                            .foregroundStyle(Palette.muted)
+                    }.listRowBackground(Color.clear)
+                }
+                if let profile = social.profile, profile.needsProfileAttention {
                     Section { ProfileModerationNotice(profile: profile) }
                 }
                 Section {
@@ -344,110 +378,115 @@ private struct ProfileEditorView: View {
                         .textInputAutocapitalization(.words)
                         .submitLabel(.done)
                         .focused($nameFocused)
+                        .onSubmit { nameFocused = false }
                         .accessibilityIdentifier("profileNameField")
                         .onChange(of: name) { _, value in
                             if value.count > 32 { name = String(value.prefix(32)) }
                         }
-                } header: {
-                    Text("What should we call you?")
-                } footer: {
-                    Text(social.isSignedIn ? "A first name or nickname is enough. Your saved name appears here while it is checked before sharing." : "A first name or nickname is enough. Your name stays on this device until you sign in.")
+                } header: { Text("Display name") } footer: {
+                    Text("A first name or nickname is enough.")
                 }
                 Section {
                     HStack {
                         Spacer()
-                        ProfilePhotoAvatar(symbol: avatar,
+                        ProfilePhotoAvatar(symbol: social.profile?.avatar ?? "globe", displayName: trimmedName,
                                            path: removePhoto ? nil : social.profile?.editableAvatarPath,
                                            localID: removePhoto ? nil : social.profile?.localAvatarID,
                                            previewData: selectedPhotoData, size: 96)
+                            .accessibilityIdentifier("profilePhotoPreview")
                         Spacer()
-                    }
-                    .padding(.vertical, 12)
+                    }.padding(.vertical, 12)
                     PhotosPicker(selection: $selectedPhoto, matching: .images, preferredItemEncoding: .current) {
-                        Label("Choose a photo", systemImage: "photo")
+                        Label(photoTitle, systemImage: "photo")
                     }
                     .disabled(photoLoading || social.isBusy)
                     .accessibilityIdentifier("chooseProfilePhoto")
                     if hasPhoto {
-                        Button("Use a symbol instead", role: .destructive) {
+                        Button("Use my initials", role: .destructive) {
                             selectedPhoto = nil
                             selectedPhotoData = nil
                             removePhoto = true
                             photoError = nil
-                        }
-                        .accessibilityIdentifier("removeProfilePhoto")
+                        }.accessibilityIdentifier("removeProfilePhoto")
                     }
                     if photoLoading { ProgressView("Preparing your photo…") }
                     if let photoError { ProfileStatusMessage(message: photoError) }
-                } header: {
-                    Text("Your photo")
-                } footer: {
-                    Text(social.isSignedIn ? "Your photo appears on your profile as soon as it saves. A safety check runs before sharing it with friends. We remove location and camera metadata." : "Your photo stays on this device. We save a small version without location or camera metadata.")
-                }
-                Section("Or choose a symbol") {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 72))], spacing: 16) {
-                        ForEach(SocialStore.avatars, id: \.self) { item in
-                            Button {
-                                avatar = item
-                                selectedPhoto = nil
-                                selectedPhotoData = nil
-                                removePhoto = true
-                                photoError = nil
-                            } label: {
-                                ExplorerAvatar(avatar: item, size: 56)
-                                    .padding(4)
-                                    .overlay(Circle().stroke(avatar == item && !hasPhoto ? Palette.pine : .clear, lineWidth: 2))
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel(item.capitalized)
-                            .accessibilityAddTraits(avatar == item && !hasPhoto ? [.isSelected] : [])
-                        }
-                    }
-                    .padding(.vertical, 10)
+                } header: { Text("Profile photo") } footer: {
+                    Text("Optional. Your initials look good here too.")
                 }
                 Section {
                     Toggle("Share explored countries with friends", isOn: $sharing)
                         .accessibilityIdentifier("profileSharingToggle")
                         .disabled(!social.isSignedIn || social.profile?.communityRestricted == true)
                 } footer: {
-                    Text(social.isSignedIn ? "Only your friends can see this list. It records what you discover in the app, never your physical location. Saved countries stay private." : "Your profile starts privately on this device. Sign in later to choose what you share with friends.")
+                    Text("Only friends you add can see what you explore. Saved countries and your physical location stay private. Change this anytime in Settings.")
                 }
-                if social.isSignedIn {
-                    Section {
-                        Link("Community guidelines", destination: social.communityURL)
-                    } footer: {
-                        Text("Keep names and photos respectful. Sexual content, hate, threats, harassment, impersonation and spam are not allowed. Names and photos are checked before friends can see them.")
-                    }
+                Section {
+                    Link("Community guidelines", destination: social.communityURL)
+                    if let url = social.privacyPolicyURL { Link("Privacy policy", destination: url) }
                 }
                 if attemptedSave, let message = social.errorMessage {
                     Section { ProfileStatusMessage(message: message) }
                 }
+                if isSetup {
+                    Section {
+                        if social.profile?.profileCheckConsentRecorded != true {
+                            Text(profileCheckDisclosure)
+                                .font(.footnote).foregroundStyle(Palette.muted)
+                                .accessibilityIdentifier("signupProfileConsent")
+                        }
+                        Button(submitting ? "Saving…" : social.profile?.profileCheckConsentRecorded == true ? "Continue" : "Agree and continue") {
+                            if social.profile?.profileCheckConsentRecorded != true { automaticChecks = true }
+                            save()
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 34)
+                        .buttonStyle(.glassProminent).tint(Palette.forest)
+                        .disabled(!validName || social.isBusy || social.deletionPending || photoLoading)
+                        .accessibilityIdentifier("completeProfileSetup")
+                        if social.profile?.profileCheckConsentRecorded != true {
+                            Button("Continue without automatic checks") {
+                                automaticChecks = false
+                                save()
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .disabled(!validName || social.isBusy || social.deletionPending || photoLoading)
+                            .accessibilityIdentifier("completeProfileWithoutChecks")
+                        }
+                    } footer: {
+                        if social.profile?.profileCheckConsentRecorded != true {
+                            Text("If you continue without allowing this, updates may take longer to appear to friends.")
+                        }
+                    }
+                }
             }
-            .disabled(social.deletionPending)
+            .disabled(social.deletionPending || submitting)
             .scrollContentBackground(.hidden)
             .background(Palette.paper)
-            .navigationTitle(social.profile == nil ? "Your profile" : "Edit profile")
+            .navigationTitle(isSetup ? "Your profile" : "Edit profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(social.isBusy) }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        nameFocused = false
-                        attemptedSave = true
-                        if social.isSignedIn, social.profile?.profileCheckConsentRecorded != true,
-                           trimmedName != "Explorer" || selectedPhotoData != nil { showCheckConsent = true }
-                        else { save() }
+                ToolbarItem(placement: .cancellationAction) {
+                    if isSetup {
+                        if let onCancel {
+                            Button("Not now", action: onCancel).disabled(social.isBusy)
+                        } else {
+                            Button("Settings", systemImage: "gearshape") { showSettings = true }
+                                .accessibilityIdentifier("setupSettings")
+                        }
+                    } else {
+                        Button("Cancel") { dismiss() }.disabled(social.isBusy)
                     }
-                    .disabled(trimmedName.isEmpty || social.isBusy || social.deletionPending || photoLoading)
-                    .accessibilityIdentifier("saveProfile")
+                }
+                if !isSetup {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Save") { save() }
+                            .disabled(!validName || social.isBusy || social.deletionPending || photoLoading)
+                            .accessibilityIdentifier("saveProfile")
+                    }
                 }
             }
             .interactiveDismissDisabled(social.isBusy || photoLoading)
-            .confirmationDialog("How should we check your profile?", isPresented: $showCheckConsent, titleVisibility: .visible) {
-                Button("Allow quick checks and save") { save(automaticChecks: true) }
-                Button("Use human review and save") { save(automaticChecks: false) }
-                Button("Cancel", role: .cancel) { }
-            } message: { Text(profileCheckDisclosure) }
+            .sheet(isPresented: $showSettings) { ProfileSettingsView() }
             .task(id: selectedPhoto) {
                 guard let selectedPhoto else { photoLoading = false; return }
                 photoLoading = true
@@ -465,21 +504,32 @@ private struct ProfileEditorView: View {
             .onAppear {
                 guard !initialized else { return }
                 initialized = true
-                if let profile = social.profile {
-                    name = profile.editableDisplayName
-                    avatar = profile.avatar
-                    sharing = profile.shareExploration
-                }
+                name = isSetup ? social.suggestedProfileName : social.profile?.editableDisplayName ?? ""
+                sharing = isSetup ? social.suggestedProfileSharing : social.profile?.shareExploration ?? true
+                automaticChecks = social.profile?.automaticProfileChecksEnabled == true
             }
         }
     }
 
-    private func save(automaticChecks: Bool? = nil) {
+    private func save() {
+        guard !submitting else { return }
+        nameFocused = false
+        attemptedSave = true
+        submitting = true
         Task {
-            await social.saveProfile(name: trimmedName, avatar: avatar, sharing: sharing,
-                                     photoData: selectedPhotoData, removePhoto: removePhoto && selectedPhotoData == nil,
-                                     automaticChecks: automaticChecks)
-            if social.errorMessage == nil { dismiss() }
+            defer { submitting = false }
+            if isSetup {
+                await social.completeProfileSetup(name: trimmedName, sharing: sharing,
+                                                  photoData: selectedPhotoData,
+                                                  removePhoto: removePhoto && selectedPhotoData == nil,
+                                                  automaticChecks: automaticChecks)
+            } else {
+                await social.saveProfile(name: trimmedName, avatar: social.profile?.avatar ?? "globe", sharing: sharing,
+                                         photoData: selectedPhotoData, removePhoto: removePhoto && selectedPhotoData == nil)
+            }
+            if isSetup {
+                if social.isSignedIn && social.hasLoadedProfile && !social.needsProfileSetup { onFinish?() }
+            } else if social.errorMessage == nil { dismiss() }
         }
     }
 }
@@ -544,7 +594,7 @@ struct ProfileSettingsView: View {
                 }
                 if social.isSignedIn {
                     Section {
-                        Toggle("Automatic profile checks", isOn: Binding(
+                        Toggle("Check my profile before sharing", isOn: Binding(
                             get: { social.profile?.automaticProfileChecksEnabled == true },
                             set: { enabled in
                                 if enabled { showCheckConsent = true }
@@ -554,7 +604,7 @@ struct ProfileSettingsView: View {
                         .disabled(social.isBusy || social.deletionPending)
                         .accessibilityIdentifier("automaticProfileChecks")
                     } header: { Text("Profile safety") } footer: {
-                        Text("When enabled, OpenAI checks submitted names and photos for safety. Turn this off to use human review for future updates. Your last approved profile stays visible to friends while a review is pending.")
+                        Text("Allow OpenAI to check your name and photo before sharing. This choice applies to future edits. If you turn it off, updates may take longer to appear to friends.")
                     }
                 }
                 Section {
@@ -631,9 +681,9 @@ struct ProfileSettingsView: View {
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.disabled(authorizingApple || social.isBusy) } }
             .sheet(isPresented: $showSignIn) { ProfileSignInView() }
             .sheet(item: $sharedItem) { item in ProfileShareSheet(url: item.url) }
-            .confirmationDialog("Allow automatic profile checks?", isPresented: $showCheckConsent, titleVisibility: .visible) {
-                Button("Allow quick checks") { Task { await social.setProfileCheckConsent(enabled: true) } }
-                Button("Keep human review", role: .cancel) { }
+            .confirmationDialog("Check your profile before sharing?", isPresented: $showCheckConsent, titleVisibility: .visible) {
+                Button("Allow") { Task { await social.setProfileCheckConsent(enabled: true) } }
+                Button("Not now", role: .cancel) { }
             } message: { Text(profileCheckDisclosure) }
             .confirmationDialog("Clear data on this device?", isPresented: $showClearConfirmation, titleVisibility: .visible) {
                 Button("Clear device data", role: .destructive) {
@@ -714,6 +764,7 @@ struct ProfileSignInView: View {
     @State private var code = ""
     @State private var showingCode = false
     @State private var showingEmailRecovery = false
+    @State private var showingProfileSetup = false
     @State private var shareExplorationForNewAccount = true
     @State private var apple = AppleSignInCoordinator()
     @State private var authorizingApple = false
@@ -729,6 +780,18 @@ struct ProfileSignInView: View {
     private var working: Bool { social.isBusy || authorizingApple }
 
     var body: some View {
+        if social.isSignedIn && (social.needsProfileSetup || showingProfileSetup) {
+            ProfileSetupView(onFinish: { dismiss() }, onCancel: { dismiss() })
+                .onAppear { showingProfileSetup = true }
+                .onChange(of: social.needsProfileSetup) { _, needed in
+                    if !needed && social.hasLoadedProfile && !social.deletionPending { dismiss() }
+                }
+        } else {
+            signInContent
+        }
+    }
+
+    private var signInContent: some View {
         NavigationStack {
             Form {
                 Section {
@@ -753,15 +816,6 @@ struct ProfileSignInView: View {
                     }
                 }
                 if showingCode { codeSection } else {
-                    if !social.deletionPending {
-                        Section {
-                            Toggle("Share explored countries with friends", isOn: $shareExplorationForNewAccount)
-                                .disabled(working)
-                                .accessibilityIdentifier("signUpSharingToggle")
-                        } footer: {
-                            Text("For a new account, countries you explore after signing in are uploaded and shared with friends you add. Your saved countries and physical location stay private. Change this anytime in Settings. Existing accounts keep their current choice.")
-                        }
-                    }
                     signInOptions
                 }
                 if working {
@@ -819,7 +873,7 @@ struct ProfileSignInView: View {
                                                          appleUserID: authorization.userID,
                                                          shareExplorationForNewAccount: shareExplorationForNewAccount)
                             authorizingApple = false
-                            if social.isSignedIn { dismiss() }
+                            if social.isSignedIn && !social.needsProfileSetup { dismiss() }
                         }
                     } catch {
                         authorizingApple = false
@@ -952,8 +1006,9 @@ struct ProfileSignInView: View {
         focusedField = nil
         Task {
             await social.verifyCode(code: value, shareExplorationForNewAccount: shareExplorationForNewAccount)
-            if social.isSignedIn { dismiss() }
-            else { focusedField = .code }
+            if social.isSignedIn {
+                if !social.needsProfileSetup { dismiss() }
+            } else { focusedField = .code }
         }
     }
 }
@@ -985,8 +1040,8 @@ private struct ProfileFriendView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     HStack(spacing: 15) {
-                        ProfilePhotoAvatar(symbol: friend.avatar, path: friend.avatarPath, size: 66)
-                        Text(friend.displayName).scaledFont(size: 33, design: .serif).foregroundStyle(Palette.pine)
+                        ProfilePhotoAvatar(symbol: friend.avatar, displayName: friend.displayName, path: friend.avatarPath, size: 66)
+                        Text(ProfileIdentity.displayName(for: friend.displayName)).scaledFont(size: 33, design: .serif).foregroundStyle(Palette.pine)
                     }
                     if !friend.sharesExploration {
                         Label("Their exploration is private.", systemImage: "lock")
@@ -1120,8 +1175,8 @@ private struct ProfilePrivacyView: View {
                 Text("Your profile, explored countries and saved countries are stored on this device. WorldNiche doesn’t request your physical location or contacts. The system photo picker shares only the photo you choose, without giving WorldNiche access to your photo library.")
             }
             Section("When you connect") {
-                Text("An optional account uses Sign in with Apple. Existing email accounts can still recover access with a code. Apple can keep your personal email hidden. Your profile name, chosen symbol or photo, friends, invitations and sharing preference are stored online. With your permission, submitted names and photos are sent to OpenAI for safety checks; otherwise our team reviews them. You can change this choice in Settings. Only approved updates appear to friends. Photos are saved without their original camera or location metadata. Your email isn’t shown to friends.")
-                Text("New accounts start with exploration sharing on, with a switch before sign-in and in Settings. Countries you explore after signing in are uploaded and visible only to friends you add. Existing accounts keep their saved preference. Guest exploration isn’t imported. This is app activity, not a record of travel. Saved countries stay private.")
+                Text("An optional account uses Sign in with Apple. Existing email accounts can still recover access with a code. Apple can keep your personal email hidden. Your chosen name, optional photo, friends, invitations and sharing preference are stored online. With your permission, submitted names and photos are sent to OpenAI for safety checks; otherwise our team reviews them. You can change this choice in Settings. Only approved updates appear to friends. Photos are saved without their original camera or location metadata. Your email isn’t shown to friends.")
+                Text("New accounts start with exploration sharing on, with a switch during profile setup and in Settings. Countries you explore after signing in are uploaded and visible only to friends you add. Existing accounts keep their saved preference. Guest exploration isn’t imported. This is app activity, not a record of travel. Saved countries stay private.")
                 Text("The account service also stores invitation links, blocks and reports used to protect the community. A first name or nickname is enough; you don’t need to share your real name.")
             }
             Section("Content and conversations") {

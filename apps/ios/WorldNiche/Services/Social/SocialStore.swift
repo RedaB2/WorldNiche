@@ -6,6 +6,7 @@ final class SocialStore {
     private(set) var profile: ExplorerProfile?
     private(set) var friends: [ExplorerFriend] = []
     private(set) var isSignedIn = false
+    private(set) var hasLoadedProfile = false
     private(set) var isBusy = false
     private(set) var isCheckingProfile = false
     private(set) var profileCheckFailed = false
@@ -39,6 +40,7 @@ final class SocialStore {
     private var profileCheckID = UUID()
     private var lastCodeSent: Date?
     private var localOwnerID: UUID?
+    private var pendingProfileSetup = false
     private var deletionTargetID: UUID?
     private var invitationGeneration = UUID()
     private var invitationNeedsAttempt = false
@@ -73,6 +75,19 @@ final class SocialStore {
         }
     }
 
+    var needsProfileSetup: Bool {
+        isSignedIn && hasLoadedProfile && !deletionPending && (pendingProfileSetup || profile?.hasChosenDisplayName != true
+            || profile?.profileCheckConsentRecorded != true)
+    }
+    var suggestedProfileName: String {
+        Self.meaningfulProfileName(profile?.editableDisplayName)
+            ?? localOwnerID.flatMap { pendingAppleName(for: $0) } ?? ""
+    }
+    var suggestedProfileSharing: Bool {
+        profile?.shareExploration
+            ?? localOwnerID.flatMap { defaults.object(forKey: profileSharingKey($0)) as? Bool } ?? true
+    }
+
     var isConfigured: Bool { configuration != nil }
     var isAppleSignInAvailable: Bool { configuration?.appleSignInEnabled == true }
     var emailCodeResendAvailableAt: Date? { lastCodeSent?.addingTimeInterval(60) }
@@ -97,6 +112,7 @@ final class SocialStore {
             profile = try? JSONDecoder().decode(ExplorerProfile.self, from: data)
         }
         localOwnerID = defaults.string(forKey: "niche.localOwnerID").flatMap(UUID.init(uuidString:)) ?? profile?.id
+        pendingProfileSetup = localOwnerID.map { defaults.bool(forKey: "niche.profileSetupPending.\($0.uuidString)") } ?? false
         deletionTargetID = defaults.string(forKey: "niche.deletionTargetID").flatMap(UUID.init(uuidString:))
         if deletionPending, deletionTargetID == nil { deletionTargetID = localOwnerID }
         defaults.set(localOwnerID?.uuidString, forKey: "niche.localOwnerID")
@@ -149,19 +165,14 @@ final class SocialStore {
         current = generation
         isSignedIn = true
         do {
-            var remote = try await api.profile()
-            guard generation == current, !Task.isCancelled, !deletionPending else { return }
-            guard remote == nil || remote?.id == userID else { throw SocialError.invalidResponse }
-            // A previous sign-in may have saved its session before profile
-            // creation lost connectivity. Resume that setup before connecting.
-            remote = try await finishProfileSetup(remote, userID: userID, api: api,
-                                                createIfMissing: pendingToken != nil || pendingAppleName(for: userID) != nil
-                                                    || defaults.object(forKey: profileSharingKey(userID)) != nil)
-            let remoteFriends = try await api.friends()
+            let remote = try await api.profile()
             guard generation == current, !Task.isCancelled, !deletionPending else { return }
             guard remote == nil || remote?.id == userID else { throw SocialError.invalidResponse }
             profile = remote
+            hasLoadedProfile = true
             persistProfile()
+            let remoteFriends = try await api.friends()
+            guard generation == current, !Task.isCancelled, !deletionPending else { return }
             friends = remoteFriends
             profilePhotoRefreshID = UUID()
             lastVisibleProfileRefresh = Date()
@@ -221,11 +232,47 @@ final class SocialStore {
                 if let previous, previous != next { AvatarPhotoFiles.remove(previous, directory: photoDirectory) }
             }
             persistProfile()
-            profileSaveMessage = profile?.hasPendingContent == true ? "Saved to your profile." : "Profile saved."
+            profileSaveMessage = "Profile saved."
             profileCheckFailed = false
             if isSignedIn, sharing { await synchronizeExploration() }
             resumeProfileCheckIfNeeded()
         } catch { record(error) }
+    }
+
+    /// Setup is unfinished until every selected field and the first privacy
+    /// choice reach the service. A failed photo can be retried or skipped.
+    func completeProfileSetup(name: String, sharing: Bool, photoData: Data? = nil,
+                              removePhoto: Bool = false, automaticChecks: Bool) async {
+        guard !isBusy, !deletionPending, isSignedIn, let owner = localOwnerID else { return }
+        guard hasLoadedProfile else { record(SocialError.unavailable); return }
+        guard Self.meaningfulProfileName(name) != nil else {
+            errorMessage = "Choose a display name that feels like you."
+            return
+        }
+        pendingProfileSetup = true
+        defaults.set(true, forKey: profileSetupKey(owner))
+        await saveProfile(name: name, avatar: profile?.avatar ?? "globe", sharing: sharing,
+                          photoData: photoData, removePhoto: removePhoto)
+        guard isSignedIn, localOwnerID == owner, !Task.isCancelled, !deletionPending,
+              errorMessage == nil, profile?.id == owner else { return }
+        guard profile?.nameModerationStatus != .rejected else {
+            profileSaveMessage = nil
+            errorMessage = "Choose a different display name that follows our community guidelines."
+            return
+        }
+        // A previous choice, including opting out, belongs to this account.
+        if profile?.profileCheckConsentRecorded != true {
+            await setProfileCheckConsent(enabled: automaticChecks)
+        }
+        guard isSignedIn, localOwnerID == owner, !Task.isCancelled, !deletionPending,
+              errorMessage == nil, profile?.profileCheckConsentRecorded == true else { return }
+        pendingProfileSetup = false
+        defaults.removeObject(forKey: profileSetupKey(owner))
+        defaults.removeObject(forKey: appleNameKey(owner))
+        defaults.removeObject(forKey: profileSharingKey(owner))
+        profileSaveMessage = "Profile saved."
+        await synchronizeExploration()
+        await resumeInvitation()
     }
 
     /// Fetch only profiles while a social screen is visible. Journal uploads and
@@ -303,7 +350,7 @@ final class SocialStore {
             guard updated.id == owner else { throw SocialError.invalidResponse }
             profile = updated
             profileCheckFailed = updated.canRetryCheck
-            profileSaveMessage = updated.hasPendingContent ? "Saved to your profile." : "Profile saved."
+            profileSaveMessage = "Profile saved."
             persistProfile()
         } catch {
             guard current == generation, checkID == profileCheckID, owner == localOwnerID,
@@ -441,8 +488,8 @@ final class SocialStore {
         isBusy = true
         generation = UUID()
         var current = generation
-        let suggestedProfile = localOwnerID == nil ? profile : nil
         isSignedIn = false
+        hasLoadedProfile = false
         defer { isBusy = false }
         do {
             let userID: UUID
@@ -473,11 +520,18 @@ final class SocialStore {
             current = generation
             isSignedIn = true
             self.emailForCode = nil
-            defaults.set(newProfileSharing, forKey: profileSharingKey(userID))
+            if defaults.object(forKey: profileSharingKey(userID)) == nil {
+                defaults.set(newProfileSharing, forKey: profileSharingKey(userID))
+            }
             let remote = try await api.profile()
+            guard generation == current, !Task.isCancelled, !deletionPending else { return }
             guard remote == nil || remote?.id == userID else { throw SocialError.invalidResponse }
-            profile = try await finishProfileSetup(remote, userID: userID, api: api,
-                                                  suggestedProfile: suggestedProfile, createIfMissing: true)
+            profile = remote
+            hasLoadedProfile = true
+            if remote?.hasChosenDisplayName == true, remote?.profileCheckConsentRecorded == true, !pendingProfileSetup {
+                defaults.removeObject(forKey: appleNameKey(userID))
+                defaults.removeObject(forKey: profileSharingKey(userID))
+            }
             guard generation == current, !Task.isCancelled, !deletionPending else { return }
             persistProfile()
             friends = try await api.friends()
@@ -490,35 +544,10 @@ final class SocialStore {
     private func appleNameKey(_ userID: UUID) -> String { "niche.pendingAppleName.\(userID.uuidString)" }
     private func appleAuthorizationNameKey(_ appleID: String) -> String { "niche.pendingAppleAuthorizationName.\(appleID)" }
     private func profileSharingKey(_ userID: UUID) -> String { "niche.pendingProfileSharing.\(userID.uuidString)" }
+    private func profileSetupKey(_ userID: UUID) -> String { "niche.profileSetupPending.\(userID.uuidString)" }
 
     private func pendingAppleName(for userID: UUID) -> String? {
         Self.meaningfulProfileName(defaults.string(forKey: appleNameKey(userID)))
-    }
-
-    private func finishProfileSetup(_ remote: ExplorerProfile?, userID: UUID, api: SocialAPI,
-                                    suggestedProfile: ExplorerProfile? = nil,
-                                    createIfMissing: Bool) async throws -> ExplorerProfile? {
-        let current = generation
-        let appleName = pendingAppleName(for: userID)
-        let existingName = Self.meaningfulProfileName(remote?.editableDisplayName)
-        if let remote, existingName != nil || appleName == nil {
-            defaults.removeObject(forKey: appleNameKey(userID))
-            defaults.removeObject(forKey: profileSharingKey(userID))
-            return remote
-        }
-        guard remote != nil || createIfMissing else { return nil }
-        let selectedName = existingName ?? Self.meaningfulProfileName(profile?.editableDisplayName)
-            ?? Self.meaningfulProfileName(suggestedProfile?.editableDisplayName) ?? appleName ?? "Explorer"
-        let saved = try await api.updateProfile(name: selectedName,
-                                                avatar: remote?.avatar ?? profile?.avatar ?? suggestedProfile?.avatar ?? "globe",
-                                                sharing: remote?.shareExploration
-                                                    ?? (defaults.object(forKey: profileSharingKey(userID)) as? Bool ?? false))
-        guard generation == current, localOwnerID == userID, saved.id == userID, !Task.isCancelled else {
-            throw CancellationError()
-        }
-        defaults.removeObject(forKey: appleNameKey(userID))
-        defaults.removeObject(forKey: profileSharingKey(userID))
-        return saved
     }
 
     private static func meaningfulProfileName(_ name: String?) -> String? {
@@ -562,7 +591,7 @@ final class SocialStore {
 
     func synchronizeExploration() async {
         guard let api, isSignedIn, let owner = localOwnerID,
-              profile?.id == owner, profile?.shareExploration == true, !deletionPending else { return }
+              profile?.id == owner, profile?.shareExploration == true, !deletionPending, hasLoadedProfile, !needsProfileSetup else { return }
         let current = generation
         do {
             let uploaded = try await api.syncExplorations(journal.visitedIDs)
@@ -580,6 +609,8 @@ final class SocialStore {
         defer { isBusy = false }
         guard let api, let configuration else { record(SocialError.notConfigured); return nil }
         guard isSignedIn else { record(SocialError.signInRequired); return nil }
+        guard hasLoadedProfile else { record(SocialError.unavailable); return nil }
+        guard !needsProfileSetup else { errorMessage = "Finish your profile to connect with friends."; return nil }
         do {
             let invite = try await api.createInvite()
             guard let url = configuration.invitationURL(token: invite.token) else { throw SocialError.invalidResponse }
@@ -615,14 +646,14 @@ final class SocialStore {
         if !refreshing { await resumeInvitation() }
     }
 
-    var canRetryInvitation: Bool { pendingToken != nil && isSignedIn && !isConnectingInvitation && !deletionPending }
+    var canRetryInvitation: Bool { pendingToken != nil && isSignedIn && !isConnectingInvitation && !deletionPending && hasLoadedProfile && !needsProfileSetup }
     var hasPendingInvitation: Bool { pendingToken != nil }
 
     func resumeInvitation() async { await resumeInvitation(allowWhileBusy: false) }
 
     private func resumeInvitation(allowWhileBusy: Bool) async {
         guard invitationNeedsAttempt, !isConnectingInvitation, !isBusy || allowWhileBusy,
-              let api, isSignedIn, profile?.id == localOwnerID, localOwnerID != nil, !deletionPending else { return }
+              let api, isSignedIn, profile?.id == localOwnerID, localOwnerID != nil, !deletionPending, hasLoadedProfile, !needsProfileSetup else { return }
         let ownedBusy = !isBusy
         if ownedBusy { isBusy = true }
         isConnectingInvitation = true
@@ -891,6 +922,8 @@ final class SocialStore {
         let previous = LocalWorkspace(profile: profile, explored: journal.visitedIDs, saved: journal.savedIDs.sorted())
         defaults.set(try? JSONEncoder().encode(previous), forKey: workspaceKey(localOwnerID))
         localOwnerID = owner
+        hasLoadedProfile = false
+        pendingProfileSetup = owner.map { defaults.bool(forKey: profileSetupKey($0)) } ?? false
         defaults.set(owner?.uuidString, forKey: "niche.localOwnerID")
         let workspace = defaults.data(forKey: workspaceKey(owner)).flatMap { try? JSONDecoder().decode(LocalWorkspace.self, from: $0) }
         profile = workspace?.profile
@@ -942,6 +975,8 @@ final class SocialStore {
         deletionPending = false
         deletionTargetID = nil
         localOwnerID = nil
+        hasLoadedProfile = false
+        pendingProfileSetup = false
         dismissInvitation()
         defaults.removeObject(forKey: "niche.profile")
         defaults.removeObject(forKey: "niche.deletionPending")
@@ -950,7 +985,7 @@ final class SocialStore {
         defaults.removeObject(forKey: "niche.localOwnerID")
         for key in defaults.dictionaryRepresentation().keys where key.hasPrefix("niche.workspace.")
             || key.hasPrefix("niche.pendingAppleName.") || key.hasPrefix("niche.pendingAppleAuthorizationName.")
-            || key.hasPrefix("niche.pendingProfileSharing.") {
+            || key.hasPrefix("niche.pendingProfileSharing.") || key.hasPrefix("niche.profileSetupPending.") {
             defaults.removeObject(forKey: key)
         }
         journal.clear()

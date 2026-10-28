@@ -5,6 +5,7 @@ struct ProfilePhotoAvatar: View {
     @Environment(SocialStore.self) private var social
     @Environment(\.scenePhase) private var scenePhase
     let symbol: String
+    var displayName: String = ""
     var path: String? = nil
     var localID: String? = nil
     var previewData: Data? = nil
@@ -32,7 +33,11 @@ struct ProfilePhotoAvatar: View {
                 Image(uiImage: image).resizable().scaledToFill()
                     .frame(width: size, height: size).clipShape(Circle())
             } else {
-                ExplorerAvatar(avatar: symbol, size: size)
+                Text(ProfileIdentity.initials(for: displayName))
+                    .font(.system(size: size * 0.34, weight: .medium, design: .rounded))
+                    .foregroundStyle(Palette.pine)
+                    .frame(width: size, height: size)
+                    .background(Palette.pine.opacity(0.08), in: Circle())
             }
         }
         .accessibilityHidden(true)
