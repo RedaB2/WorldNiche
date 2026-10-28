@@ -2,9 +2,9 @@
 
 The external **WorldNiche Public Beta** group has a [public signup link](https://testflight.apple.com/join/kqpQhYFw) with 100 places. Apple approved build 1.0 (3), and it is available to external testers with automatic profile checks, friend updates, closer globe zoom, and the discovery fix.
 
-The next update adds the optional intro, chosen names, optional photos with initials, and one-time profile-check permission. The matching website copy is live in site version 11. This app update has not been uploaded yet; the final protected-storage checks and unfolded-layout verification are release gates. Build 3 remains the public beta.
+Build 4 adds the optional intro, chosen names, optional photos with initials, and one-time profile-check permission. The matching website copy is live in site version 11.
 
-Validation covers 26 unique simulator scenarios across the full run and a focused rerun. All five profile-setup scenarios passed twice after the test was changed to dismiss the keyboard with Done before interacting with the form. The 12 intro state checks and 29 website checks also pass. The final host social-suite run cannot reopen protected export and photo files while the Mac is locked; rerun it after protected data becomes available before uploading build 4.
+Validation covers 26 unique simulator scenarios across the full run and focused reruns, 403 native social assertions, 12 intro state checks, and 29 website checks. The final five profile-setup scenarios pass on both iPhone 17 Pro Max and an unfolded iPhone Duo. They cover remembered consent, sharing on and off, existing privacy choices, optional photos, and larger text. Manual unfolded checks also cover the intro, profile form, photo picker, initials, and normal edits. The UI tests scroll the active Form and check the control's own window so a second display cannot distort the results.
 
 Apple currently requires an internal group before an external group can be created. If needed, create that prerequisite without adding testers, then use the external group for public distribution. Do not upload the build as TestFlight Internal Only. [Apple's external testing instructions](https://developer.apple.com/help/app-store-connect/test-a-beta-version/invite-external-testers/).
 

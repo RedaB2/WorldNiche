@@ -8,11 +8,11 @@ final class ProfileSetupUITests: XCTestCase {
         let app = openSetup()
         let name = app.textFields["profileNameField"]
         XCTAssertEqual(name.value as? String, "Your name")
-        for _ in 0..<7 where !app.buttons["completeProfileSetup"].exists { app.swipeUp() }
+        for _ in 0..<7 where !app.buttons["completeProfileSetup"].exists { form(in: app).swipeUp() }
         XCTAssertTrue(app.buttons["completeProfileSetup"].exists)
         XCTAssertFalse(app.buttons["completeProfileSetup"].isEnabled)
         XCTAssertFalse(app.staticTexts["Explorer"].exists)
-        for _ in 0..<7 where !name.isHittable { app.swipeDown() }
+        for _ in 0..<7 where !name.isHittable { form(in: app).swipeDown() }
         XCTAssertTrue(name.isHittable)
         name.tap()
         name.typeText("Mira Sun")
@@ -37,7 +37,7 @@ final class ProfileSetupUITests: XCTestCase {
         app.buttons["editProfile"].tap()
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         assertNormalEditHasNoConsentControls(app)
-        for _ in 0..<7 where !name.isHittable { app.swipeDown() }
+        for _ in 0..<7 where !name.isHittable { form(in: app).swipeDown() }
         XCTAssertTrue(name.isHittable)
         name.tap()
         name.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 8) + "Mira Moon")
@@ -61,7 +61,9 @@ final class ProfileSetupUITests: XCTestCase {
         let sharing = app.switches["profileSharingToggle"]
         reveal(sharing, in: app)
         XCTAssertEqual(sharing.value as? String, "1")
-        sharing.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+        let sharingControl = sharing.switches.firstMatch
+        XCTAssertTrue(sharingControl.exists)
+        sharingControl.tap()
         XCTAssertEqual(sharing.value as? String, "0")
         let consent = app.staticTexts["signupProfileConsent"]
         reveal(consent, in: app)
@@ -173,7 +175,7 @@ final class ProfileSetupUITests: XCTestCase {
 
     @MainActor
     private func assertNormalEditHasNoConsentControls(_ app: XCUIApplication) {
-        for _ in 0..<4 { app.swipeUp() }
+        for _ in 0..<4 { form(in: app).swipeUp() }
         XCTAssertFalse(app.staticTexts["signupProfileConsent"].exists)
         XCTAssertFalse(app.buttons["completeProfileSetup"].exists)
         XCTAssertFalse(app.buttons["completeProfileWithoutChecks"].exists)
@@ -183,9 +185,20 @@ final class ProfileSetupUITests: XCTestCase {
 
     @MainActor
     private func assertHorizontalBounds(_ element: XCUIElement, in app: XCUIApplication) {
+        let window = app.windows.containing(.any, identifier: element.identifier).firstMatch
+        XCTAssertTrue(window.exists, app.debugDescription)
+        XCTAssertGreaterThan(window.frame.width, 0)
         XCTAssertGreaterThan(element.frame.width, 0)
-        XCTAssertGreaterThanOrEqual(element.frame.minX, app.frame.minX)
-        XCTAssertLessThanOrEqual(element.frame.maxX, app.frame.maxX)
+        XCTAssertGreaterThanOrEqual(element.frame.minX, window.frame.minX)
+        XCTAssertLessThanOrEqual(element.frame.maxX, window.frame.maxX)
+    }
+
+    @MainActor
+    private func form(in app: XCUIApplication) -> XCUIElement {
+        let forms = app.collectionViews.allElementsBoundByIndex
+        let active = forms.first { $0.isHittable } ?? app.collectionViews.firstMatch
+        XCTAssertTrue(active.exists, app.debugDescription)
+        return active
     }
 
     @MainActor
@@ -199,7 +212,7 @@ final class ProfileSetupUITests: XCTestCase {
 
     @MainActor
     private func reveal(_ element: XCUIElement, in app: XCUIApplication) {
-        for _ in 0..<7 where !element.isHittable { app.swipeUp() }
+        for _ in 0..<7 where !element.isHittable { form(in: app).swipeUp() }
         XCTAssertTrue(element.isHittable)
     }
 
