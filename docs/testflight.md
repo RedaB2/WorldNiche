@@ -1,6 +1,6 @@
 # Public beta
 
-The external **WorldNiche Public Beta** group has a [public signup link](https://testflight.apple.com/join/kqpQhYFw) with 100 places. Apple approved build 1.0 (3), and it is available to external testers with automatic profile checks, friend updates, closer globe zoom, and the discovery fix.
+The external **WorldNiche Public Beta** group has a [public signup link](https://testflight.apple.com/join/kqpQhYFw) with 100 places. Apple approved build 1.0 (4), and it is available to external testers with the optional intro, personal profile setup, remembered consent, and sharing controls.
 
 Build 4 adds the optional intro, chosen names, optional photos with initials, and one-time profile-check permission. The matching website copy is live in site version 11.
 
@@ -61,3 +61,5 @@ An Agreements and Contracts support case was submitted after the earlier agreeme
 October 27, 2026: Release 1.0 (3) passed all 18 simulator tests, 54 avatar checks, 348 social assertions, and the deterministic culture checks. A discovery filter that rejected valid musical styles and plural traditions was fixed with a regression test. The signed IPA passed signature, entitlement, app icon, privacy manifest, and configured-service verification.
 
 The hosted moderation checks passed for safe names and JPEGs, exact approved friend-photo bytes, consent isolation, flagged content, cooldown recovery, and deletion. Temporary test accounts were removed. Updated privacy, security, and community disclosures are live. Reviewer notes now match automatic checks, the human-review choice, Apple sign-in, and sharing enabled by default. Build 1.0 (3) uploaded, processed successfully, and was approved for external testing on October 27. Fresh App Store Connect reads confirm `VALID`, `APPROVED`, and `IN_BETA_TESTING`, plus its assignment to WorldNiche Public Beta. The existing public link remains enabled with 100 places, the new What to Test notes are saved, and automatic notification is enabled. The build declares that it does not use non-exempt encryption. No Apple review is pending for this beta.
+
+October 28, 2026: Release 1.0 (4) is approved and available to the existing public beta group. App Store Connect confirms `VALID`, `APPROVED`, and `IN_BETA_TESTING`. The exact build is assigned to WorldNiche Public Beta, the public signup link remains enabled, updated What to Test notes are saved, and automatic tester notification is enabled. All release checks above passed before upload. No Apple review is pending for this beta.
