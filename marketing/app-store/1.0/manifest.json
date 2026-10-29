@@ -1,0 +1,84 @@
+{
+  "capturedOn": "2026-10-29",
+  "locale": "en-US",
+  "assets": [
+    {
+      "file": "1.0/en-US/duo/screenshots/01-globe.png",
+      "width": 2034,
+      "height": 1398,
+      "sha256": "9c2bbf2a6a701513311666a4a7ab968a8af01bbf761cd9b849e715b58fb18485",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/duo/screenshots/03-atlas.png",
+      "width": 2034,
+      "height": 1398,
+      "sha256": "de1829d708409f94559d52976a78577a6cfa8855927a47d9ac70246c9a156602",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/screenshots/01-globe.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "7884d587b9ced4dd951f8d7dccd8bffd2868ac718cf5838264b0800803cc27b9",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/screenshots/02-local-lens.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "00b191b5ff457bbe3901b5632fd94dfd11a1bdbfa67e1df627756d2345548552",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/screenshots/03-atlas.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "929a496f1dbb5e0b869fe4c35e472274c969a1c30a113454928bfb2951018cfd",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/screenshots/04-journal.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "0195d388ddbb0c911bdd952a5d742413641bca1562e410343d8202377578e49f",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/screenshots/05-friends.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "fa6aae5e3507a2b363695f70b4b2da4c508f564030461601371b660bd78f8f12",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/ipad/screenshots/01-globe.png",
+      "width": 2064,
+      "height": 2752,
+      "sha256": "d7e2081851100cad06c8edd3655a6eb4f048d2386d2bd20902494cb7090372b2",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/ipad/screenshots/03-atlas.png",
+      "width": 2064,
+      "height": 2752,
+      "sha256": "8e564d43b8235600596672eba8d0f9a544b9840ebee5138d123fa790bc96d852",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/ipad/screenshots/04-journal.png",
+      "width": 2064,
+      "height": 2752,
+      "sha256": "f7b6a43b0a98e97edaa2ffbabd533971a350c39883435ba80909fc2abbcf24b8",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/previews/01-morocco.mp4",
+      "durationSeconds": 20,
+      "width": 886,
+      "height": 1920,
+      "sha256": "51584a672a18d8a25c799393e987c9af74cc3a6cf610f1cdd37bd55a88c08029",
+      "deliveryState": "COMPLETE"
+    }
+  ]
+}

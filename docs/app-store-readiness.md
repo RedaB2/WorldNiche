@@ -4,21 +4,26 @@ Rechecked against Apple's documentation and the live App Store Connect record on
 
 ## Current submission status: October 29, 2026
 
-The live App Store Connect validation for version 1.0 reports **34 errors and two warnings**. Most are empty listing and questionnaire fields. The version is `PREPARE_FOR_SUBMISSION` and still has build **2** selected, although public TestFlight is on build 6. TestFlight approval does not approve the App Store listing.
+Version 1.0 is `PREPARE_FOR_SUBMISSION` with **build 6** selected and manual release. The listing now has its description, keywords, subtitle, support and privacy links, Education and Travel categories, copyright, and App Review contact and notes. Pricing is free in all 175 available territories, with future territories enabled. Regional permits and trader requirements still need checking before release.
+
+Apple calculates **13+ in 172 regions**, with regional ratings of 16+ in Vietnam, 14+ in Brazil and 12+ in Korea. Mature or suggestive themes are marked infrequent for the app's incidental news and music content. The rating reflects the questionnaire, not a forced override. Reassess if the content or social features change.
+
+The [listing media](../marketing/app-store/README.md) is uploaded and processed: five iPhone screenshots, three iPad screenshots, two unfolded iPhone Duo screenshots, and a 20-second Morocco app preview. These use actual simulator UI. Metadata and supported screenshot format validation pass. The current CLI reports **one error**, the unset content-rights declaration, and **one warning**, because its size catalog does not yet recognize `APP_IPHONE_DUO`. Apple's browser accepts that display type and reports both Duo images processed at 2034 by 1398.
+
+The browser also confirms **App Privacy is not yet completed**: it still shows Get Started. The API validator cannot detect this gate. TestFlight approval does not approve the App Store listing.
 
 Before requesting App Review:
 
-1. Select the final tested build for the App Store version. Build 6 containing the journal changes is already uploaded and approved for public TestFlight. Capture the actual app's required iPhone screenshots, including appropriate Duo assets where supported.
-2. Finish the listing: description, keywords, subtitle, support URL, privacy-policy URL, primary category and copyright.
-3. Complete the age-rating questionnaire and content-rights declaration for the actual music, news, cultural sources and social features. The app uses third-party content; do not copy a validator's generic no-third-party-content suggestion.
-4. Set distribution availability and confirm the pricing setup. Add the App Review contact name, email and phone, with Apple sign-in and friend-feature instructions.
-5. Reconcile and publish App Privacy, including linked private journal notes as user content, journal sync identifiers and exploration activity for app functionality. The public API cannot verify published privacy answers. The browser session requires signing in again, so that publish state has not been verified in this audit.
-6. Complete native account deletion with a consenting disposable Apple account, including Apple authorization revocation. Local fixtures and hosted deletion checks pass, but do not substitute for this live Apple path.
-7. Confirm the support/moderation inbox is monitored, review outstanding reports, verify maintenance and provider retention, and check attribution and media rights for the submitted build.
+1. Confirm rights for the actual music, news and cultural sources, then complete the content-rights declaration. Public availability of a feed is not itself permission. Do not copy a validator's generic no-third-party-content suggestion.
+2. Reconcile and publish App Privacy, including linked private journal notes as user content, journal sync identifiers and exploration activity for app functionality.
+3. Complete native account deletion with a consenting disposable Apple account, including Apple authorization revocation. Local fixtures and hosted deletion checks pass, but do not substitute for this live Apple path.
+4. Provide a reliable friend-feature route for App Review, in addition to the saved native Apple sign-in instructions.
+5. Confirm the support/moderation inbox is monitored, review outstanding reports, verify maintenance and provider retention, and check attribution and media rights for the submitted build.
+6. Resolve applicable EU trader and China mainland permit requirements for the selected territories.
 
 The journal migration is deployed. Hosted rollback-only checks passed for private sync, repeated-request handling, friend isolation, export and deletion cascades. They preserved the existing account and all 195 countries, and left no test accounts. Notes and bookmarks are private even when friend exploration sharing is on. See [journal behavior](journal.md).
 
-This audit is read-only for App Store Connect. No App Store review request was sent.
+The draft listing was updated. No App Store review request was sent.
 
 ## Website and app disclosures
 
@@ -45,9 +50,9 @@ Hosted testing found that the storage CDN can replay a previously authorized pho
 - **Moderation operations:** Server-enforced prepublication review, reports, removal and account restrictions are deployed and tested. The operator must review the private queue and published inbox regularly, handle urgent reports promptly, and respond to appeals. A working queue alone does not establish ongoing staffing. [Review Guidelines, section 1.2](https://developer.apple.com/app-store/review/guidelines/).
 - **Native end-to-end review:** Hosted multi-account access checks pass. Complete the same social and deletion flows on the exact signed release build, including interruption recovery and the actual Apple-account path. Keep the hosted suite as a regression check.
 - **Retention:** pg_cron is installed. On October 29, the moderation worker and daily reservation cleanup both showed successful latest executions with zero cron failures in the previous 24 hours. The separate `worldniche-retention` general maintenance job is not installed, so report, invite and other general cleanup remain outstanding. Verify provider log/backup retention before publishing exact periods.
-- **Privacy labels:** Reconcile the website, release binary, privacy manifest, and App Store Connect answers. The manifest currently declares email, display name, user ID, profile photo, social graph, shared exploration, and support records, journal notes and journal sync identifiers as linked data for app functionality, with no tracking. Review operational logs and provider practices too. On-device-only processing and optional cloud collection are different. [App Privacy Details](https://developer.apple.com/app-store/app-privacy-details/).
+- **Privacy labels:** The browser shows the questionnaire has not been started. Reconcile the website, release binary, privacy manifest, and App Store Connect answers. The manifest currently declares email, display name, user ID, profile photo, social graph, shared exploration, and support records, journal notes and journal sync identifiers as linked data for app functionality, with no tracking. Review operational logs and provider practices too. On-device-only processing and optional cloud collection are different. [App Privacy Details](https://developer.apple.com/app-store/app-privacy-details/).
 - **Review access:** Provide a reliable way for App Review to test account and friend features, including instructions for Sign in with Apple and a usable friend-flow test route. Keep the backend available. Finish metadata, screenshots, review notes, and on-device stability checks. [Review Guidelines, sections 2.1 and 2.3](https://developer.apple.com/app-store/review/guidelines/).
-- **Content and age rating:** Check rights and attribution for music artwork, news, cultural text, images, and marketing media. Complete the current age-rating questionnaire for actual dynamic content and social features. Do not choose a rating solely from the app's educational purpose. [Review Guidelines, sections 4.5 and 5.2](https://developer.apple.com/app-store/review/guidelines/), [age-rating definitions](https://developer.apple.com/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions/).
+- **Content and age rating:** Check rights and attribution for music artwork, news, cultural text, images, and marketing media. The questionnaire is saved and calculates 13+ with regional exceptions. Keep it aligned with actual dynamic content and social features. [Review Guidelines, sections 4.5 and 5.2](https://developer.apple.com/app-store/review/guidelines/), [age-rating definitions](https://developer.apple.com/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions/).
 - **Submission configuration:** Verify release signing, required-reason API declarations, encryption answers, distribution-territory requirements, and the current upload toolchain requirements before submitting. [Privacy manifests](https://developer.apple.com/documentation/bundleresources/privacy-manifest-files), [current requirements](https://developer.apple.com/news/upcoming-requirements/).
 
 Recheck this list against the exact build and deployed service submitted for review.
@@ -58,4 +63,4 @@ The external WorldNiche Public Beta group has a [public signup link](https://tes
 
 The agreement block is resolved. Apple approved build 1.0 (1), verified on October 20, and the public group shows Testing. Beta metadata and review instructions are saved, and the first TestFlight preflight reported no errors or warnings. Beta approval does not replace the App Store submission checks above. [Public beta notes](testflight.md) contain the distribution status, beta metadata, and remaining native validation and operational checks.
 
-The full App Store listing tasks above, including store screenshots and final privacy labels, remain tracked separately from beta upload requirements. Their unfinished status is not evidence that Apple has rejected a TestFlight upload.
+Public TestFlight is now on build 6. The remaining App Store gates above are tracked separately from beta upload requirements. Their unfinished status is not evidence that Apple has rejected a TestFlight upload.
