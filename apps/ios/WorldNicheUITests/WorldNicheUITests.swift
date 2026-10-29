@@ -73,38 +73,55 @@ final class WorldNicheUITests: XCTestCase {
     }
 
     @MainActor
-    func testAppleSignInIsVisibleAndEmailRecoveryIsOptIn() throws {
+    func testAppleIsTheOnlySignInOption() throws {
         let app = XCUIApplication()
         app.launchArguments = ["-worldniche-skip-intro"]
         openSignedOutSignIn(app)
-        let apple = app.buttons["signInWithApple"]
-        XCTAssertTrue(apple.waitForExistence(timeout: 5))
-        for _ in 0..<3 where apple.frame.midY >= app.frame.maxY - 50 { app.swipeUp() }
-        XCTAssertTrue(app.frame.contains(CGPoint(x: apple.frame.midX, y: apple.frame.midY)))
-        let email = app.textFields["signInEmailField"]
-        XCTAssertFalse(email.exists)
-        let recover = app.buttons["recoverEmailAccount"]
-        for _ in 0..<3 where !recover.isHittable { app.swipeUp() }
-        XCTAssertTrue(recover.isHittable)
-        recover.tap()
-        XCTAssertTrue(email.waitForExistence(timeout: 5))
-        XCTAssertTrue(email.isHittable)
-        XCTAssertFalse(app.buttons["recoverEmailAccount"].exists)
-        email.typeText("not-an-address")
-        XCTAssertFalse(app.buttons["requestEmailCode"].isEnabled)
-        XCTAssertFalse(app.textFields["emailCodeField"].exists)
-        capture("Existing email account recovery", app: app)
+        assertAppleOnlySignIn(app)
+        capture("Apple-only sign-in", app: app)
         app.navigationBars["Sign in"].buttons["Cancel"].tap()
         XCTAssertTrue(app.navigationBars["Profile"].waitForExistence(timeout: 5))
     }
 
     @MainActor
+    func testAppleOnlySignInWithLargeTextRemainsAccessible() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
+        openSignedOutSignIn(app)
+        assertAppleOnlySignIn(app)
+        capture("Apple-only sign-in with large text", app: app)
+        app.navigationBars["Sign in"].buttons["Cancel"].tap()
+        XCTAssertTrue(app.navigationBars["Profile"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    private func assertAppleOnlySignIn(_ app: XCUIApplication) {
+        let apple = app.buttons["signInWithApple"]
+        XCTAssertTrue(apple.waitForExistence(timeout: 5))
+        let form = app.collectionViews.firstMatch
+        for _ in 0..<5 where !apple.isHittable { form.swipeUp() }
+        XCTAssertTrue(apple.isHittable)
+        XCTAssertFalse(app.textFields["signInEmailField"].exists)
+        XCTAssertFalse(app.textFields["emailCodeField"].exists)
+        XCTAssertFalse(app.buttons["requestEmailCode"].exists)
+        XCTAssertFalse(app.buttons["recoverEmailAccount"].exists)
+        // Inspect the footer too, where the recovery option used to appear.
+        form.swipeUp()
+        XCTAssertFalse(app.buttons["recoverEmailAccount"].exists)
+        XCTAssertFalse(app.staticTexts["Already used email? Recover your account"].exists)
+    }
+
+    @MainActor
     private func openSignedOutSignIn(_ app: XCUIApplication) {
         app.launch()
-        app.tabBars.buttons["Profile"].tap()
+        let profile = app.tabBars.buttons["Profile"].exists
+            ? app.tabBars.buttons["Profile"]
+            : app.buttons.matching(NSPredicate(format: "label == %@", "Profile")).firstMatch
+        XCTAssertTrue(profile.waitForExistence(timeout: 8))
+        profile.tap()
         let signIn = app.buttons["signInForFriends"]
         XCTAssertTrue(signIn.waitForExistence(timeout: 8), "Run this check with a signed-out simulator.")
-        for _ in 0..<4 where !signIn.isHittable { app.swipeUp() }
+        for _ in 0..<4 where !signIn.isHittable { app.scrollViews.firstMatch.swipeUp() }
         XCTAssertTrue(signIn.isHittable)
         signIn.tap()
         XCTAssertTrue(app.navigationBars["Sign in"].waitForExistence(timeout: 5))

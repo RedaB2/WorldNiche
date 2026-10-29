@@ -192,17 +192,14 @@ enum ProfileReportReason: String, CaseIterable, Sendable {
 }
 
 enum SocialError: LocalizedError {
-    case notConfigured, signInRequired, invalidEmail, invalidCode, invalidName, invalidInvitation
+    case notConfigured, signInRequired, invalidName, invalidInvitation
     case rateLimited, unavailable, rejected, invalidResponse, storageFailure
-    case codeRejected, appleSignInFailed, appleReauthenticationRequired, invalidPhoto
+    case appleSignInFailed, appleReauthenticationRequired, invalidPhoto
 
     var errorDescription: String? {
         switch self {
         case .notConfigured: "Friends are not available in this build yet. Your profile and journal still work on this device."
         case .signInRequired: "Sign in to connect with friends."
-        case .invalidEmail: "Enter a valid email address."
-        case .invalidCode: "Enter the six-digit code from your email."
-        case .codeRejected: "That code has expired or wasn’t accepted. Check your latest email or request a new code."
         case .appleSignInFailed: "Apple sign-in couldn’t be completed. Please try again."
         case .appleReauthenticationRequired: "Confirm with Apple to finish deleting your account and disconnect Sign in with Apple."
         case .invalidPhoto: "Choose a photo we can open. Try a different image if this one doesn’t load."

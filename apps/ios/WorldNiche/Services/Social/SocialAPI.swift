@@ -92,16 +92,6 @@ actor SocialAPI {
     func currentAppleUserID() -> String? { session?.user.appleUserID }
     func hasAppleIdentity() -> Bool { session?.user.hasAppleIdentity == true }
 
-    func requestCode(email: String, allowNewAccount: Bool = true) async throws {
-        guard !storageFailed else { throw SocialError.storageFailure }
-        do { _ = try await request(path: "auth/v1/otp", body: ["email": email, "create_user": allowNewAccount], token: nil) }
-        catch let error as HTTPFailure { throw Self.authenticationError(error) }
-    }
-
-    func verifyCode(email: String, code: String) async throws -> UUID {
-        try await signIn(path: "auth/v1/verify", body: ["email": email, "token": code, "type": "email"], invalidCredential: .codeRejected)
-    }
-
     func signInWithApple(identityToken: String, nonce: String) async throws -> UUID {
         guard !identityToken.isEmpty, !nonce.isEmpty else { throw SocialError.appleSignInFailed }
         return try await signIn(path: "auth/v1/token", query: "grant_type=id_token",

@@ -16,7 +16,7 @@ A little more world, every day. Spin the globe, find a song, catch up on local n
 
 - Explore Morocco, spin to another country, search the Atlas, and save a place.
 - Refresh music, news, and local discoveries independently. Tell us when a source fails or a discovery repeats too often.
-- Try Sign in with Apple. Existing email users can recover their account with a six-digit code. Close and reopen the app to check that you stay signed in.
+- Try Sign in with Apple. Close and reopen the app to check that you stay signed in.
 - Try the optional intro, then create a profile with your chosen name and an optional photo. Skipping the photo should show your initials.
 - Check the sharing switch during signup and choose whether to allow automatic profile checks. Normal edits should remember that choice without asking again. Friends should see approved updates without reopening the app.
 - Zoom closer on the globe to tap smaller countries, and try Show me another for new cultural discoveries.
@@ -27,11 +27,11 @@ Send feedback through TestFlight or the contact at [worldniche.app/support](http
 
 ## Review notes
 
-Exploration works without an account. The short intro can be skipped and ends with an optional invitation to create a profile. New users can use native Sign in with Apple; existing email users can recover their account with a six-digit code. Profile setup asks for a chosen display name and an optional photo, with initials when no photo is selected. There are no passwords, purchases, ads, or tracking SDKs. Exploration sharing is visibly on for new profiles during setup and can be turned off there or in Settings. Existing choices stay unchanged.
+Exploration works without an account. The short intro can be skipped and ends with an optional invitation to create a profile. Account access uses native Sign in with Apple. Profile setup asks for a chosen display name and an optional photo, with initials when no photo is selected. There are no passwords, purchases, ads, or tracking SDKs. Exploration sharing is visibly on for new profiles during setup and can be turned off there or in Settings. Existing choices stay unchanged.
 
 Profile edits appear privately to their owner immediately. Setup offers one-time permission to send the submitted name and selected photo to OpenAI, with a clear option to continue without automatic checks. That choice is remembered for normal edits and can be changed in Settings. Approved changes become visible to friends automatically. Human review remains available. Flagged or unapproved changes stay private, while friends see the previously approved profile or a neutral New friend placeholder. Normal edits show no review status card; rejected content and restrictions show actionable feedback. Settings contains the privacy policy, support, community guidelines, export, device clear, and account deletion.
 
-Provide any private reviewer access details only in App Store Connect. Do not commit credentials or a real user's friend invitation. Keep the hosted service, SMTP delivery, moderation queue, and support inbox available during review.
+Provide any private reviewer access details only in App Store Connect. Do not commit credentials or a real user's friend invitation. Keep the hosted service, moderation queue, and support inbox available during review.
 
 ## Test information
 
@@ -42,9 +42,9 @@ Provide any private reviewer access details only in App Store Connect. Do not co
 | Privacy policy | https://worldniche.app/privacy |
 | Support | https://worldniche.app/support |
 
-For a new profile, open Profile and choose Sign in with Apple. To recover an existing email account, choose the email recovery option and enter the six-digit code sent to that address. A code is short-lived and must not be saved as a reusable review credential. Supply the review contact and any required private access details in App Store Connect before submission. [Apple's test information requirements](https://developer.apple.com/help/app-store-connect/test-a-beta-version/provide-test-information/).
+To create or access a profile, open Profile and choose Sign in with Apple. Keep Apple passwords and verification codes on Apple’s authorization screen. Supply the review contact and any required private access details in App Store Connect before submission. [Apple's test information requirements](https://developer.apple.com/help/app-store-connect/test-a-beta-version/provide-test-information/).
 
-Before inviting testers, confirm production email-code delivery, the native social and deletion flows on the submitted build, and regular human monitoring of the profile queue and support inbox. The hosted integration suite sends no emails; its passing result does not establish email delivery. Live Apple authorization revocation still needs a disposable Apple identity.
+Before inviting testers, confirm native Apple sign-in, persistent sessions, and the social and deletion flows on the submitted build. Regularly monitor the profile queue and support inbox. Live Apple authorization revocation still needs a disposable Apple identity.
 
 ## Current state
 

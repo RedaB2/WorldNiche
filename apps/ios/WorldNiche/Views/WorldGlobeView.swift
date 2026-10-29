@@ -8,6 +8,7 @@ struct WorldGlobeView: UIViewRepresentable {
     let countries: [Country]
     let selectedCountry: Country?
     let spinToken: Int
+    var allowsCountrySelection = true
     var onSelect: (Country) -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(onSelect: onSelect) }
@@ -22,8 +23,9 @@ struct WorldGlobeView: UIViewRepresentable {
         view.autoenablesDefaultLighting = false
         view.isAccessibilityElement = true
         view.accessibilityLabel = "Interactive world globe"
-        view.accessibilityHint = "Drag to turn the world. Pinch to zoom. Tap a country to explore it. All destinations are also available in the country list."
+        updateAccessibility(view)
         view.accessibilityTraits = [.image]
+        context.coordinator.allowsCountrySelection = allowsCountrySelection
         context.coordinator.configure(view: view, countries: countries)
         return view
     }
@@ -31,7 +33,15 @@ struct WorldGlobeView: UIViewRepresentable {
     func updateUIView(_ uiView: SCNView, context: Context) {
         context.coordinator.countries = countries
         context.coordinator.onSelect = onSelect
+        context.coordinator.allowsCountrySelection = allowsCountrySelection
+        updateAccessibility(uiView)
         context.coordinator.updateSelection(selectedCountry, spinToken: spinToken)
+    }
+
+    private func updateAccessibility(_ view: SCNView) {
+        view.accessibilityHint = allowsCountrySelection
+            ? "Drag to turn the world. Pinch to zoom. Tap a country to explore it. All destinations are also available in the country list."
+            : "Drag to turn the world. Pinch to zoom. This practice globe does not open countries."
     }
 
     static func dismantleUIView(_ uiView: SCNView, coordinator: Coordinator) {
@@ -43,6 +53,7 @@ struct WorldGlobeView: UIViewRepresentable {
     final class Coordinator: NSObject, UIGestureRecognizerDelegate {
         var countries: [Country] = []
         var onSelect: (Country) -> Void
+        var allowsCountrySelection = true
         private weak var view: SCNView?
         private let worldNode = SCNNode()
         private let surfaceNode = SCNNode()
@@ -216,7 +227,7 @@ struct WorldGlobeView: UIViewRepresentable {
         }
 
         @objc private func tap(_ recognizer: UITapGestureRecognizer) {
-            guard let view else { return }
+            guard allowsCountrySelection, let view else { return }
             stopRotation()
             let results = view.hitTest(recognizer.location(in: view), options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
             guard let hit = results.first(where: { $0.node === surfaceNode }) else { return }

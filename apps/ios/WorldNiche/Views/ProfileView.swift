@@ -760,23 +760,11 @@ struct ProfileSignInView: View {
     @Environment(SocialStore.self) private var social
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
-    @State private var email = ""
-    @State private var code = ""
-    @State private var showingCode = false
-    @State private var showingEmailRecovery = false
     @State private var showingProfileSetup = false
-    @State private var shareExplorationForNewAccount = true
     @State private var apple = AppleSignInCoordinator()
     @State private var authorizingApple = false
     @State private var localError: String?
-    @State private var lastSubmittedCode: String?
-    @FocusState private var focusedField: Field?
-    private enum Field { case email, code }
 
-    private var cleanedEmail: String { email.trimmingCharacters(in: .whitespacesAndNewlines) }
-    private var emailLooksValid: Bool {
-        cleanedEmail.utf8.count <= 254 && cleanedEmail.range(of: #"^[^\s@]+@[^\s@]+\.[^\s@]+$"#, options: .regularExpression) != nil
-    }
     private var working: Bool { social.isBusy || authorizingApple }
 
     var body: some View {
@@ -796,13 +784,13 @@ struct ProfileSignInView: View {
             Form {
                 Section {
                     VStack(alignment: .leading, spacing: 12) {
-                        Image(systemName: showingCode ? "envelope.badge" : "person.crop.circle")
+                        Image(systemName: "person.crop.circle")
                             .font(.system(size: 32, weight: .light))
                             .foregroundStyle(Palette.pine)
                             .accessibilityHidden(true)
-                        Text(showingCode ? "Check your inbox." : "Your world, connected.")
+                        Text("Your world, connected.")
                             .scaledFont(size: 31, design: .serif).foregroundStyle(Palette.pine)
-                        Text(showingCode ? "Enter the six-digit code sent to \(social.emailForCode ?? cleanedEmail)." : "Continue with Apple to connect with friends. Your email stays private from them.")
+                        Text("Continue with Apple to connect with friends. Your email stays private from them.")
                             .font(.subheadline).foregroundStyle(Palette.muted)
                     }
                     .padding(.vertical, 8)
@@ -815,9 +803,7 @@ struct ProfileSignInView: View {
                             .accessibilityIdentifier("signInNotConfigured")
                     }
                 }
-                if showingCode { codeSection } else {
-                    signInOptions
-                }
+                appleSignIn
                 if working {
                     Section { ProgressView(authorizingApple ? "Connecting with Apple…" : "One moment…") }
                 }
@@ -826,15 +812,19 @@ struct ProfileSignInView: View {
                 }
                 Section {
                     NavigationLink("Privacy & your data") { ProfilePrivacyView() }
+                    if social.deletionPending, let support = social.supportURL {
+                        Link("Get help finishing account deletion", destination: support)
+                            .accessibilityIdentifier("pendingDeletionSupport")
+                    }
                 } footer: {
                     Text(social.deletionPending
-                         ? "Use the existing account’s email to finish deletion. If it has already been removed or you can’t receive a code, contact support to confirm completion."
-                         : "New here? Continue with Apple to create your private account. You stay signed in on this device, and can sign out or delete your account and data in Settings.")
+                         ? "Your previous deletion has not been confirmed. Contact support to finish it before creating another account."
+                         : "Continue with Apple to create or sign in to your private account. You stay signed in on this device, and can sign out or delete your account and data in Settings.")
                 }
             }
             .scrollContentBackground(.hidden)
             .background(Palette.paper)
-            .navigationTitle(showingCode ? "Email sign-in" : "Sign in")
+            .navigationTitle("Sign in")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -842,173 +832,50 @@ struct ProfileSignInView: View {
                 }
             }
             .interactiveDismissDisabled(working)
-            .onAppear {
+            .onAppear { social.errorMessage = nil }
+        }
+    }
+
+    private var appleSignIn: some View {
+        Section {
+            SignInWithAppleButton(.continue) { request in
+                localError = nil
                 social.errorMessage = nil
-                if let pendingEmail = social.emailForCode {
-                    email = pendingEmail
-                    showingCode = true
-                    showingEmailRecovery = true
+                authorizingApple = true
+                do { try apple.prepare(request) }
+                catch {
+                    authorizingApple = false
+                    localError = error.localizedDescription
                 }
-                if social.deletionPending { showingEmailRecovery = true }
-            }
-        }
-    }
-
-    private var signInOptions: some View {
-        Group {
-            Section {
-                SignInWithAppleButton(.continue) { request in
-                    focusedField = nil
-                    localError = nil
-                    social.errorMessage = nil
-                    authorizingApple = true
-                    do { try apple.prepare(request) }
-                    catch { localError = error.localizedDescription }
-                } onCompletion: { result in
-                    do {
-                        let authorization = try apple.complete(result)
-                        Task {
-                            await social.signInWithApple(identityToken: authorization.identityToken,
-                                                         nonce: authorization.nonce, name: authorization.name,
-                                                         appleUserID: authorization.userID,
-                                                         shareExplorationForNewAccount: shareExplorationForNewAccount)
-                            authorizingApple = false
-                            if social.isSignedIn && !social.needsProfileSetup { dismiss() }
-                        }
-                    } catch {
+            } onCompletion: { result in
+                do {
+                    let authorization = try apple.complete(result)
+                    Task {
+                        await social.signInWithApple(identityToken: authorization.identityToken,
+                                                     nonce: authorization.nonce, name: authorization.name,
+                                                     appleUserID: authorization.userID)
                         authorizingApple = false
-                        if !AppleSignInCoordinator.isCancellation(error) {
-                            localError = "Apple sign-in couldn’t be completed. Please try again."
-                        }
+                        if social.isSignedIn && !social.needsProfileSetup { dismiss() }
+                    }
+                } catch {
+                    authorizingApple = false
+                    if !AppleSignInCoordinator.isCancellation(error) {
+                        localError = "Apple sign-in couldn’t be completed. Please try again."
                     }
                 }
-                .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
-                .frame(height: 52)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .disabled(working || !social.isAppleSignInAvailable || social.deletionPending)
-                .accessibilityIdentifier("signInWithApple")
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-            } footer: {
-                if social.deletionPending {
-                    Text("Use an email code to finish deleting your existing account.")
-                } else if social.isConfigured && !social.isAppleSignInAvailable {
-                    Text("Apple sign-in is temporarily unavailable. If you already have an email account, you can recover it below.")
-                        .accessibilityIdentifier("appleSignInNotConfigured")
-                }
             }
-            if showingEmailRecovery {
-                Section {
-                    TextField("you@example.com", text: $email)
-                        .textContentType(.emailAddress)
-                        .keyboardType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .submitLabel(.go)
-                        .focused($focusedField, equals: .email)
-                        .disabled(working)
-                        .onSubmit { if emailLooksValid && !working { requestCode() } }
-                        .accessibilityIdentifier("signInEmailField")
-                    TimelineView(.periodic(from: .now, by: 1)) { context in
-                        let remaining = resendSeconds(at: context.date)
-                        Button(remaining > 0 ? "Send code in \(remaining)s" : "Email me a code") { requestCode() }
-                            .disabled(!emailLooksValid || working || !social.isConfigured || remaining > 0)
-                            .accessibilityIdentifier("requestEmailCode")
-                    }
-                } header: {
-                    Text("Recover an existing email account")
-                } footer: {
-                    Text("Use the email you previously used for WorldNiche. This recovers that account and does not create a new one.")
-                }
-            } else {
-                Section {
-                    Button("Already used email? Recover your account") {
-                        showingEmailRecovery = true
-                        focusedField = .email
-                    }
-                    .font(.footnote)
-                    .accessibilityIdentifier("recoverEmailAccount")
-                }
+            .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+            .frame(height: 52)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .disabled(working || !social.isAppleSignInAvailable || social.deletionPending)
+            .accessibilityIdentifier("signInWithApple")
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+        } footer: {
+            if social.isConfigured && !social.isAppleSignInAvailable {
+                Text("Apple sign-in is temporarily unavailable. Please try again later. You can keep exploring without an account.")
+                    .accessibilityIdentifier("appleSignInNotConfigured")
             }
-        }
-    }
-
-    private var codeSection: some View {
-        Group {
-            Section("Six-digit code") {
-                TextField("000000", text: $code)
-                    .font(.system(.title, design: .monospaced).weight(.medium))
-                    .tracking(8)
-                    .textContentType(.oneTimeCode)
-                    .keyboardType(.numberPad)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .focused($focusedField, equals: .code)
-                    .disabled(working)
-                    .accessibilityLabel("Six-digit email code")
-                    .accessibilityIdentifier("emailCodeField")
-                    .onChange(of: code) { _, value in
-                        let digits = String(value.filter { $0.isASCII && $0.isNumber }.prefix(6))
-                        if code != digits { code = digits }
-                        if digits.count < 6 { lastSubmittedCode = nil }
-                        if digits.count == 6, digits != lastSubmittedCode, !working { verifyCode(digits) }
-                    }
-                Button("Continue") { verifyCode(code) }
-                    .disabled(code.count != 6 || working || !social.isConfigured)
-                    .accessibilityIdentifier("verifyEmailCode")
-            }
-            Section {
-                TimelineView(.periodic(from: .now, by: 1)) { context in
-                    let remaining = resendSeconds(at: context.date)
-                    Button(remaining > 0 ? "Send another code in \(remaining)s" : "Send another code") { requestCode() }
-                        .disabled(working || !social.isConfigured || remaining > 0)
-                        .accessibilityIdentifier("resendEmailCode")
-                }
-                Button("Use a different email") {
-                    showingCode = false
-                    code = ""
-                    lastSubmittedCode = nil
-                    localError = nil
-                    social.errorMessage = nil
-                    focusedField = .email
-                }
-                .disabled(working)
-                .accessibilityIdentifier("changeSignInEmail")
-            } footer: {
-                Text("Check your spam folder too. Only your most recent code will work.")
-            }
-        }
-    }
-
-    private func resendSeconds(at date: Date) -> Int {
-        max(0, Int(ceil((social.emailCodeResendAvailableAt ?? .distantPast).timeIntervalSince(date))))
-    }
-
-    private func requestCode() {
-        guard social.isConfigured, !working, emailLooksValid else { return }
-        localError = nil
-        focusedField = nil
-        Task {
-            await social.requestCode(email: cleanedEmail, existingAccountOnly: true)
-            if social.errorMessage == nil, social.emailForCode != nil {
-                code = ""
-                lastSubmittedCode = nil
-                showingCode = true
-                focusedField = .code
-            }
-        }
-    }
-
-    private func verifyCode(_ value: String) {
-        guard value.count == 6, !working, social.isConfigured else { return }
-        lastSubmittedCode = value
-        localError = nil
-        focusedField = nil
-        Task {
-            await social.verifyCode(code: value, shareExplorationForNewAccount: shareExplorationForNewAccount)
-            if social.isSignedIn {
-                if !social.needsProfileSetup { dismiss() }
-            } else { focusedField = .code }
         }
     }
 }
@@ -1175,7 +1042,7 @@ private struct ProfilePrivacyView: View {
                 Text("Your profile, explored countries and saved countries are stored on this device. WorldNiche doesn’t request your physical location or contacts. The system photo picker shares only the photo you choose, without giving WorldNiche access to your photo library.")
             }
             Section("When you connect") {
-                Text("An optional account uses Sign in with Apple. Existing email accounts can still recover access with a code. Apple can keep your personal email hidden. Your chosen name, optional photo, friends, invitations and sharing preference are stored online. With your permission, submitted names and photos are sent to OpenAI for safety checks; otherwise our team reviews them. You can change this choice in Settings. Only approved updates appear to friends. Photos are saved without their original camera or location metadata. Your email isn’t shown to friends.")
+                Text("An optional account uses Sign in with Apple. Apple can keep your personal email hidden. Your chosen name, optional photo, friends, invitations and sharing preference are stored online. With your permission, submitted names and photos are sent to OpenAI for safety checks; otherwise our team reviews them. You can change this choice in Settings. Only approved updates appear to friends. Photos are saved without their original camera or location metadata. Your email isn’t shown to friends.")
                 Text("New accounts start with exploration sharing on, with a switch during profile setup and in Settings. Countries you explore after signing in are uploaded and visible only to friends you add. Existing accounts keep their saved preference. Guest exploration isn’t imported. This is app activity, not a record of travel. Saved countries stay private.")
                 Text("The account service also stores invitation links, blocks and reports used to protect the community. A first name or nickname is enough; you don’t need to share your real name.")
             }

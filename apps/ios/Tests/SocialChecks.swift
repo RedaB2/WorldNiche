@@ -143,12 +143,10 @@ private final class SocialFixture: @unchecked Sendable {
         let body = observed.json()
         let value: Any
         switch observed.path {
-        case "/auth/v1/otp", "/auth/v1/logout": value = [:] as [String: String]
-        case "/auth/v1/verify", "/auth/v1/token":
+        case "/auth/v1/logout": value = [:] as [String: String]
+        case "/auth/v1/token":
             if observed.query == "grant_type=id_token" { appleAccount = true }
-            let access = observed.path == "/auth/v1/token"
-                ? (account == userA ? "refreshed-test-access" : "refreshed-account-B")
-                : (account == userA ? accessSecret : "access-account-B")
+            let access = account == userA ? "refreshed-test-access" : "refreshed-account-B"
             var authUser: [String: Any] = ["id": account.uuidString, "email": "test@example.test"]
             if appleAccount {
                 authUser["identities"] = [["provider": "apple", "identity_data": ["sub": "apple-fixture-user-\(account.uuidString)"]]]
@@ -391,28 +389,28 @@ private final class CheckSuite {
         let vault = MemoryVault()
         let service = api(vault: vault)
         let store = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory, configuration: configuration, api: service)
-        await store.requestCode(email: "not an email")
-        check(fixture.observed().isEmpty && store.emailForCode == nil, "Invalid email must be rejected before any network request")
-        await store.requestCode(email: " TEST@EXAMPLE.TEST ")
-        let otp = fixture.observed("/auth/v1/otp")
-        check(otp.count == 1 && otp.first?.json()["email"] as? String == "test@example.test", "OTP request normalizes email exactly once")
-        check(otp.first?.method == "POST" && otp.first?.apiKey == "test-public-key" && otp.first?.authorization == nil, "OTP uses public API key, never a stale bearer token")
-        await store.requestCode(email: "test@example.test")
-        check(fixture.observed("/auth/v1/otp").count == 1 && store.errorMessage != nil, "Repeated OTP request is locally rate limited")
-        for code in ["12", "1234567", "１２３４５６", "12345a"] {
-            await store.verifyCode(code: code)
-            check(fixture.observed("/auth/v1/verify").isEmpty, "Only six ASCII digits may reach OTP verification")
+        for (token, nonce) in [("", appleNonce), (appleIdentityToken, "")] {
+            await store.signInWithApple(identityToken: token, nonce: nonce, name: nil)
+            check(fixture.observed().isEmpty && !store.isSignedIn && store.errorMessage != nil,
+                  "Incomplete Apple authorization must fail before any network request")
         }
-        await store.verifyCode(code: "123456")
-        check(store.isSignedIn && store.profile?.id == userA, "Successful OTP restores authenticated account profile")
-        check(store.emailForCode == nil && !store.isBusy, "Successful sign-in clears pending email and busy state")
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Mira")
+        let authorization = fixture.observed("/auth/v1/token")
+        check(authorization.count == 1 && authorization.first?.query == "grant_type=id_token",
+              "Sign-in exchanges one native Apple identity token")
+        check(authorization.first?.method == "POST" && authorization.first?.apiKey == "test-public-key" && authorization.first?.authorization == nil,
+              "Apple authorization uses the public API key without a stale bearer token")
+        check(fixture.observed("/auth/v1/otp").isEmpty && fixture.observed("/auth/v1/verify").isEmpty,
+              "Apple-only authentication never requests or verifies an email code")
+        check(store.isSignedIn && store.profile?.id == userA, "Successful Apple authorization restores the authenticated account profile")
+        check(!store.isBusy && store.errorMessage == nil, "Successful sign-in clears errors and busy state")
         let vaultText = (try? vault.load()).flatMap { $0 }.flatMap { String(data: $0, encoding: .utf8) } ?? ""
-        check(vaultText.contains(accessSecret) && vaultText.contains(refreshSecret), "Successful authentication persists tokens in injected secure vault")
+        check(vaultText.contains("refreshed-test-access") && vaultText.contains(refreshSecret), "Successful authentication persists tokens in the injected secure vault")
         let preferenceText = defaults.dictionaryRepresentation().values.map { value -> String in
             if let data = value as? Data { return String(data: data, encoding: .utf8) ?? "" }
             return String(describing: value)
         }.joined()
-        check(!preferenceText.contains(accessSecret) && !preferenceText.contains(refreshSecret), "Session tokens must never enter UserDefaults")
+        check(!preferenceText.contains("refreshed-test-access") && !preferenceText.contains(refreshSecret), "Session tokens must never enter UserDefaults")
         check(fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty, "Sign-in with sharing off must not upload local journal")
         await store.clearLocalData()
         let clearedIdentity = await service.currentUserID()
@@ -424,7 +422,7 @@ private final class CheckSuite {
         failingVault.failSave = true
         let failedService = api(vault: failingVault)
         do {
-            _ = try await failedService.verifyCode(email: "test@example.test", code: "123456")
+            _ = try await failedService.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce)
             check(false, "Vault save failure must reject authentication")
         } catch { check(await failedService.currentUserID() == nil, "Vault save failure must not leave an unpersisted signed-in session") }
     }
@@ -545,12 +543,12 @@ private final class CheckSuite {
             responseGate.release(); olderApple.cancel(); return
         }
         fixture.switchAccount(to: userB)
-        do { _ = try await service.verifyCode(email: "other@example.test", code: "123456") }
-        catch { check(false, "Newer email sign-in must succeed during pending Apple exchange: \(error)") }
+        do { _ = try await service.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce) }
+        catch { check(false, "Newer Apple sign-in must succeed during pending Apple exchange: \(error)") }
         responseGate.release()
-        check(!(await olderApple.value), "Older Apple exchange must be cancelled after newer email sign-in")
+        check(!(await olderApple.value), "Older Apple exchange must be cancelled after newer Apple sign-in")
         check(await service.currentUserID() == userB,
-              "Late Apple token must not overwrite the newer email account")
+              "Late Apple token must not overwrite the newer Apple account")
         let persisted = (try? vault.load()).flatMap { $0 }.flatMap { try? JSONDecoder().decode(SocialSession.self, from: $0) }
         check(persisted?.user.id == userB, "Late Apple response must not replace newer persisted credentials")
 
@@ -583,14 +581,14 @@ private final class CheckSuite {
         let relaunched = api(vault: vault)
         check(await relaunched.currentUserID() == userA && (try? vault.load()) != nil,
               "Successive API instances must retain and restore the secure session")
-        check(fixture.observed().isEmpty, "Restoring a still-valid local session must not request another email code")
+        check(fixture.observed().isEmpty, "Restoring a still-valid local session must not request another authorization")
         let journal = DiscoveryJournal(defaults: defaults)
         let store = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory, configuration: configuration, api: relaunched)
         await store.refresh()
         check(store.isSignedIn && store.profile?.id == userA,
               "An empty preferences container must still restore a valid Keychain-backed account")
-        check(fixture.observed("/auth/v1/otp").isEmpty && fixture.observed("/auth/v1/verify").isEmpty,
-              "Restoring account data must not require another sign-in code")
+        check(fixture.observed("/auth/v1/token").isEmpty,
+              "Restoring account data must not require another authorization")
         await store.signOut()
         let signedOut = api(vault: vault)
         check(await signedOut.currentUserID() == nil && (try? vault.load()) == nil,
@@ -602,7 +600,7 @@ private final class CheckSuite {
         check(await blocked.currentUserID() == nil, "Unavailable secure storage must never fabricate an authenticated account")
         fixture.clearRequests()
         do {
-            try await blocked.requestCode(email: "test@example.test")
+            _ = try await blocked.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce)
             check(false, "Secure-storage read failure must block authentication until storage becomes available")
         } catch {
             check((error as? SocialError)?.localizedDescription == SocialError.storageFailure.localizedDescription,
@@ -621,19 +619,18 @@ private final class CheckSuite {
         let corrupt = api(vault: corruptVault)
         check(await corrupt.currentUserID() == nil, "Corrupted persisted session must not produce an authenticated identity")
         do {
-            try await corrupt.requestCode(email: "test@example.test")
+            _ = try await corrupt.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce)
             check(false, "Corrupted secure session must initially block authentication")
         } catch {
             check((error as? SocialError)?.localizedDescription == SocialError.storageFailure.localizedDescription,
                   "Corrupt session must expose a recoverable secure-storage error")
         }
-        check(fixture.observed().isEmpty, "Corrupt secure storage must be resolved before sending an email code")
+        check(fixture.observed().isEmpty, "Corrupt secure storage must be resolved before Apple authorization")
         do {
             try await corrupt.forgetSession()
-            try await corrupt.requestCode(email: "test@example.test")
-            _ = try await corrupt.verifyCode(email: "test@example.test", code: "123456")
+            _ = try await corrupt.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce)
             check(await corrupt.currentUserID() == userA,
-                  "Successful local cleanup must allow email authentication without recreating the API actor")
+                  "Successful local cleanup must allow Apple authentication without recreating the API actor")
         } catch { check(false, "Cleaning a corrupted vault must restore authentication immediately: \(error)") }
 
         fixture.reset()
@@ -650,7 +647,7 @@ private final class CheckSuite {
                   "Failed cleanup must not adopt the unresolved stored account")
         }
         do {
-            try await unavailable.requestCode(email: "test@example.test")
+            _ = try await unavailable.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce)
             check(false, "Failed cleanup must leave authentication blocked")
         } catch {
             check((error as? SocialError)?.localizedDescription == SocialError.storageFailure.localizedDescription,
@@ -672,7 +669,7 @@ private final class CheckSuite {
         do { try await valid.forgetSession(); check(false, "A healthy session's failed clear must report failure") }
         catch { check(await valid.currentUserID() == nil, "Failed explicit cleanup must still stop using in-memory credentials") }
         do {
-            try await valid.requestCode(email: "test@example.test")
+            _ = try await valid.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce)
             check(false, "Failed clear from a healthy actor must block new authentication until resolved")
         } catch {
             check((error as? SocialError)?.localizedDescription == SocialError.storageFailure.localizedDescription,
@@ -769,7 +766,7 @@ private final class CheckSuite {
         check(await raceService.currentUserID() == nil && (try? raceVault.load()) == nil,
               "Definitive revocation must stop local authenticated requests while hosted logout is still pending")
         fixture.switchAccount(to: userB)
-        do { _ = try await raceService.verifyCode(email: "other@example.test", code: "123456") }
+        do { _ = try await raceService.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce) }
         catch { check(false, "New account must sign in while older logout is pending: \(error)") }
         responseGate.release()
         check(await olderRevocation.value == false, "Late Apple revocation must not clear a newer account's session")
@@ -1038,8 +1035,12 @@ private final class CheckSuite {
         check(store.deletionPending, "Wrong-account deletion fixture must first establish failed deletion")
         fixture.clearRequests()
         fixture.switchAccount(to: userB)
-        await store.requestCode(email: "other@example.test")
-        await store.verifyCode(code: "123456")
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil)
+        check(fixture.observed().isEmpty && store.errorMessage?.contains("Contact support") == true,
+              "Pending deletion blocks Apple sign-in so it cannot recreate the deleted account")
+        do { _ = try await service.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce) }
+        catch { check(false, "Different restored identity fixture must authenticate: \(error)") }
+        await store.refresh()
         check(store.deletionPending && store.profile?.id == userA && journal.visitedIDs.contains("FR"),
               "Signing into a different account must not replace pending deletion's account or data")
         check(store.errorMessage != nil, "Wrong-account deletion recovery must explain the identity mismatch")
@@ -1075,7 +1076,7 @@ private final class CheckSuite {
     }
 
     func invitationAuthenticationPersistence() async {
-        for apple in [false, true] {
+        for firstAttemptFails in [false, true] {
             fixture.reset(profile: false)
             let defaults = isolatedDefaults()
             let vault = MemoryVault()
@@ -1086,22 +1087,20 @@ private final class CheckSuite {
                   "Signed-out invitation persists without exposing a profile or redeeming anonymously")
             let restored = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults, photoDirectory: photoDirectory, configuration: configuration, api: service)
             check(restored.hasPendingInvitation && restored.presentsInvitation, "Pending invitation survives process restart before sign-in")
-            if apple {
+            if firstAttemptFails {
+                fixture.fail("/auth/v1/token", statuses: [401])
                 await restored.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Apple Explorer",
                                                shareExplorationForNewAccount: false)
-            } else {
-                await restored.requestCode(email: "test@example.test")
-                fixture.fail("/auth/v1/verify", statuses: [401])
-                await restored.verifyCode(code: "123456", shareExplorationForNewAccount: false)
                 check(restored.hasPendingInvitation && fixture.observed("/rest/v1/rpc/accept_invite").isEmpty,
-                      "Rejected email code keeps invitation available without creating friendship")
-                await restored.verifyCode(code: "123456", shareExplorationForNewAccount: false)
+                      "Rejected Apple authorization keeps the invitation available without creating a friendship")
             }
+            await restored.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Apple Explorer",
+                                           shareExplorationForNewAccount: false)
             check(restored.needsProfileSetup && restored.hasPendingInvitation && fixture.observed("/rest/v1/rpc/accept_invite").isEmpty,
-                  "\(apple ? "Apple" : "Email") signup preserves its invitation until a real profile is chosen")
+                  "Apple signup preserves its invitation until a real profile is chosen")
             await restored.completeProfileSetup(name: "Chosen Friend Name", sharing: restored.suggestedProfileSharing, automaticChecks: false)
             check(restored.invitationConnected && fixture.observed("/rest/v1/rpc/accept_invite").count == 1,
-                  "Completing \(apple ? "Apple" : "Email") signup automatically resumes the invitation once")
+                  "Completing Apple signup automatically resumes the invitation once")
             let paths = fixture.observed().map(\.path)
             check((paths.firstIndex(of: "/rest/v1/rpc/update_my_profile") ?? 999) < (paths.firstIndex(of: "/rest/v1/rpc/accept_invite") ?? 0),
                   "New account profile exists before redeeming the friend link")
@@ -1368,7 +1367,7 @@ private final class CheckSuite {
             responseGate.release(); olderMutation.cancel(); return
         }
         fixture.switchAccount(to: userB)
-        do { _ = try await service.verifyCode(email: "other@example.test", code: "123456") }
+        do { _ = try await service.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce) }
         catch { check(false, "New account verification must succeed in race fixture: \(error)") }
         responseGate.release()
         check(!(await olderMutation.value), "Old account mutation must cancel when newer account signs in")
@@ -1391,12 +1390,14 @@ private final class CheckSuite {
             responseGate.release(); rejectedOldMutation.cancel(); return
         }
         fixture.switchAccount(to: userB)
-        do { _ = try await retryService.verifyCode(email: "other@example.test", code: "123456") }
+        do { _ = try await retryService.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce) }
         catch { check(false, "Second new account verification must succeed: \(error)") }
         responseGate.release()
         check(!(await rejectedOldMutation.value), "Old account's late 401 must cancel instead of retrying under new account")
         check(await retryService.currentUserID() == userB, "Late old-account 401 must preserve new account session")
-        check(fixture.observed("/rest/v1/rpc/update_my_profile").count == 1 && fixture.observed("/auth/v1/token").isEmpty,
+        check(fixture.observed("/rest/v1/rpc/update_my_profile").count == 1
+                && fixture.observed("/auth/v1/token").count == 1
+                && fixture.observed("/auth/v1/token").first?.query == "grant_type=id_token",
               "Late 401 must neither refresh B nor repeat A's mutation")
     }
 
@@ -1983,14 +1984,6 @@ private final class CheckSuite {
         responseGate.release()
         check(!(await linkTask.value), "A native link response after sign-out must be cancelled")
         check(await racingLink.currentUserID() == nil, "Late linking must not restore a cleared secure session")
-
-        fixture.reset()
-        let recoveryDefaults = isolatedDefaults()
-        let recovery = SocialStore(journal: DiscoveryJournal(defaults: recoveryDefaults), defaults: recoveryDefaults,
-                                   configuration: configuration, api: api(vault: MemoryVault()))
-        await recovery.requestCode(email: "existing@example.test", existingAccountOnly: true)
-        check(fixture.observed("/auth/v1/otp").first?.json()["create_user"] as? Bool == false,
-              "Email recovery cannot create new passwordless accounts")
     }
 
     func newAccountSharingChoices() async {
@@ -2056,8 +2049,7 @@ private final class CheckSuite {
             responseGate.release(); oldRefresh.cancel(); return
         }
         fixture.switchAccount(to: userB)
-        await store.requestCode(email: "other@example.test")
-        await store.verifyCode(code: "123456")
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil)
         check(store.isSignedIn && store.profile?.id == userB, "New account must sign in while older profile refresh is pending")
         responseGate.release()
         await oldRefresh.value
@@ -2112,7 +2104,7 @@ private final class CheckSuite {
         await suite.staleStoreRefresh()
         suite.cleanup()
         if suite.failures.isEmpty {
-            print("PASS: \(suite.assertions) social assertions; strict invitations, local profile/export/erase, vault-only sessions, email OTP, native Apple exchange, persistent session restoration, refresh recovery, sharing privacy, deletion failures/retry, and account isolation. No live network or Keychain access.")
+            print("PASS: \(suite.assertions) social assertions; strict invitations, local profile/export/erase, vault-only sessions, Apple-only authentication and native token exchange, persistent session restoration, refresh recovery, sharing privacy, deletion failures/retry, and account isolation. No live network or Keychain access.")
         } else {
             print("FAIL: \(suite.failures.count) of \(suite.assertions) social assertions failed.")
             exit(1)

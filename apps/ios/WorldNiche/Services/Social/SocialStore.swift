@@ -13,7 +13,6 @@ final class SocialStore {
     private(set) var profileSaveMessage: String?
     private(set) var profilePhotoRefreshID = UUID()
     var errorMessage: String?
-    private(set) var emailForCode: String?
     private(set) var pendingInvitation: InvitationPreview?
     private(set) var invitationURL: URL?
     private(set) var isConnectingInvitation = false
@@ -38,7 +37,6 @@ final class SocialStore {
     private var lastVisibleProfileRefresh: Date?
     private var profileCheckTask: Task<Void, Never>?
     private var profileCheckID = UUID()
-    private var lastCodeSent: Date?
     private var localOwnerID: UUID?
     private var pendingProfileSetup = false
     private var deletionTargetID: UUID?
@@ -90,7 +88,6 @@ final class SocialStore {
 
     var isConfigured: Bool { configuration != nil }
     var isAppleSignInAvailable: Bool { configuration?.appleSignInEnabled == true }
-    var emailCodeResendAvailableAt: Date? { lastCodeSent?.addingTimeInterval(60) }
     var privacyPolicyURL: URL? { URL(string: "https://worldniche.app/privacy") }
     var supportURL: URL? { URL(string: "https://worldniche.app/support") }
     var communityURL: URL { URL(string: "https://worldniche.app/community")! }
@@ -418,40 +415,12 @@ final class SocialStore {
         return nil
     }
 
-    func requestCode(email: String, existingAccountOnly: Bool = false) async {
-        guard !isBusy else { return }
-        errorMessage = nil
-        guard let api else { record(SocialError.notConfigured); return }
-        let email = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard email.utf8.count <= 254, email.range(of: #"^[^\s@]+@[^\s@]+\.[^\s@]+$"#, options: .regularExpression) != nil else {
-            record(SocialError.invalidEmail); return
-        }
-        if let lastCodeSent, Date().timeIntervalSince(lastCodeSent) < 60 { record(SocialError.rateLimited); return }
-        isBusy = true
-        defer { isBusy = false }
-        do {
-            try await api.requestCode(email: email, allowNewAccount: !deletionPending && !existingAccountOnly)
-            emailForCode = email
-            lastCodeSent = Date()
-        } catch { record(error) }
-    }
-
-    func verifyCode(code: String, shareExplorationForNewAccount: Bool = true) async {
-        guard !isBusy else { return }
-        errorMessage = nil
-        guard let api else { record(SocialError.notConfigured); return }
-        guard let emailForCode else { record(SocialError.invalidEmail); return }
-        let code = code.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard code.count == 6, code.allSatisfy({ $0.isASCII && $0.isNumber }) else { record(SocialError.invalidCode); return }
-        await authenticate(.email(emailForCode, code), api: api, newProfileSharing: shareExplorationForNewAccount)
-    }
-
     func signInWithApple(identityToken: String, nonce: String, name: String?, appleUserID: String? = nil,
                          shareExplorationForNewAccount: Bool = true) async {
         guard !isBusy else { return }
         errorMessage = nil
         guard !deletionPending else {
-            errorMessage = "Use an email code for the existing account to finish deletion. Apple sign-in could create a new account if the original was already deleted."
+            errorMessage = "Your previous deletion has not been confirmed. Contact support to finish it before creating another account."
             return
         }
         guard let api else { record(SocialError.notConfigured); return }
@@ -461,7 +430,7 @@ final class SocialStore {
             // offline. It is only used after the server verifies that Apple ID.
             defaults.set(name, forKey: appleAuthorizationNameKey(appleUserID))
         }
-        await authenticate(.apple(identityToken, nonce), api: api, suggestedName: name,
+        await authenticateWithApple(identityToken: identityToken, nonce: nonce, api: api, suggestedName: name,
                            newProfileSharing: shareExplorationForNewAccount)
     }
 
@@ -481,9 +450,7 @@ final class SocialStore {
         }
     }
 
-    private enum AuthenticationMethod { case email(String, String), apple(String, String) }
-
-    private func authenticate(_ method: AuthenticationMethod, api: SocialAPI, suggestedName: String? = nil,
+    private func authenticateWithApple(identityToken: String, nonce: String, api: SocialAPI, suggestedName: String? = nil,
                               newProfileSharing: Bool = true) async {
         isBusy = true
         generation = UUID()
@@ -492,34 +459,26 @@ final class SocialStore {
         hasLoadedProfile = false
         defer { isBusy = false }
         do {
-            let userID: UUID
-            switch method {
-            case .email(let email, let code): userID = try await api.verifyCode(email: email, code: code)
-            case .apple(let token, let nonce): userID = try await api.signInWithApple(identityToken: token, nonce: nonce)
-            }
+            let userID = try await api.signInWithApple(identityToken: identityToken, nonce: nonce)
             guard generation == current, !Task.isCancelled else { return }
             let appleID = await api.currentAppleUserID()
             let hasApple = await api.hasAppleIdentity()
             guard generation == current, !Task.isCancelled else { return }
-            if case .apple = method {
-                let remembered = appleID.flatMap { defaults.string(forKey: appleAuthorizationNameKey($0)) }
-                if let name = Self.meaningfulProfileName(suggestedName) ?? Self.meaningfulProfileName(remembered) {
-                    defaults.set(name, forKey: appleNameKey(userID))
-                    if let appleID { defaults.removeObject(forKey: appleAuthorizationNameKey(appleID)) }
-                }
+            let remembered = appleID.flatMap { defaults.string(forKey: appleAuthorizationNameKey($0)) }
+            if let name = Self.meaningfulProfileName(suggestedName) ?? Self.meaningfulProfileName(remembered) {
+                defaults.set(name, forKey: appleNameKey(userID))
+                if let appleID { defaults.removeObject(forKey: appleAuthorizationNameKey(appleID)) }
             }
             appleUserID = appleID
             requiresAppleAuthorizationForDeletion = hasApple
             if deletionPending {
                 guard deletionTargetID == userID else { await rejectDeletionIdentity(api: api); return }
                 isSignedIn = true
-                self.emailForCode = nil
                 return
             }
             switchWorkspace(to: userID)
             current = generation
             isSignedIn = true
-            self.emailForCode = nil
             if defaults.object(forKey: profileSharingKey(userID)) == nil {
                 defaults.set(newProfileSharing, forKey: profileSharingKey(userID))
             }
@@ -781,7 +740,6 @@ final class SocialStore {
             appleUserID = nil
             requiresAppleAuthorizationForDeletion = false
             friends = []
-            emailForCode = nil
             invitationURL = nil
             dismissInvitation()
             switchWorkspace(to: nil)
@@ -950,7 +908,6 @@ final class SocialStore {
         appleUserID = nil
         requiresAppleAuthorizationForDeletion = false
         friends = []
-        emailForCode = nil
         errorMessage = "Sign in to the same account that requested deletion. No other account or its data has been deleted."
     }
 
@@ -970,7 +927,6 @@ final class SocialStore {
         isSignedIn = false
         appleUserID = nil
         requiresAppleAuthorizationForDeletion = false
-        emailForCode = nil
         invitationURL = nil
         deletionPending = false
         deletionTargetID = nil

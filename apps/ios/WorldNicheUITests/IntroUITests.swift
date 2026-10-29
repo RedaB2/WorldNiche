@@ -48,7 +48,7 @@ final class IntroUITests: XCTestCase {
         app.navigationBars["Sign in"].buttons["Cancel"].tap()
         XCTAssertTrue(app.navigationBars["Profile"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["introSkip"].exists)
-        app.tabBars.buttons["Discover"].tap()
+        discoveryDestination(app).tap()
         assertDiscovery(app)
     }
 
@@ -75,8 +75,14 @@ final class IntroUITests: XCTestCase {
 
     @MainActor
     private func assertDiscovery(_ app: XCUIApplication) {
-        XCTAssertTrue(app.tabBars.buttons["Discover"].waitForExistence(timeout: 8))
+        XCTAssertTrue(discoveryDestination(app).waitForExistence(timeout: 8))
         XCTAssertTrue(app.staticTexts["discoverHeadline"].exists)
         XCTAssertFalse(app.buttons["signInWithApple"].exists)
+    }
+
+    @MainActor
+    private func discoveryDestination(_ app: XCUIApplication) -> XCUIElement {
+        let tab = app.tabBars.buttons["Discover"]
+        return tab.exists ? tab : app.buttons["Discover"].firstMatch
     }
 }
