@@ -4,11 +4,11 @@ Rechecked against Apple's documentation and the live App Store Connect record on
 
 ## Current submission status: October 29, 2026
 
-The live App Store Connect validation for version 1.0 reports **34 errors and two warnings**. Most are empty listing and questionnaire fields. The version is `PREPARE_FOR_SUBMISSION` and still has build **2** selected, although public TestFlight is on build 5. TestFlight approval does not approve the App Store listing.
+The live App Store Connect validation for version 1.0 reports **34 errors and two warnings**. Most are empty listing and questionnaire fields. The version is `PREPARE_FOR_SUBMISSION` and still has build **2** selected, although public TestFlight is on build 6. TestFlight approval does not approve the App Store listing.
 
 Before requesting App Review:
 
-1. Upload and select the final tested build containing the journal changes. Capture the actual app's required iPhone screenshots, including appropriate Duo assets where supported.
+1. Select the final tested build for the App Store version. Build 6 containing the journal changes is already uploaded and approved for public TestFlight. Capture the actual app's required iPhone screenshots, including appropriate Duo assets where supported.
 2. Finish the listing: description, keywords, subtitle, support URL, privacy-policy URL, primary category and copyright.
 3. Complete the age-rating questionnaire and content-rights declaration for the actual music, news, cultural sources and social features. The app uses third-party content; do not copy a validator's generic no-third-party-content suggestion.
 4. Set distribution availability and confirm the pricing setup. Add the App Review contact name, email and phone, with Apple sign-in and friend-feature instructions.

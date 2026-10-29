@@ -1,6 +1,6 @@
 # Public beta
 
-The external **WorldNiche Public Beta** group has a [public signup link](https://testflight.apple.com/join/kqpQhYFw) with 100 places. Apple approved build 1.0 (5), and it is available to external testers with an interactive intro and Apple-only sign-in.
+The external **WorldNiche Public Beta** group has a [public signup link](https://testflight.apple.com/join/kqpQhYFw) with 100 places. Apple approved build 1.0 (6), and it is available to external testers with private journal notes, cloud sync, and corrected intro avatars.
 
 Build 5 adds a practice globe, expandable live music and news previews, a local-culture example, and an animated friend invitation. Only one preview opens at a time. The intro adapts to folded and unfolded displays and larger text. All email sign-in and recovery screens are removed. The matching website help is live in site version 12.
 
@@ -13,6 +13,8 @@ Apple currently requires an internal group before an external group can be creat
 A little more world, every day. Spin the globe, find a song, catch up on local news, and discover small details about cultures around the world. Save places you're curious about and see what your friends have explored.
 
 ## What to test
+
+- Save a country and add a private note from Journal. Relaunch, edit, cancel and clear it. Signed-in users can check the same journal on another device and retry after being offline. Turning friend sharing off should preserve private journal sync. Friends must never see notes or bookmarks.
 
 - Explore Morocco, spin to another country, search the Atlas, and save a place.
 - Refresh music, news, and local discoveries independently. Tell us when a source fails or a discovery repeats too often.
@@ -66,3 +68,5 @@ The hosted moderation checks passed for safe names and JPEGs, exact approved fri
 October 28, 2026: Release 1.0 (4) is approved and available to the existing public beta group. App Store Connect confirms `VALID`, `APPROVED`, and `IN_BETA_TESTING`. The exact build is assigned to WorldNiche Public Beta, the public signup link remains enabled, updated What to Test notes are saved, and automatic tester notification is enabled. All release checks above passed before upload. No Apple review is pending for this beta.
 
 October 28, 2026: Release 1.0 (5) is approved and available to the existing public beta group. Fresh App Store Connect reads confirm `VALID`, `APPROVED`, and `IN_BETA_TESTING`, its exact public-group assignment, saved test and reviewer notes, and automatic notification. The public signup link remains enabled with 100 places. The signed IPA contains both intro avatars, the app icon, privacy manifest, production configuration, Apple sign-in, and the worldniche.app associated domain. Signature and secret/test-fixture exclusion checks pass, and strict TestFlight preflight has no errors or warnings.
+
+October 29, 2026: Release 1.0 (6) is approved and in external testing for WorldNiche Public Beta. It adds private destination notes and account sync for bookmarks and exploration dates, independent of friend sharing. Guest journals remain device-only. The backend migration and website privacy update are deployed. All 12 selected intro, profile and journal scenarios pass on both iPhone 17 Pro Max and unfolded Duo, including large text, with 21 journal checks, 408 social checks, local database access checks, hosted rollback-only checks and 32 website checks. The signed package passed entitlement, production configuration, privacy manifest, and secret/test-fixture checks. Strict TestFlight preflight has zero errors or warnings; updated test/reviewer notes and automatic notification are verified. No production App Store review was submitted.
