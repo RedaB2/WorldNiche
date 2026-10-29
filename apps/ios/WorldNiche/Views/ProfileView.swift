@@ -636,7 +636,7 @@ struct ProfileSettingsView: View {
                         .accessibilityIdentifier("deleteAccountAndData")
                     }
                 } header: { Text("Data controls") } footer: {
-                    Text("Clearing this device removes its profile and journal. It does not delete an online account. Account deletion removes your account, profile, friendships and shared exploration, then clears this device. It needs an internet connection.")
+                    Text("Clearing this device removes its profile and journal. It does not delete an online account. Account deletion removes your account, profile, friendships, private journal and shared exploration, then clears this device. It needs an internet connection.")
                 }
                 if authorizingApple {
                     Section { ProgressView("Confirming your Apple account…") }
@@ -1039,11 +1039,11 @@ private struct ProfilePrivacyView: View {
     var body: some View {
         List {
             Section("On this device") {
-                Text("Your profile, explored countries and saved countries are stored on this device. WorldNiche doesn’t request your physical location or contacts. The system photo picker shares only the photo you choose, without giving WorldNiche access to your photo library.")
+                Text("Your journal is available on this device, including when you are offline. Guest journals stay on the device. WorldNiche doesn’t request your physical location or contacts. The system photo picker shares only the photo you choose, without giving WorldNiche access to your photo library.")
             }
             Section("When you connect") {
                 Text("An optional account uses Sign in with Apple. Apple can keep your personal email hidden. Your chosen name, optional photo, friends, invitations and sharing preference are stored online. With your permission, submitted names and photos are sent to OpenAI for safety checks; otherwise our team reviews them. You can change this choice in Settings. Only approved updates appear to friends. Photos are saved without their original camera or location metadata. Your email isn’t shown to friends.")
-                Text("New accounts start with exploration sharing on, with a switch during profile setup and in Settings. Countries you explore after signing in are uploaded and visible only to friends you add. Existing accounts keep their saved preference. Guest exploration isn’t imported. This is app activity, not a record of travel. Saved countries stay private.")
+                Text("New accounts start with exploration sharing on, with a switch during profile setup and in Settings. After signing in, saved countries, private notes and first and recent exploration dates sync to your account, even with sharing off. Friends can only see explored countries while sharing is on. Existing accounts keep their saved preference. Guest exploration isn’t imported. This is app activity, not a record of travel. Bookmarks and notes stay private and are never sent for AI moderation.")
                 Text("The account service also stores invitation links, blocks and reports used to protect the community. A first name or nickname is enough; you don’t need to share your real name.")
             }
             Section("Content and conversations") {

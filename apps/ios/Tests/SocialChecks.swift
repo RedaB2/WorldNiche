@@ -68,6 +68,7 @@ private final class SocialFixture: @unchecked Sendable {
     private var sharing = false
     private var name = "Mira"
     private var profileAvatar = "globe"
+    private var journalEntries: [String: [String: Any]] = [:]
     private var syncedIDs: [String] = ["JP"]
     private var deletionAcknowledged = true
     private var overrides: [String: Data] = [:]
@@ -83,6 +84,7 @@ private final class SocialFixture: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         requests = []; failures = [:]; failureCodes = [:]; account = user; hasProfile = profile
         self.sharing = sharing; name = user == userA ? "Mira" : "Noah"; profileAvatar = "globe"
+        journalEntries = [:]
         syncedIDs = ["JP"]; deletionAcknowledged = true; overrides = [:]; appleAccount = false
         moderatingPhotos = false; approvedPhoto = nil; pendingPhoto = nil; losePhotoCommitResponse = false
         profileCheckConsent = profile ? false : nil; nextPhotoUploadFailure = nil
@@ -178,6 +180,16 @@ private final class SocialFixture: @unchecked Sendable {
                       "share_exploration": true, "country_ids": ["FR"], "explored_count": 1],
                      ["id": friendB.uuidString, "display_name": "Sam", "avatar": "sun",
                       "share_exploration": false, "country_ids": ["FR"], "explored_count": 1]]
+        case "/rest/v1/rpc/sync_journal":
+            let time = Date().timeIntervalSince1970
+            if journalEntries["JP"] == nil { journalEntries["JP"] = ["country_id": "JP", "saved": false, "note": "", "first_explored_at": time - 200, "last_explored_at": time - 200] }
+            for change in body["p_changes"] as? [[String: Any]] ?? [] {
+                guard let id = change["country_id"] as? String else { continue }
+                var entry = journalEntries[id] ?? ["country_id": id, "saved": false, "note": ""]
+                for key in ["saved", "note", "first_explored_at", "last_explored_at"] { if let value = change[key] { entry[key] = value } }
+                journalEntries[id] = entry
+            }
+            value = ["entries": Array(journalEntries.values) + [["country_id": "INVALID", "saved": false, "note": ""]]]
         case "/rest/v1/rpc/sync_explorations":
             let submitted = body["p_country_ids"] as? [String] ?? []
             value = ["country_ids": Array(Set(submitted + syncedIDs + ["INVALID"])).sorted(), "count": 2]
@@ -789,7 +801,7 @@ private final class CheckSuite {
         check(fixture.observed("/rest/v1/rpc/update_my_profile").isEmpty,
               "Authentication never submits a placeholder or Apple name without the profile choice")
         await store.completeProfileSetup(name: "Mira Apple", sharing: store.suggestedProfileSharing, automaticChecks: false)
-        check(store.profile?.shareExploration == true && !fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty,
+        check(store.profile?.shareExploration == true && !fixture.observed("/rest/v1/rpc/sync_journal").isEmpty,
               "New Apple accounts use the disclosed sharing-on default")
         check(!journal.visitedIDs.contains("FR"), "Apple sign-in must not merge a guest journal into the online account")
         await store.signOut()
@@ -914,6 +926,49 @@ private final class CheckSuite {
               "Report payloads must identify the selected profile")
     }
 
+    func privateJournalRecovery() async {
+        fixture.reset(sharing: false)
+        let defaults = isolatedDefaults()
+        defaults.set(userA.uuidString, forKey: "niche.localOwnerID")
+        let journal = DiscoveryJournal(defaults: defaults)
+        let service = api(vault: MemoryVault(savedSession()))
+        let store = SocialStore(journal: journal, defaults: defaults, configuration: configuration, api: service)
+        await store.refresh()
+        let country = CountryRepository.country(id: "MA")!
+        journal.toggleSaved(country)
+        journal.saveNote("A private memory", for: country)
+        fixture.fail("/rest/v1/rpc/sync_journal", statuses: [503])
+        await store.synchronizeExploration()
+        check(store.journalSyncFailed && journal.hasPendingChanges, "Failed journal upload keeps durable pending changes")
+        check(DiscoveryJournal(defaults: defaults).note(for: "MA") == "A private memory", "Offline note survives a restart")
+        await store.synchronizeExploration()
+        check(!store.journalSyncFailed && !journal.hasPendingChanges, "A successful retry clears pending changes")
+        check(store.profile?.shareExploration == false, "Private sync does not enable friend sharing")
+        journal.saveNote("First revision", for: country)
+        responseGate.arm("/rest/v1/rpc/sync_journal")
+        let syncing = Task { await store.synchronizeExploration() }
+        guard await waitForHeldResponse() else { check(false, "Journal race must hold response"); responseGate.release(); syncing.cancel(); return }
+        journal.saveNote("Most recent revision", for: country)
+        responseGate.release()
+        await syncing.value
+        check(journal.note(for: "MA") == "Most recent revision" && !journal.hasPendingChanges,
+              "An edit during upload is sent next and never replaced by the earlier response")
+        let export = await store.exportData()
+        let document = export.flatMap { try? Data(contentsOf: $0) }.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+        let local = document?["local"] as? [String: Any]
+        check((local?["journalEntries"] as? [[String: Any]] ?? []).contains { $0["note"] as? String == "Most recent revision" }, "Local export contains private notes")
+        responseGate.arm("/rest/v1/rpc/sync_journal")
+        journal.saveNote("Before signing out", for: country)
+        let leaving = Task { await store.synchronizeExploration() }
+        guard await waitForHeldResponse() else { check(false, "Account switch race must hold journal response"); responseGate.release(); leaving.cancel(); return }
+        await store.signOut()
+        responseGate.release()
+        await leaving.value
+        check(journal.note(for: "MA").isEmpty && !store.isSignedIn, "Late account sync cannot expose a note in the guest workspace")
+        await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil)
+        check(journal.note(for: "MA") == "Before signing out", "Returning to the account restores its own private note")
+    }
+
     func sharingAndDeletion() async {
         fixture.reset()
         let defaults = isolatedDefaults()
@@ -928,13 +983,13 @@ private final class CheckSuite {
         let store = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory, configuration: configuration, api: service, culture: culture)
         await store.refresh()
         await store.synchronizeExploration()
-        check(fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty, "Sharing off must prevent journal uploads during refresh and explicit sync")
+        check(fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty, "Private journal sync must not call the legacy sharing endpoint")
         check(store.friendsWhoExplored("FR").map(\.id) == [friendA], "Private friend exploration must not appear in country social context")
         await store.saveProfile(name: "Mira", avatar: "leaf", sharing: true)
-        let uploads = fixture.observed("/rest/v1/rpc/sync_explorations")
-        check(uploads.count == 1 && uploads[0].json()["p_country_ids"] as? [String] == ["FR"], "Opting in must upload only explored country IDs")
+        let uploads = fixture.observed("/rest/v1/rpc/sync_journal")
+        check(!uploads.isEmpty && uploads.allSatisfy { $0.json()["p_owner"] as? String == userA.uuidString }, "Journal sync is bound to the signed-in owner")
         check(Set(journal.visitedIDs) == ["FR", "JP"], "Sync must merge valid remote countries and reject unknown IDs")
-        check(!String(data: uploads.first?.body ?? Data(), encoding: .utf8)!.contains("CA"), "Sync must never upload private saved countries")
+        check(uploads.contains { ($0.json()["p_changes"] as? [[String: Any]] ?? []).contains { $0["country_id"] as? String == "CA" && $0["saved"] as? Bool == true } }, "Saved countries sync privately even when friend sharing is off")
         fixture.clearRequests()
         fixture.fail("/functions/v1/delete-account", statuses: [502])
         await store.deleteAccountAndData()
@@ -1720,10 +1775,10 @@ private final class CheckSuite {
         let store = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
                                 configuration: configuration, api: service)
         await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: nil)
-        fixture.fail("/rest/v1/rpc/sync_explorations", statuses: [503])
+        fixture.fail("/rest/v1/rpc/sync_journal", statuses: [503])
         await store.completeProfileSetup(name: "Finished Profile", sharing: true, automaticChecks: false)
         check(store.hasLoadedProfile && store.isSignedIn && !store.needsProfileSetup
-              && store.profile?.displayName == "Finished Profile" && store.errorMessage != nil,
+              && store.profile?.displayName == "Finished Profile" && store.journalSyncFailed,
               "A secondary exploration sync failure does not reopen completed profile setup")
         let relaunched = SocialStore(journal: DiscoveryJournal(defaults: defaults), defaults: defaults,
                                      configuration: configuration, api: service)
@@ -2075,6 +2130,7 @@ private final class CheckSuite {
         await suite.appleProfilePrivacy()
         await suite.appleDeletionContract()
         await suite.reportContract()
+        await suite.privateJournalRecovery()
         await suite.sharingAndDeletion()
         await suite.deletionAuthExpiry()
         await suite.deletionConfirmationRetry()

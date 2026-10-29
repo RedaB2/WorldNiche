@@ -85,7 +85,9 @@ struct CountryRow: View {
 
 struct JournalView: View {
     @Environment(DiscoveryJournal.self) private var journal
+    @Environment(SocialStore.self) private var social
     @State private var detail: Country?
+    @State private var noteCountry: Country?
     @State private var showSaved = true
 
     private var countries: [Country] {
@@ -105,6 +107,19 @@ struct JournalView: View {
                         Text("of 195 countries explored").scaledFont(size: 13).foregroundStyle(Palette.muted)
                     }
                     ProgressView(value: Double(journal.visitedIDs.count), total: 195).tint(Palette.clay)
+                    if social.isSignedIn {
+                        if social.journalSyncFailed {
+                            Button("Your changes are saved on this device. Retry sync") { Task { await social.synchronizeExploration() } }
+                                .font(.footnote).accessibilityIdentifier("retryJournalSync")
+                        } else {
+                            Text(social.isSyncingJournal || journal.hasPendingChanges ? "Saved on this device. Syncing your journal…" : "Your journal is synced. Notes are just for you.")
+                                .font(.footnote).foregroundStyle(Palette.muted)
+                                .accessibilityIdentifier("journalSyncStatus")
+                        }
+                    } else {
+                        Text("Your journal is saved on this device. Account journals sync privately when you sign in.")
+                            .font(.footnote).foregroundStyle(Palette.muted)
+                    }
                     Picker("Collection", selection: $showSaved) {
                         Text("Saved").tag(true)
                         Text("Recently explored").tag(false)
@@ -120,15 +135,90 @@ struct JournalView: View {
                     } else {
                         LazyVStack(spacing: 0) {
                             ForEach(countries) { country in
-                                Button { detail = country } label: { CountryRow(country: country) }.buttonStyle(.plain)
-                                Divider()
+                                VStack(spacing: 0) {
+                                    Button { detail = country } label: { CountryRow(country: country) }.buttonStyle(.plain)
+                                    if showSaved || !journal.note(for: country.id).isEmpty {
+                                        Button { noteCountry = country } label: {
+                                            HStack(alignment: .top, spacing: 10) {
+                                                Image(systemName: "square.and.pencil")
+                                                VStack(alignment: .leading, spacing: 5) {
+                                                    Text(journal.note(for: country.id).isEmpty ? "Add a note" : journal.note(for: country.id))
+                                                        .lineLimit(3).multilineTextAlignment(.leading)
+                                                    if !journal.note(for: country.id).isEmpty { Text("Edit private note").font(.caption).foregroundStyle(Palette.muted) }
+                                                }
+                                                Spacer(minLength: 0)
+                                            }.font(.subheadline).foregroundStyle(Palette.pine)
+                                                .padding(.bottom, 18).frame(minHeight: 44)
+                                        }.buttonStyle(.plain).accessibilityIdentifier("journalNote_\(country.id)")
+                                    }
+                                    Divider()
+                                }.accessibilityElement(children: .contain)
                             }
                         }
                     }
                 }.padding(24).frame(maxWidth: 760).frame(maxWidth: .infinity)
-            }.background(Palette.paper)
+            }.background(Palette.paper).accessibilityIdentifier("journalScroll")
                 .navigationTitle("Journal").navigationBarTitleDisplayMode(.inline)
                 .sheet(item: $detail) { CountryDetailView(country: $0) }
+                .sheet(item: $noteCountry) { JournalNoteView(country: $0) }
+                .task { await social.synchronizeExploration() }
+                .refreshable { await social.synchronizeExploration() }
+        }
+    }
+}
+
+struct JournalNoteView: View {
+    let country: Country
+    @Environment(DiscoveryJournal.self) private var journal
+    @Environment(\.dismiss) private var dismiss
+    @State private var draft = ""
+    @State private var loaded = false
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("A detail to remember. A question for next time.")
+                    .font(.subheadline).foregroundStyle(Palette.muted)
+                TextEditor(text: $draft)
+                    .font(.body).scrollContentBackground(.hidden)
+                    .padding(12).background(Palette.card, in: RoundedRectangle(cornerRadius: 18))
+                    .focused($focused)
+                    .accessibilityLabel("Private note for \(country.name)")
+                    .accessibilityIdentifier("journalNoteEditor")
+                    .onChange(of: draft) { _, value in
+                        if value.unicodeScalars.count > DiscoveryJournal.noteLimit { draft = String(String.UnicodeScalarView(value.unicodeScalars.prefix(DiscoveryJournal.noteLimit))) }
+                    }
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("Only you can see this", systemImage: "lock")
+                        .font(.caption).foregroundStyle(Palette.muted)
+                    HStack {
+                        Button("Clear note", role: .destructive) { draft = ""; focused = false }
+                            .disabled(draft.isEmpty).frame(minHeight: 44)
+                            .accessibilityIdentifier("clearJournalNote")
+                        Spacer()
+                        Text("\(draft.unicodeScalars.count)/\(DiscoveryJournal.noteLimit)")
+                            .font(.caption).monospacedDigit().foregroundStyle(Palette.muted)
+                    }.font(.subheadline)
+                }
+            }
+            .padding(24).frame(maxWidth: 720).frame(maxWidth: .infinity)
+            .background(Palette.paper)
+            .navigationTitle(country.name).navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.accessibilityIdentifier("cancelJournalNote") }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { journal.saveNote(draft, for: country); dismiss() }
+                        .accessibilityIdentifier("saveJournalNote")
+                }
+                ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("Done") { focused = false } }
+            }
+            .onAppear {
+                guard !loaded else { return }
+                draft = journal.note(for: country.id)
+                loaded = true
+            }
+            .interactiveDismissDisabled(draft != journal.note(for: country.id))
         }
     }
 }
@@ -149,7 +239,7 @@ struct AboutView: View {
                     Text("A world of perspectives").scaledFont(size: 24, design: .serif)
                     Text("The atlas includes 193 UN member states plus Palestine and the Holy See. Borders follow Natural Earth’s cartographic dataset and aren’t a statement of political recognition. Cultural discoveries rotate daily from live sources. Music and headlines refresh throughout the day; coverage varies by provider.")
                     Text("Built for curiosity, with privacy").scaledFont(size: 24, design: .serif)
-                    Text("Saved countries and your journal stay on this device. An optional account connects you with friends; sharing explored countries is off until you choose to enable it. Ask Niche uses Apple Intelligence on supported devices. The app requests public content directly from Apple, Google and Wikimedia. No analytics SDK or location permission. Profile settings include privacy details, export and deletion controls.")
+                    Text("Guest journals stay on this device. With an account, saved countries, private notes and exploration history sync to your account. Friends only see explored countries when sharing is enabled. Sharing starts on for new accounts and can be turned off in Settings. Ask Niche uses Apple Intelligence on supported devices. The app requests public content directly from Apple, Google and Wikimedia. No analytics SDK or location permission. Profile settings include privacy details, export and deletion controls.")
                     Text("Sources & credits").scaledFont(size: 24, design: .serif)
                     Link("Natural Earth · public-domain map data", destination: URL(string: "https://www.naturalearthdata.com/about/terms-of-use/")!)
                     Link("Country data · mledoze/countries · ODbL", destination: URL(string: "https://github.com/mledoze/countries")!)

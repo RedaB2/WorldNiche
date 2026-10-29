@@ -450,7 +450,8 @@ private struct IntroFriendConnection: View {
         VStack(spacing: 10) {
             Image(image)
                 .resizable().scaledToFit()
-                .padding(5)
+                .frame(width: 100, height: 100)
+                .offset(y: 12)
                 .frame(width: 100, height: 100)
                 .background(Palette.card, in: Circle())
                 .clipShape(Circle())

@@ -31,7 +31,10 @@ struct WorldNicheApp: App {
                 .environment(social)
                 .tint(Palette.pine)
                 .task { await restoreSession() }
-                .task(id: journal.visitedIDs) { await social.synchronizeExploration() }
+                .task(id: journal.revision) {
+                    try? await Task.sleep(for: .milliseconds(750))
+                    if !Task.isCancelled { await social.synchronizeExploration() }
+                }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active { Task { await restoreSession() } }
                 }

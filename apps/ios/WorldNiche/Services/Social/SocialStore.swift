@@ -32,6 +32,10 @@ final class SocialStore {
     private let appleCredentialIsAuthorized: @Sendable (String) async -> Bool?
     private var pendingToken: String?
     private var generation = UUID()
+    private var journalSyncTask: Task<Void, Never>?
+    private var journalSyncID = UUID()
+    private(set) var journalSyncFailed = false
+    private(set) var isSyncingJournal = false
     private var refreshing = false
     private var refreshingVisibleProfiles = false
     private var lastVisibleProfileRefresh: Date?
@@ -55,6 +59,7 @@ final class SocialStore {
         let profile: ExplorerProfile?
         let explored: [String]
         let saved: [String]
+        var journalSnapshot: JournalSnapshot?
     }
 
     private var exportDirectory: URL {
@@ -231,7 +236,7 @@ final class SocialStore {
             persistProfile()
             profileSaveMessage = "Profile saved."
             profileCheckFailed = false
-            if isSignedIn, sharing { await synchronizeExploration() }
+            if isSignedIn { await synchronizeExploration() }
             resumeProfileCheckIfNeeded()
         } catch { record(error) }
     }
@@ -549,18 +554,47 @@ final class SocialStore {
     }
 
     func synchronizeExploration() async {
-        guard let api, isSignedIn, let owner = localOwnerID,
-              profile?.id == owner, profile?.shareExploration == true, !deletionPending, hasLoadedProfile, !needsProfileSetup else { return }
-        let current = generation
-        do {
-            let uploaded = try await api.syncExplorations(journal.visitedIDs)
-            guard current == generation, !Task.isCancelled, !deletionPending,
-                  localOwnerID == owner, profile?.shareExploration == true else { return }
-            journal.mergeExplored(uploaded)
-        } catch {
-            guard current == generation, !Task.isCancelled, !deletionPending, localOwnerID == owner else { return }
-            record(error)
+        if let journalSyncTask {
+            let startedIn = generation
+            await journalSyncTask.value
+            if generation != startedIn || journal.hasPendingChanges && !journalSyncFailed {
+                await synchronizeExploration()
+            }
+            return
         }
+        guard let api, isSignedIn, let owner = localOwnerID,
+              profile?.id == owner, !deletionPending, hasLoadedProfile, !needsProfileSetup else { return }
+        let current = generation
+        isSyncingJournal = true
+        let syncID = UUID()
+        journalSyncID = syncID
+        journalSyncTask = Task { [weak self] in
+            guard let self else { return }
+            defer {
+                if journalSyncID == syncID { journalSyncTask = nil; isSyncingJournal = false }
+            }
+            repeat {
+                let sent = journal.pendingChanges
+                do {
+                    let remote = try await api.syncJournal(owner: owner, device: journal.snapshot.deviceId, changes: sent)
+                    guard current == generation, !Task.isCancelled, !deletionPending, localOwnerID == owner else { return }
+                    journal.apply(remote, acknowledging: sent)
+                    journalSyncFailed = false
+                } catch {
+                    guard current == generation, !Task.isCancelled, !deletionPending, localOwnerID == owner else { return }
+                    journalSyncFailed = true
+                    return
+                }
+            } while journal.hasPendingChanges
+        }
+        await journalSyncTask?.value
+    }
+
+    private func cancelJournalSync() {
+        journalSyncID = UUID()
+        journalSyncTask?.cancel()
+        journalSyncTask = nil
+        isSyncingJournal = false
     }
 
     func createInvitation() async -> URL? {
@@ -822,8 +856,9 @@ final class SocialStore {
                 let profile: ExplorerProfile?
                 let exploredCountryIDs: [String]
                 let savedCountryIDs: [String]
+                let journalEntries: [JournalEntry]
             }
-            let local = LocalExport(profile: profile, exploredCountryIDs: journal.visitedIDs, savedCountryIDs: journal.savedIDs.sorted())
+            let local = LocalExport(profile: profile, exploredCountryIDs: journal.visitedIDs, savedCountryIDs: journal.savedIDs.sorted(), journalEntries: journal.snapshot.entries.values.sorted { $0.countryId < $1.countryId })
             var document: [String: Any] = ["local": try JSONSerialization.jsonObject(with: JSONEncoder().encode(local))]
             if let localID = profile?.localAvatarID, let data = AvatarPhotoFiles.load(localID, directory: photoDirectory) {
                 document["profile_photo_jpeg_base64"] = data.base64EncodedString()
@@ -872,12 +907,13 @@ final class SocialStore {
     /// into an already-sharing account never silently publishes guest activity.
     private func switchWorkspace(to owner: UUID?) {
         guard owner != localOwnerID else { return }
+        cancelJournalSync()
         cancelProfileCheck()
         profileCheckFailed = false
         profileSaveMessage = nil
         lastVisibleProfileRefresh = nil
         generation = UUID()
-        let previous = LocalWorkspace(profile: profile, explored: journal.visitedIDs, saved: journal.savedIDs.sorted())
+        let previous = LocalWorkspace(profile: profile, explored: journal.visitedIDs, saved: journal.savedIDs.sorted(), journalSnapshot: journal.snapshot)
         defaults.set(try? JSONEncoder().encode(previous), forKey: workspaceKey(localOwnerID))
         localOwnerID = owner
         hasLoadedProfile = false
@@ -888,14 +924,9 @@ final class SocialStore {
         if profile?.id != owner { profile = nil }
         friends = []
         journal.clear()
-        if let workspace {
-            for id in workspace.saved {
-                if let country = CountryRepository.country(id: id), !journal.savedIDs.contains(id) { journal.toggleSaved(country) }
-            }
-            for id in workspace.explored.reversed() {
-                if let country = CountryRepository.country(id: id) { journal.visit(country) }
-            }
-        }
+        if let snapshot = workspace?.journalSnapshot { journal.restore(snapshot) }
+        else if let workspace { journal.restoreLegacy(saved: workspace.saved, explored: workspace.explored) }
+        journalSyncFailed = false
         persistProfile()
     }
 
@@ -916,6 +947,7 @@ final class SocialStore {
     }
 
     private func clearLocalState() async {
+        cancelJournalSync()
         cancelProfileCheck()
         profileCheckFailed = false
         profileSaveMessage = nil

@@ -207,6 +207,14 @@ actor SocialAPI {
     }
 
     struct ExplorationResult: Decodable, Sendable { let countryIds: [String]; let count: Int }
+    func syncJournal(owner: UUID, device: UUID, changes: [JournalChange]) async throws -> [JournalEntry] {
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        let changes = try JSONSerialization.jsonObject(with: encoder.encode(changes))
+        let result: JournalSyncResult = try await rpc("sync_journal", body: ["p_owner": owner.uuidString, "p_device": device.uuidString, "p_changes": changes])
+        return result.entries
+    }
+
     func syncExplorations(_ ids: [String]) async throws -> [String] {
         let response: ExplorationResult = try await rpc("sync_explorations", body: ["p_country_ids": ids])
         return response.countryIds

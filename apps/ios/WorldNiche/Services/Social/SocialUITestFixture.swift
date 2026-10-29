@@ -8,6 +8,18 @@ import UIKit
 enum SocialUITestFixture {
     static func make() -> (journal: DiscoveryJournal, social: SocialStore)? {
         let arguments = ProcessInfo.processInfo.arguments
+        if let index = arguments.firstIndex(of: "-worldniche-journal-fixture"), arguments.indices.contains(index + 1),
+           let defaults = UserDefaults(suiteName: "io.worldniche.app.journal-ui-fixture") {
+            if arguments[index + 1] == "reset" {
+                defaults.removePersistentDomain(forName: "io.worldniche.app.journal-ui-fixture")
+            }
+            let journal = DiscoveryJournal(defaults: defaults)
+            if arguments[index + 1] == "reset", let country = CountryRepository.country(id: "MA") {
+                journal.visit(country)
+                journal.toggleSaved(country)
+            }
+            return (journal, SocialStore(journal: journal, defaults: defaults, configuration: nil))
+        }
         guard let index = arguments.firstIndex(of: "-worldniche-social-fixture"), arguments.indices.contains(index + 1),
               ["approval", "retry", "manual", "friend", "photo", "signup", "signup-photo-failure", "existing-private"].contains(arguments[index + 1]) else { return nil }
         let mode = arguments[index + 1]
@@ -135,6 +147,7 @@ private final class SocialUIResponses: @unchecked Sendable {
             pendingOwnerPhotoPath = nil; retrying = false
             value = profile()
             delay = 5
+        case "/rest/v1/rpc/sync_journal": value = ["entries": []] as [String: Any]
         case "/rest/v1/rpc/sync_explorations": value = ["country_ids": [], "count": 0] as [String: Any]
         default: return (404, Data("{}".utf8), 0)
         }
