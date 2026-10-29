@@ -10,7 +10,7 @@ enum SocialUITestFixture {
         let arguments = ProcessInfo.processInfo.arguments
         if let index = arguments.firstIndex(of: "-worldniche-journal-fixture"), arguments.indices.contains(index + 1),
            let defaults = UserDefaults(suiteName: "io.worldniche.app.journal-ui-fixture") {
-            if arguments[index + 1] == "reset" {
+            if ["reset", "marketing"].contains(arguments[index + 1]) {
                 defaults.removePersistentDomain(forName: "io.worldniche.app.journal-ui-fixture")
             }
             let journal = DiscoveryJournal(defaults: defaults)
@@ -18,15 +18,20 @@ enum SocialUITestFixture {
                 journal.visit(country)
                 journal.toggleSaved(country)
             }
+            if arguments[index + 1] == "marketing" { seedMarketingJournal(journal) }
             return (journal, SocialStore(journal: journal, defaults: defaults, configuration: nil))
         }
         guard let index = arguments.firstIndex(of: "-worldniche-social-fixture"), arguments.indices.contains(index + 1),
-              ["approval", "retry", "manual", "friend", "photo", "signup", "signup-photo-failure", "existing-private"].contains(arguments[index + 1]) else { return nil }
+              ["approval", "retry", "manual", "friend", "photo", "signup", "signup-photo-failure", "existing-private", "marketing"].contains(arguments[index + 1]) else { return nil }
         let mode = arguments[index + 1]
         let suite = "io.worldniche.app.simulator-ui-fixture"
         guard let defaults = UserDefaults(suiteName: suite) else { return nil }
         defaults.removePersistentDomain(forName: suite)
         let journal = DiscoveryJournal(defaults: defaults)
+        if mode == "marketing" {
+            defaults.set(SocialUIResponses.owner.uuidString, forKey: "niche.localOwnerID")
+            seedMarketingJournal(journal)
+        }
         let configuration = SocialConfiguration(serviceURL: URL(string: "https://social-ui.example.test")!,
                                                 publicAPIKey: "ui-fixture-public-key", invitationHost: "invite.example.test",
                                                 privacyPolicyURL: nil, supportURL: nil)
@@ -36,6 +41,30 @@ enum SocialUITestFixture {
         SocialUIResponses.shared.reset(mode: mode)
         let api = SocialAPI(configuration: configuration, transport: URLSession(configuration: transport), vault: SocialUIVault())
         return (journal, SocialStore(journal: journal, defaults: defaults, configuration: configuration, api: api))
+    }
+
+    private static func seedMarketingJournal(_ journal: DiscoveryJournal) {
+        let saved = [
+            ("BR", "Build a playlist of the songs I discover."),
+            ("FR", "Ask a friend about their favorite local tradition."),
+            ("IN", "Find a festival I have never heard of."),
+            ("IT", "Learn the story behind a neighborhood ritual."),
+            ("JP", "Look for the small details in everyday life."),
+            ("MX", "Keep a few new artists on repeat."),
+            ("MA", "Listen to Gnawa. Learn the stories behind the music."),
+            ("PT", "Find a local story to bring to dinner."),
+            ("SN", "Explore the music beyond the charts."),
+            ("KR", "Save a new point of view for later.")
+        ]
+        for (id, note) in saved {
+            guard let country = CountryRepository.country(id: id) else { continue }
+            journal.visit(country)
+            journal.toggleSaved(country)
+            journal.saveNote(note, for: country)
+        }
+        for id in ["AR", "AU", "CA", "EG", "GE", "GR", "ID", "KE", "NZ", "TR"] {
+            if let country = CountryRepository.country(id: id) { journal.visit(country) }
+        }
     }
 }
 
@@ -86,6 +115,20 @@ private final class SocialUIResponses: @unchecked Sendable {
             UIColor.red.setFill()
             context.fill(CGRect(x: 0, y: 0, width: 44, height: 44))
         }.jpegData(compressionQuality: 0.9) ?? Data()
+        if mode == "marketing" {
+            ownerPhotoPath = "\(Self.owner.uuidString.lowercased())/88888888-8888-4888-8888-888888888888.jpg"
+            sharing = true
+            let avatar = UIImage(named: "IntroAvatarB")!
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = 1
+            format.opaque = true
+            photo = UIGraphicsImageRenderer(size: CGSize(width: 512, height: 512), format: format).image { context in
+                UIColor(red: 0.86, green: 0.90, blue: 0.82, alpha: 1).setFill()
+                context.fill(CGRect(x: 0, y: 0, width: 512, height: 512))
+                avatar.draw(in: CGRect(x: 0, y: 0, width: 512, height: 512))
+            }.jpegData(compressionQuality: 0.9)!
+            precondition(AvatarPhotoReference.isValidJPEG(photo))
+        }
     }
 
     func response(_ request: URLRequest) -> (Int, Data, TimeInterval) {

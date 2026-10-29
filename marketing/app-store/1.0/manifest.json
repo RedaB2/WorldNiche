@@ -41,14 +41,14 @@
       "file": "1.0/en-US/iphone/screenshots/04-journal.png",
       "width": 1320,
       "height": 2868,
-      "sha256": "0195d388ddbb0c911bdd952a5d742413641bca1562e410343d8202377578e49f",
+      "sha256": "3faad9ef638ae00a1ead868a8da04b4cdf89a6e1db314d09f733963ada17e11f",
       "deliveryState": "COMPLETE"
     },
     {
       "file": "1.0/en-US/iphone/screenshots/05-friends.png",
       "width": 1320,
       "height": 2868,
-      "sha256": "fa6aae5e3507a2b363695f70b4b2da4c508f564030461601371b660bd78f8f12",
+      "sha256": "cc500664dfd539bbbae0a8a5fb6cccabf76d18aa813ec144918db1dc43ca6414",
       "deliveryState": "COMPLETE"
     },
     {
@@ -69,7 +69,7 @@
       "file": "1.0/en-US/ipad/screenshots/04-journal.png",
       "width": 2064,
       "height": 2752,
-      "sha256": "f7b6a43b0a98e97edaa2ffbabd533971a350c39883435ba80909fc2abbcf24b8",
+      "sha256": "90c23527084c5d6178fe5362f7434dcfe46aee90213378a6e1daf0b2a9114b93",
       "deliveryState": "COMPLETE"
     },
     {

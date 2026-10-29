@@ -4,6 +4,34 @@ final class JournalUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     @MainActor
+    func testMarketingJournalShowsSeveralSavedPlacesAndNotes() {
+        let app = launch(mode: "marketing")
+        openJournal(app)
+        XCTAssertTrue(app.buttons["journalNote_BR"].waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["journalNote_FR"].exists)
+        XCTAssertTrue(app.buttons["journalNote_IN"].exists)
+        XCTAssertTrue(app.staticTexts["Build a playlist of the songs I discover."].exists)
+        app.buttons["journalNote_BR"].tap()
+        XCTAssertEqual(app.textViews["journalNoteEditor"].value as? String, "Build a playlist of the songs I discover.")
+        app.buttons["cancelJournalNote"].tap()
+        capture("Populated marketing journal", app)
+    }
+
+    @MainActor
+    func testMarketingProfileLoadsOwnerAndFriend() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro", "-worldniche-social-fixture", "marketing"]
+        app.launch()
+        let tab = app.tabBars.buttons["Profile"]
+        (tab.exists ? tab : app.buttons["Profile"].firstMatch).tap()
+        XCTAssertTrue(app.staticTexts["Mira"].waitForExistence(timeout: 8))
+        XCTAssertTrue(app.staticTexts["Jun"].waitForExistence(timeout: 8))
+        XCTAssertTrue(app.staticTexts["20"].exists)
+        XCTAssertTrue(app.staticTexts["10"].exists)
+        capture("Marketing profile with illustrated photo", app)
+    }
+
+    @MainActor
     func testNoteSaveRelaunchEditCancelAndErase() {
         let app = launch(mode: "reset")
         openJournal(app)
