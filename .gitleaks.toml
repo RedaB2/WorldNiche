@@ -1,11 +1,7 @@
 title = "WorldNiche secret scan"
 [extend]
 useDefault = true
-[[allowlists]]
-description = "The exact UserDefaults key for pending invite storage is not a credential."
+[allowlist]
+description = "These exact UserDefaults storage identifiers are not credentials. Compatible with the CI scanner."
 regexTarget = "secret"
-regexes = ['''^niche\.pendingInvitation\.v1$''']
-[[allowlists]]
-description = "The exact UserDefaults journal storage key is not a credential."
-regexTarget = "secret"
-regexes = ['''^niche\.journal\.v2$''']
+regexes = ['''^niche\.pendingInvitation\.v1$''', '''^niche\.journal\.v2$''']
