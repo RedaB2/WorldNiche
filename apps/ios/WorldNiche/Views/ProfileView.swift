@@ -99,7 +99,9 @@ struct ProfileView: View {
                     } else {
                         welcome
                     }
-                    friendsSection
+                    if social.profile != nil {
+                        friendsSection
+                    }
                     if let message = social.errorMessage {
                         ProfileStatusMessage(message: message)
                     }
@@ -184,11 +186,11 @@ struct ProfileView: View {
                 .foregroundStyle(Palette.pine)
             Text("Make discoveries together. Choose your name, add a photo if you like, and invite your friends.")
                 .font(.subheadline).foregroundStyle(Palette.muted)
-            Button("Create your profile") { showSignIn = true }
+            Button("Continue with Apple") { showSignIn = true }
                 .buttonStyle(.glassProminent).tint(Palette.forest)
                 .controlSize(.large)
                 .disabled(social.deletionPending)
-                .accessibilityIdentifier("createProfile")
+                .accessibilityIdentifier("profileAccountEntry")
             Text("Keep exploring without an account, or join your friends when you’re ready.")
                 .font(.footnote).foregroundStyle(Palette.muted)
         }
@@ -208,18 +210,12 @@ struct ProfileView: View {
                 Button("Sign-in options", systemImage: "person.crop.circle") { showSignIn = true }
                     .buttonStyle(.glass).controlSize(.large)
                     .accessibilityIdentifier("signInForFriends")
-            } else if social.profile == nil {
-                Text("Sign in, then invite someone to discover the world with you.")
-                    .font(.subheadline).foregroundStyle(Palette.muted)
-                Button("Sign in to connect", systemImage: "person.crop.circle.badge.plus") { showSignIn = true }
-                    .buttonStyle(.glass).controlSize(.large)
-                    .accessibilityIdentifier("signInForFriends")
             } else if !social.isSignedIn {
                 Text("Sign in to add friends and see the places they’ve explored. You choose which discoveries your friends can see.")
                     .font(.subheadline).foregroundStyle(Palette.muted)
-                Button("Sign in to connect", systemImage: "person.crop.circle.badge.plus") { showSignIn = true }
+                Button("Continue with Apple") { showSignIn = true }
                     .buttonStyle(.glass).controlSize(.large)
-                    .accessibilityIdentifier("signInForFriends")
+                    .accessibilityIdentifier("profileAccountEntry")
             } else {
                 Button {
                     Task {

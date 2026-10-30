@@ -68,10 +68,10 @@ struct IntroView: View {
             .accessibilityIdentifier("introProgress")
 
             if page == 2 {
-                Button("Create your profile", action: createProfile)
+                Button("Continue with Apple", action: createProfile)
                     .buttonStyle(.glassProminent).tint(Palette.forest)
                     .controlSize(.large)
-                    .accessibilityIdentifier("introCreateProfile")
+                    .accessibilityIdentifier("introAccountEntry")
                 Button("Continue exploring", action: explore)
                     .font(.subheadline)
                     .frame(minHeight: 44)

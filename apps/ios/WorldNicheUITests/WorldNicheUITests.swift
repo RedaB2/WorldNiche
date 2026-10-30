@@ -119,8 +119,14 @@ final class WorldNicheUITests: XCTestCase {
             : app.buttons.matching(NSPredicate(format: "label == %@", "Profile")).firstMatch
         XCTAssertTrue(profile.waitForExistence(timeout: 8))
         profile.tap()
-        let signIn = app.buttons["signInForFriends"]
+        let signIn = app.buttons["profileAccountEntry"]
         XCTAssertTrue(signIn.waitForExistence(timeout: 8), "Run this check with a signed-out simulator.")
+        XCTAssertEqual(signIn.label, "Continue with Apple")
+        XCTAssertEqual(app.buttons.matching(identifier: "profileAccountEntry").count, 1)
+        XCTAssertFalse(app.buttons["createProfile"].exists)
+        XCTAssertFalse(app.buttons["signInForFriends"].exists)
+        XCTAssertFalse(app.staticTexts["Curiosity, together."].exists)
+        capture("One account entry for new and returning explorers", app: app)
         for _ in 0..<4 where !signIn.isHittable { app.scrollViews.firstMatch.swipeUp() }
         XCTAssertTrue(signIn.isHittable)
         signIn.tap()
@@ -395,6 +401,24 @@ final class WorldNicheUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-worldniche-skip-intro"]
         app.launch()
+        // Start with an unread catalog instead of inheriting prior live runs.
+        // Source exhaustion and history preservation have deterministic coverage.
+        let profile = app.tabBars.buttons["Profile"].exists
+            ? app.tabBars.buttons["Profile"] : app.buttons["Profile"].firstMatch
+        profile.tap()
+        XCTAssertTrue(app.buttons["profileAccountEntry"].waitForExistence(timeout: 8), "Use a signed-out test simulator.")
+        app.buttons["profileSettings"].tap()
+        let clear = app.buttons["clearLocalData"]
+        for _ in 0..<8 where !clear.isHittable { app.collectionViews.firstMatch.swipeUp() }
+        XCTAssertTrue(clear.isHittable)
+        clear.tap()
+        let confirm = app.buttons["Clear device data"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        confirm.tap()
+        app.navigationBars["Settings"].buttons["Done"].tap()
+        let discover = app.tabBars.buttons["Discover"].exists
+            ? app.tabBars.buttons["Discover"] : app.buttons["Discover"].firstMatch
+        discover.tap()
         app.buttons["landingCountry"].tap()
         let title = app.staticTexts["liveCultureTitle"]
         guard title.waitForExistence(timeout: 40) else {
@@ -404,10 +428,13 @@ final class WorldNicheUITests: XCTestCase {
         capture("Live discovery", app: app)
         let another = app.buttons["anotherDiscovery"]
         for _ in 0..<5 where !another.isHittable { app.swipeUp() }
+        capture("Before requesting another discovery", app: app)
         another.tap()
         let changed = NSPredicate(format: "label != %@", original)
-        expectation(for: changed, evaluatedWith: title)
-        waitForExpectations(timeout: 40)
+        let change = XCTNSPredicateExpectation(predicate: changed, object: title)
+        let result = XCTWaiter.wait(for: [change], timeout: 40)
+        capture("Discovery rotation result", app: app)
+        XCTAssertEqual(result, .completed, app.debugDescription)
         app.swipeDown()
         capture("Another live discovery", app: app)
     }
