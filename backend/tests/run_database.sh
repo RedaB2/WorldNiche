@@ -39,4 +39,5 @@ PGUSER=wn_test python3 "$project_root/tests/moderation_abuse.py" --psql "$pg_bin
 PGUSER=wn_test python3 "$project_root/tests/automatic_check_race.py" --psql "$pg_bin/psql" --socket "$scratch"
 "$pg_bin/psql" -h "$scratch" -p 55433 -U wn_test -d postgres -v ON_ERROR_STOP=1 -q \
   -f "$project_root/supabase/migrations/202610290008_private_journal.sql" \
-  -f "$project_root/tests/journal_security.sql"
+  -f "$project_root/tests/journal_security.sql" \
+  -f "$project_root/tests/retention.sql"

@@ -49,7 +49,7 @@ Provide any private reviewer access details only in App Store Connect. Do not co
 
 To create or access a profile, open Profile and choose Sign in with Apple. Keep Apple passwords and verification codes on Apple’s authorization screen. Supply the review contact and any required private access details in App Store Connect before submission. [Apple's test information requirements](https://developer.apple.com/help/app-store-connect/test-a-beta-version/provide-test-information/).
 
-Before inviting testers, confirm native Apple sign-in, persistent sessions, and the social and deletion flows on the submitted build. Regularly monitor the profile queue and support inbox. Live Apple authorization revocation still needs a disposable Apple identity.
+Before inviting testers, confirm native Apple sign-in, persistent sessions, and the social and deletion flows on the submitted build. Regularly monitor the profile queue and support inbox. The native Apple revocation and account deletion flow passed on build 7 with a consenting disposable profile; backend erasure and removal from Apple settings were both confirmed.
 
 ## Current state
 
