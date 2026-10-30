@@ -25,3 +25,7 @@ The main page uses `/landing/` asset URLs to avoid colliding with invite styles 
 Run the playback and hosting tests with `npm --prefix apps/web test` from the repository root. Before publishing, check both video masks at 200% zoom, desktop and narrow mobile layouts, keyboard selection, playback failure, and Reduce Motion in the browser with the final recordings.
 
 The hosting build rejects a Duo preview until its frame, video, and poster are all imported and nonempty. Artifact validation also verifies the exact bytes, content types, and range responses of those three assets. Pages without a Duo reference keep the original media contract.
+
+## Friends illustration
+
+The friends section reuses the original `IntroAvatarA` and `IntroAvatarB` portraits from iOS onboarding. Keep their 12% downward placement inside each circle so the shoulders fill the lower edge. `friends.js` plays the invitation once when visible, then offers replay. Reduce Motion shows the completed connection. The animation and the existing phone previews have separate controllers.
