@@ -1,0 +1,5 @@
+# GitHub's hosted Xcode 27 preview is not yet in actionlint's built-in catalog.
+# This setting extends its accepted labels; it does not create a self-hosted job.
+self-hosted-runner:
+  labels:
+    - xcode-27

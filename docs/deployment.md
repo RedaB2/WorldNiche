@@ -31,7 +31,7 @@ flowchart LR
 
 After all checks pass on `main`, CI builds a website delivery artifact tied to that exact commit. Download `website-delivery-<commit>` from the successful run. It contains source, public routing configuration, `provenance.json` and the validated Worker output. This is **continuous integration and delivery with an explicit production publish step**, not unattended deployment.
 
-GitHub's [runner inventory](https://github.com/actions/runner-images/blob/main/images/macos/macos-26-Readme.md) lists Xcode 26.6 on `macos-26`, used for the iOS 26 baseline in CI. Release testing also uses the owner's Xcode 27 phone/Duo simulators. Hosted CI does not replace those checks or a real Apple authorization test.
+The app supports iOS 26 at runtime but requires the Xcode 27 SDK to compile its availability-guarded iOS 27 APIs. CI uses GitHub's documented [`xcode-27` runner](https://github.com/actions/runner-images/issues/14404), currently a preview runner image. Release testing also uses the owner's Xcode 27 phone/Duo simulators. Hosted CI does not replace those checks or a real Apple authorization test.
 
 ## Publish the website
 
