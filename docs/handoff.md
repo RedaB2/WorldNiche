@@ -18,6 +18,7 @@ The `v1.0.0` tag marks this first submitted version. Documentation and CI were a
 | Friend link fallback and Universal Link routing | `apps/web/invite-site/`, `apps/web/invite-hosting/` |
 | Accounts, friendship access, journal sync, moderation | `backend/supabase/` |
 | App Store screenshots and preview | `marketing/app-store/1.0/` |
+| App Store title, description, keywords and URLs | `metadata/app-info/`, `metadata/version/` |
 | Logo and onboarding portraits | `apps/ios/WorldNiche/Assets.xcassets/`; website copies in `apps/web/landing-site/assets/` |
 | Deployments, service IDs and current release | `docs/deployment.md`, `ops/` |
 

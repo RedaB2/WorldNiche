@@ -81,6 +81,8 @@ Archive/export using the owner's Apple Distribution certificate and WorldNiche A
 
 Do not change the submitted build while review is pending. Check its state with:
 
+Listing source lives in `metadata/app-info/` and `metadata/version/`. The frozen submitted listing beside the 1.0 media is a readback snapshot. Use the current App Store metadata sync tools to validate and review a future metadata diff before applying it.
+
 ```sh
 asc submit status --id 2128740a-4e7d-4e44-b4d9-7037e89013e7
 asc versions view --version-id 41861671-736b-4776-be96-f52aabd20343 --include-build
