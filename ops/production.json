@@ -1,9 +1,14 @@
 {
   "website": {
     "url": "https://worldniche.app",
-    "hosting": "Sites / Cloudflare Workers",
+    "hosting": "Vercel",
     "sitesProjectID": "appgprj_6ad5354a0da481919ffcd3a148d379bf",
-    "domainProvider": "Squarespace"
+    "domainProvider": "Squarespace",
+    "vercelTeam": "redab2s-projects",
+    "vercelProject": "worldniche",
+    "productionBranch": "main",
+    "rootDirectory": "apps/web",
+    "apexIPv4": "216.198.79.1"
   },
   "supabase": {
     "projectRef": "tgsjbjcihobumeirmzgm",

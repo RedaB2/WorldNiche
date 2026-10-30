@@ -1,0 +1,50 @@
+name: Check live website
+
+on:
+  status:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.context == 'Vercel' && github.event.state == 'success')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    env:
+      DEPLOY_SHA: ${{ github.event.sha || github.sha }}
+    steps:
+      - name: Verify this is the current main commit
+        id: current
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          head=$(gh api "repos/$REPOSITORY/branches/main" --jq .commit.sha)
+          if [ "$DEPLOY_SHA" = "$head" ]; then
+            echo 'verify=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'Preview or superseded commit; production check skipped.'
+          fi
+      - if: steps.current.outputs.verify == 'true'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+          persist-credentials: false
+      - if: steps.current.outputs.verify == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Check the serving website and commit
+        if: steps.current.outputs.verify == 'true'
+        run: |
+          for attempt in 1 2 3 4; do
+            if node apps/web/invite-hosting/scripts/check-live.mjs https://worldniche.app "$DEPLOY_SHA"; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 4 ]; then sleep 10; fi
+          done
+          exit 1

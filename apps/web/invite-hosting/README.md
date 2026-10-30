@@ -1,7 +1,9 @@
 # Website routing
 
-This Worker serves the landing page, invitation fallback, and Apple's association document from one package. Video requests support byte ranges for Safari. Invitation pages do not redeem tokens or request profiles.
+Shared routing serves the landing page, invitation fallback and Apple association document. Opening an invitation page never redeems its token or looks up profiles.
 
-`npm run build` imports the sibling website sources and builds `dist/server/index.js`; `npm test` and `npm run validate` check the output. Local hosting and app-association settings override the example files through ignored `hosting.local.json` and `association.local.json`. Example values are for local builds only, never production deployment.
+Production uses Vercel with `apps/web` as the project root. `npm --prefix apps/web run build:vercel` creates `.vercel/output`, with pages, images and videos on the CDN and a small function for invitation/error routes. It reads public routing IDs from `ops/production.json` and checks exact asset bytes, headers and invitation behavior. Vercel runs the website tests before every build and publishes `main` automatically.
 
-For production, use the root `scripts/prepare_site.py` command. It exports committed source and creates public `hosting.production.json` and `association.production.json` routing files in the delivery snapshot. Local overrides take precedence, then production routing, then examples. Malformed configuration fails the build. See [`docs/deployment.md`](../../../docs/deployment.md) for the Sites publishing workflow.
+The original `npm run build`, `npm test` and `npm run validate` commands still exercise the Worker package. Ignored local routing files override the examples for that legacy build. `scripts/prepare_site.py` preserves the old Sites delivery format for archival use, not production publishing.
+
+See [the deployment guide](../../../docs/deployment.md) for the GitHub workflow, live checks and rollback.

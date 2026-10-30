@@ -27,7 +27,7 @@ Living in LA, it feels like everyone wants to be niche. Knowing about the world 
 | Accounts, friends & journals | Supabase Auth, PostgreSQL with row-level security, private Storage |
 | Music & culture | Apple Music charts, Global Voices news, Wikipedia and Wikimedia sources |
 | AI | Apple Foundation Models on-device; OpenAI for backend profile moderation |
-| Website | HTML, CSS and JavaScript, hosted through Sites on Cloudflare Workers |
+| Website | HTML, CSS and JavaScript, hosted on Vercel with automatic deployments from `main` |
 | Checks | GitHub Actions, Swift/XCTest, Node tests and isolated PostgreSQL tests |
 
 One repo: [`apps/ios`](apps/ios) · [`apps/web`](apps/web) · [`backend`](backend) · [`screenshots & media`](marketing/app-store)

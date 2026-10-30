@@ -1,55 +1,65 @@
 # Where WorldNiche lives
 
-GitHub stores the code. Each running part has its own host. **A push does not automatically change production.**
+**Merge to `main` to publish the website.** Vercel runs the website checks, builds that commit and updates `worldniche.app` automatically. No chat, local Mac or deployment key in GitHub is required.
 
 | Part | Host or account | Source |
 | --- | --- | --- |
-| Domain and DNS | Squarespace, `worldniche.app` | Provider settings; leave email and verification records intact |
-| Website, demos, invite pages, Apple association file | Sites, running on Cloudflare Workers | `apps/web/` |
+| Domain and DNS | Squarespace, `worldniche.app` | Provider settings; leave email records intact |
+| Website, demos, invite pages, Apple association file | Vercel project `worldniche`, team `redab2s-projects` | `apps/web/` |
 | Auth, PostgreSQL, private photos, Edge Functions | Supabase project `tgsjbjcihobumeirmzgm` | `backend/supabase/` |
 | Profile moderation | OpenAI, called only by Supabase | `backend/supabase/functions/moderate-profile/` |
 | Sign in with Apple and distribution | Apple team `AD6Q827Z79`, bundle `io.worldniche.app` | `apps/ios/` and App Store Connect |
 | Email delivery retained from early beta | Resend SMTP, `mail.worldniche.app` | Supabase SMTP settings; current app uses Apple sign-in only |
 
-Public identifiers are in [`ops/production.json`](../ops/production.json). They are not credentials. Sites currently serves version 16 with active HTTPS on the custom domain. Squarespace DNS points the apex to `162.159.143.30` and `172.66.3.26`. Do not move the domain or recreate the Site to deploy an edit.
+Public identifiers are in [`ops/production.json`](../ops/production.json). They are not credentials. The Vercel project is in the owner's existing Hobby account. Squarespace still owns the domain and DNS; the apex A record points to `216.198.79.1`. The backend and iOS signing configuration are separate.
 
-## The pipeline
+## The website pipeline
 
 ```mermaid
 flowchart LR
-  A[Branch and pull request] --> B[GitHub Actions checks]
+  A[Branch and pull request] --> B[GitHub checks and Vercel preview]
   B --> C[Merge to main]
-  C --> D[Tested website source artifact]
-  D --> E[Publish through Sites]
-  C --> F[Reviewed Supabase migration and function deployment]
-  C --> G[Mac simulator tests and signed archive]
-  G --> H[TestFlight and App Review]
-  H --> I[Owner releases after approval]
+  C --> D[Vercel website tests and build]
+  D --> E[Automatic production deployment]
+  E --> F[worldniche.app]
+  C --> G[Separate backend and iOS release processes]
 ```
 
-[`Checks`](../.github/workflows/ci.yml) runs on PRs, pushes to `main`, or manual dispatch. It checks secrets, website behavior and packaging, listing hashes, deletion/moderation handlers, database permissions/races/retention, six Swift suites, and profile/journal simulator flows. It uses synthetic data, no production credentials and no paid AI calls.
+The Vercel GitHub integration watches `RedaB2/WorldNiche`, with `main` as the production branch and `apps/web` as the root directory. [`apps/web/vercel.json`](../apps/web/vercel.json) owns the build command: `npm test && npm run build:vercel`. It checks the website behavior, exact public asset bytes, routing and headers, the production Apple association file, and invitation/error responses before publishing. A failed build leaves the previous production deployment serving visitors.
 
-After all checks pass on `main`, CI builds a website delivery artifact tied to that exact commit. Download `website-delivery-<commit>` from the successful run. It contains source, public routing configuration, `provenance.json` and the validated Worker output. This is **continuous integration and delivery with an explicit production publish step**, not unattended deployment.
+GitHub's [`Checks`](../.github/workflows/ci.yml) independently runs the website/package tests, listing checksums, secret scanning, backend security/database suites and native tests. Vercel's website checks are its publication gate; unrelated iOS simulator jobs are not part of the Vercel build.
 
-The app supports iOS 26 at runtime but requires the Xcode 27 SDK to compile its availability-guarded iOS 27 APIs. CI uses GitHub's documented [`xcode-27` runner](https://github.com/actions/runner-images/issues/14404), currently a preview runner image. Release testing also uses the owner's Xcode 27 phone/Duo simulators. Hosted CI does not replace those checks or a real Apple authorization test.
+After Vercel reports success for the current `main` commit, [`Check live website`](../.github/workflows/website-live.yml) verifies the public domain and its serving commit. Preview and superseded commits are skipped. This check can also be run manually from GitHub Actions. A failed live check reports a problem; it does not automatically roll back production.
 
-## Publish the website
+The generated `.vercel/output` uses Vercel's Build Output API. Pages, images and videos are CDN files. A small Node function handles invitations, unsupported methods and unknown URLs using the existing handler. It does not read profiles, redeem invites or need service keys. The build gets the public Apple team/bundle IDs from `ops/production.json`.
 
-1. Start from a passing, pushed commit. To reproduce the CI artifact locally:
+## Make a website change
+
+1. Create a branch and edit `apps/web/landing-site`, `apps/web/invite-site` or the shared hosting code.
+2. Run `bash scripts/check.sh web` and `npm --prefix apps/web run build:vercel`. Open a PR and inspect its checks and Vercel preview.
+3. Merge to `main`. Vercel publishes the checked website automatically. There is no separate publish button to press.
+4. Check the production deployment in [Vercel](https://vercel.com/redab2s-projects/worldniche). Its source commit should match GitHub. The public `/deployment.json` endpoint identifies the serving commit.
+5. For a live verification, run:
 
    ```sh
-   python3 scripts/prepare_site.py --ref HEAD --output outputs/site
+   node apps/web/invite-hosting/scripts/check-live.mjs https://worldniche.app <full-commit-sha>
    ```
 
-   The output directory must not exist. This exports committed files only, includes no ignored local files and runs the website tests/build/validation. Uncommitted edits are intentionally excluded.
+   This verifies all public policy pages, direct JSON AASA responses, both demo videos' byte ranges, invitation/error behavior and commit provenance. Its invitation token is synthetic and never connects accounts. Apple/iMessage testing is still needed if the association rules change.
 
-2. Connect the owner's **Sites** account. Read the current Site using project ID `appgprj_6ad5354a0da481919ffcd3a148d379bf`; preserve its public audience and custom domain. Use the installed Sites skill's current source workflow. Obtain a short-lived source write credential and open the existing Site repository in a fresh temporary checkout. Keep credentials in memory/stdin only.
-3. Copy the prepared snapshot into that checkout, preserving its `.git`. Remove obsolete source files from the prior layout after reviewing the diff. The new snapshot is self-contained; the root `npm test`, `npm run build` and `npm run validate` work without the old local folder layout. Preserve `.openai/hosting.json` with this exact Site ID.
-4. The Sites source helper commits/pushes that snapshot to the **Sites source repository**, then packages its `dist/`. Use the helper's returned commit and archive with `save_site_version`, then `deploy_site_version`. A GitHub SHA and a Sites source SHA are different: `provenance.json` connects them. Do not pass a GitHub SHA as an unpushed Sites commit.
-5. Verify successful deployment, then check `/`, `/privacy`, `/support`, an invitation fallback, both demo videos and `/.well-known/apple-app-site-association`. The AASA must be direct JSON and identify `AD6Q827Z79.io.worldniche.app` for `/invite/*`. Test an actual Messages link after association changes.
-6. Record the GitHub commit, Sites version/source commit/deployment ID in `ops/releases/` and the relevant release notes. Rollback uses a previously saved Sites version; it does not reset Git history.
+Project settings: framework `Other`, Node `24.x`, root `apps/web`, include source outside the root directory so `ops/production.json` is available. Keep build settings in `vercel.json`; do not add production API secrets or enable analytics as part of deployment maintenance. Existing preview access controls can remain in place while the production domain stays public.
 
-The website currently uses no runtime API secrets. Sites controls its Cloudflare deployment; this is not a Cloudflare project in the owner's separate account. There is no configured GitHub-to-Sites auto-publish hook. The native Sites connector and source credential workflow are the supported publishing route. Do not store a short-lived Sites token as a permanent GitHub secret.
+Rollback uses Vercel's previous successful production deployment. Also revert the bad commit in GitHub so the next merge preserves the correction. No DNS edits are needed for routine deployments or Vercel rollbacks.
+
+## Previous hosting
+
+Before October 30, 2026, the website ran on Sites project `appgprj_6ad5354a0da481919ffcd3a148d379bf`, using Cloudflare Workers. Version 16 and the `v1.0.0` release record remain historical snapshots. The `sitesProjectID` field and `scripts/prepare_site.py` remain for archival packaging; they are not the production deployment path.
+
+The former apex A records were `162.159.143.30` and `172.66.3.26`. Do not restore them unless intentionally rolling back the hosting migration. Email and domain verification records were preserved. The old private configured checkout is not the source for future website edits.
+
+## Native CI
+
+The app supports iOS 26 at runtime but needs Xcode 27 to compile its availability-guarded APIs. GitHub's `xcode-27` runner covers synthetic profile and journal flows. Release testing also uses the owner's phone and unfolded Duo simulators, plus real Apple authorization when that behavior changes.
 
 ## Deploy the backend
 
@@ -79,9 +89,9 @@ Run the Swift suites and affected UI suites on phone and Duo, then live discover
 
 Archive/export using the owner's Apple Distribution certificate and WorldNiche App Store profile, upload via App Store Connect, wait for processing and verify the exact build's public beta group assignment. New uploads need a new build number in `Config/Shared.xcconfig`. Credentials and configured IPAs remain private. GitHub does not currently hold signing or App Store upload credentials, so iOS distribution is an operator-run release step.
 
-Do not change the submitted build while review is pending. Check its state with:
-
 Listing source lives in `metadata/app-info/` and `metadata/version/`. The frozen submitted listing beside the 1.0 media is a readback snapshot. Use the current App Store metadata sync tools to validate and review a future metadata diff before applying it.
+
+Do not change the submitted build while review is pending. Check its state with:
 
 ```sh
 asc submit status --id 2128740a-4e7d-4e44-b4d9-7037e89013e7

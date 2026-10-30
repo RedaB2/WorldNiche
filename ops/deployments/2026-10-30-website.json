@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-30",
+  "website": "https://worldniche.app",
+  "host": "Vercel",
+  "team": "redab2s-projects",
+  "project": "worldniche",
+  "productionBranch": "main",
+  "rootDirectory": "apps/web",
+  "initialSourceCommit": "2d644e41b3e0e49bf36612b719cace1dcdf35866",
+  "initialDeploymentID": "dpl_HckNWQAtEZPYL6DUEyWRBALUTkjF",
+  "initialDeploymentURL": "https://worldniche.vercel.app",
+  "apexIPv4": "216.198.79.1",
+  "previousHosting": {
+    "provider": "Sites / Cloudflare Workers",
+    "projectID": "appgprj_6ad5354a0da481919ffcd3a148d379bf",
+    "version": 16,
+    "apexIPv4": [
+      "162.159.143.30",
+      "172.66.3.26"
+    ]
+  },
+  "note": "Migration record. Use /deployment.json and Vercel for the current serving commit. Email DNS, Supabase and native app configuration were preserved."
+}
