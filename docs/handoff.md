@@ -4,7 +4,7 @@
 
 ## Current release
 
-As checked October 29, 2026, WorldNiche **1.0 (8)** is **Waiting for Review** in App Store Connect. It was submitted at 6:28 p.m. Pacific and will require manual release after approval. Build 8 is also available in the [public TestFlight beta](https://testflight.apple.com/join/kqpQhYFw). The website is public on Sites version **16**. These are snapshots, not a live status feed.
+As checked October 29, 2026, WorldNiche **1.0 (8)** is **Waiting for Review** in App Store Connect. It was submitted at 6:28 p.m. Pacific and will require manual release after approval. Build 8 is also available in the [public TestFlight beta](https://testflight.apple.com/join/kqpQhYFw). The app status is a dated snapshot, not a live feed. The website moved from Sites version 16 to Vercel on October 30; merges to `main` now publish it automatically.
 
 The `v1.0.0` tag marks this first submitted version. Documentation and CI were added after submission; app runtime source is unchanged. [Machine-readable release record](../ops/releases/1.0.json) · [submission checklist](app-store-readiness.md).
 
@@ -28,7 +28,7 @@ The `v1.0.0` tag marks this first submitted version. Documentation and CI were a
 2. Run the relevant suites with `bash scripts/check.sh web`, `backend`, `swift`, or `assets`. `all` runs everything on a Mac with Swift 6, Node 24+ and PostgreSQL installed.
 3. For native UI changes, use XcodeBuildMCP to test the affected scenarios on a phone and an unfolded Duo. CI covers synthetic profile/journal flows; live news, Apple authorization, push-to-device and Duo testing remain release checks.
 4. Review the diff for credentials and private data, then commit under the owner's GitHub identity. Open a PR and inspect [GitHub Actions](https://github.com/RedaB2/WorldNiche/actions).
-5. Merge passing changes. Follow the [deployment guide](deployment.md) for the affected service. Update the release record after verifying the actual deployment.
+5. Merge passing changes. Website changes publish through Vercel automatically; check `/deployment.json` against the merged commit. Backend and iOS publishing remain separate. Follow the [deployment guide](deployment.md) for the affected service.
 
 ## Important behavior
 
@@ -57,4 +57,4 @@ Private archives, IPAs and signing diagnostics are under `/Users/rb/dev/WorldNic
 
 ## Brief for another agent
 
-> Work in RedaB2/WorldNiche from current main. Read AGENTS.md, docs/handoff.md and docs/deployment.md. Preserve the submitted v1.0.0 release. Make the requested change on a branch, run relevant checks and simulator tests, and show the diff and deployment target. Use the service IDs in ops/production.json. Keep secrets and reviewer invitations private. Report separately what is committed, what passed CI and what is actually deployed.
+> Work in RedaB2/WorldNiche from current main. Read AGENTS.md, docs/handoff.md and docs/deployment.md. Preserve the submitted v1.0.0 release. Make the requested change on a branch, run relevant checks and simulator tests, and show the diff and deployment target. Website merges to main publish automatically through Vercel; verify the live commit afterward. Use the service IDs in ops/production.json. Keep secrets and reviewer invitations private. Report separately what is committed, what passed CI and what is actually deployed.
