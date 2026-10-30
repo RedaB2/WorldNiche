@@ -13,6 +13,8 @@ The first listing, with Morocco as the demo destination. Captured from WorldNich
 
 All ten screenshots and the preview have finished processing in App Store Connect for version 1.0, English (U.S.). The preview shows the globe rotating and Morocco's overview opening. It uses H.264 video and a silent AAC stereo track, with no commercial music. Its final frame is held briefly for readability.
 
+The submitted public title, subtitle, description, keywords and URLs are saved in [`1.0/en-US/listing.json`](1.0/en-US/listing.json), read back from App Store Connect on October 29. Private review contact details and invitations are excluded. This file is a snapshot, not an automatic metadata upload.
+
 `source/` holds the actual UI captures. Journal notes and the Mira/Jun friend profiles are simulator fixtures, not real users or production records. The journal has 20 explored countries and 10 saved countries with notes. Mira uses the existing girl illustration from onboarding. The Duo captures use the active inner display (`primary-1`); the outer display is blank when unfolded. No app UI was painted into these screenshots.
 
 Run `swift marketing/app-store/render.swift` from the repository root on macOS to rebuild the posters. Rendered screenshots are opaque sRGB PNGs. The renderer preserves each screen's proportions. The current App Store CLI recognizes the iPhone and iPad sizes; the Duo sizes were checked against Apple's upload page and uploaded there.
