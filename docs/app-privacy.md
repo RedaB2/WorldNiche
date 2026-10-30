@@ -1,6 +1,6 @@
 # App Privacy
 
-Reconciled on October 29, 2026 for build 7. All twelve categories were published in App Store Connect on October 29, 2026 and verified in the browser as published by Reda Boutayeb.
+Reconciled on October 29, 2026 for build 8. All twelve categories were published in App Store Connect on October 29, 2026 and verified in the browser as published by Reda Boutayeb.
 
 All twelve categories use **App Functionality**, are **linked to the user**, and are **not used for tracking**. Optional account features still count as collection. Operational records can be correlated with authenticated requests, so they are not declared anonymous.
 
