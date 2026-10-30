@@ -1,0 +1,115 @@
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: 'false'
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: 'false'
+
+  web:
+    name: Website and listing assets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - run: bash scripts/check.sh assets
+      - run: bash scripts/check.sh web
+
+  backend:
+    name: Backend security and database
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Install isolated database test tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-16
+          echo 'WORLDNICHE_PG_BIN=/usr/lib/postgresql/16/bin' >> "$GITHUB_ENV"
+      - run: bash scripts/check.sh backend
+
+  native:
+    name: Swift and simulator
+    runs-on: macos-26
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - run: bash scripts/check.sh swift
+      - name: Build and test profile and journal flows with synthetic data
+        run: |
+          device_id=$(xcrun simctl create WorldNiche-CI com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max)
+          xcodebuild test \
+            -project apps/ios/WorldNiche.xcodeproj -scheme WorldNiche \
+            -destination "platform=iOS Simulator,id=$device_id" \
+            -parallel-testing-enabled NO -resultBundlePath outputs/ci.xcresult \
+            -only-testing:WorldNicheUITests/ProfileSetupUITests \
+            -only-testing:WorldNicheUITests/JournalUITests \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Preserve simulator results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: simulator-results
+          path: outputs/ci.xcresult
+          if-no-files-found: ignore
+          retention-days: 7
+
+  delivery:
+    name: Prepare website delivery
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: [secrets, web, backend, native]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Build from this exact commit
+        run: |
+          python3 scripts/prepare_site.py --ref "$GITHUB_SHA" --output outputs/site
+          tar -czf outputs/worldniche-site-source.tar.gz -C outputs/site .
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: website-delivery-${{ github.sha }}
+          path: outputs/worldniche-site-source.tar.gz
+          retention-days: 30

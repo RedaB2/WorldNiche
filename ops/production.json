@@ -1,0 +1,18 @@
+{
+  "website": {
+    "url": "https://worldniche.app",
+    "hosting": "Sites / Cloudflare Workers",
+    "sitesProjectID": "appgprj_6ad5354a0da481919ffcd3a148d379bf",
+    "domainProvider": "Squarespace"
+  },
+  "supabase": {
+    "projectRef": "tgsjbjcihobumeirmzgm",
+    "url": "https://tgsjbjcihobumeirmzgm.supabase.co"
+  },
+  "apple": {
+    "appID": "6824807927",
+    "bundleID": "io.worldniche.app",
+    "teamID": "AD6Q827Z79",
+    "publicBetaURL": "https://testflight.apple.com/join/kqpQhYFw"
+  }
+}

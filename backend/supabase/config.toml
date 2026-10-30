@@ -30,3 +30,7 @@ content_path = "./supabase/templates/email-code.html"
 [functions.delete-account]
 # Auth is verified inside the function using project JWKS + a live-session check.
 verify_jwt = false
+
+[functions.moderate-profile]
+# The handler verifies a live user session or the scoped scheduled-worker secret.
+verify_jwt = false

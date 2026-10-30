@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "build": "8",
+  "tag": "v1.0.0",
+  "appStore": {
+    "state": "WAITING_FOR_REVIEW",
+    "releaseType": "MANUAL",
+    "versionID": "41861671-736b-4776-be96-f52aabd20343",
+    "buildID": "47bfd9d3-1dd9-4322-8df7-4f7b3263d660",
+    "submissionID": "2128740a-4e7d-4e44-b4d9-7037e89013e7",
+    "submittedAt": "2026-10-30T01:28:39.695Z",
+    "sourceAtSubmission": "3a5ed9425b3d5a8dc906b0390e4545b54337bbaa",
+    "mediaManifest": "marketing/app-store/1.0/manifest.json"
+  },
+  "website": {
+    "version": 16,
+    "sitesSourceCommit": "051505aceddbe8eafa190a6579710dddc1f06637",
+    "versionID": "appgprj_6ad5354a0da481919ffcd3a148d379bf~appgver_a9dbb5baf95c8191ba13f7602aa45039",
+    "deploymentID": "appgdep_6ae3e5d241e08191b90cf972ca293a1c"
+  },
+  "note": "Status is a dated snapshot. The release tag includes repository documentation and CI added after submission, with unchanged app and website runtime source. GitHub release does not release the app on Apple's store.",
+  "verifiedOn": "2026-10-29",
+  "timeZone": "America/Los_Angeles"
+}

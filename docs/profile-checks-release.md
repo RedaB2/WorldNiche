@@ -1,6 +1,8 @@
 # Profile checks release
 
-This work is on the development branch. Database migrations 005, 006 and 007, the guarded worker, cloud secrets and the schedules were installed in Supabase on October 27. Automatic moderation and its minute-based retry job are active. Hosted verification passed all eight groups and confirmed cleanup of four disposable accounts. Daily reservation retention is scheduled but has not yet had its first scheduled execution. The separate general maintenance job is not installed. Matching legal disclosures are published in site version 10. Build 1.0 (3) is approved and available in the existing public TestFlight group. Fresh App Store Connect reads verified processing, approval, group membership, and external testing availability.
+This is the October 27 moderation release record, now merged into `main`. Database migrations 005, 006 and 007, the guarded worker, cloud secrets and the schedules were installed in Supabase on October 27. Hosted verification passed all eight groups and confirmed cleanup of four disposable accounts. Build 1.0 (3) was approved for public TestFlight at that time.
+
+Update, October 29: general retention is now installed and its scheduled SQL passed verification. Build 1.0 (8) is in public TestFlight and submitted to App Review. The website is on version 16, including subsequent disclosure, journal and friends updates. See [App Store readiness](app-store-readiness.md) for the current dated status and [deployment](deployment.md) for operational details. The verification below describes the original moderation rollout.
 
 ## Intended behavior
 
