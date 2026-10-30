@@ -1,15 +1,25 @@
 # Local configuration and credentials
+.local/
+.xcodebuildmcp/
+.asc/
 .env
 .env.*
 !.env.example
+.envrc
 *.local.*
 *.pem
 *.p8
 *.p12
 *.pfx
 *.key
+*.cer
+*.der
+*.csr
+*.keychain
+*.keychain-db
 *.mobileprovision
 *.provisionprofile
+ExportOptions*.plist
 credentials*.json
 service-account*.json
 
@@ -28,10 +38,23 @@ node_modules/
 xcuserdata/
 *.xcuserstate
 *.xcresult
+*.xcarchive/
+*.app/
+*.xctest/
 *.ipa
 *.dSYM/
+*.xcactivitylog
 __pycache__/
 *.pyc
+
+# Local data exports and database snapshots
+*.dump
+*.backup
+*.sqlite*
+*.db
+*.db-wal
+*.db-shm
+*.sql.gz
 
 # Generated site sources and local diagnostics
 apps/web/invite-hosting/content/

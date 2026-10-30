@@ -109,7 +109,12 @@ def setting_values(path: Path, name: str) -> set[str]:
 
 
 def release_setting(root: Path, name: str) -> str | None:
-    for path in (root / "Config/Release.xcconfig", root / "Config/Shared.xcconfig", root / "WorldNiche.xcodeproj/project.pbxproj"):
+    shared = root / "Config/Shared.xcconfig"
+    paths = [root / "Config/Release.xcconfig"]
+    if shared.is_file() and re.search(r'^\s*#include\??\s+"Signing\.local\.xcconfig"', shared.read_text(), re.M):
+        paths.append(root / "Config/Signing.local.xcconfig")
+    paths.extend((shared, root / "WorldNiche.xcodeproj/project.pbxproj"))
+    for path in paths:
         values = setting_values(path, name)
         if values:
             return next(iter(values)) if len(values) == 1 else None
@@ -133,14 +138,15 @@ def supports_invites(detail: dict) -> bool:
 def check(root: Path, aasa_path: Path) -> tuple[list[str], list[str]]:
     blockers: list[str] = []
     notes: list[str] = []
-    path = root / "WorldNiche/Resources/SocialConfiguration.json"
+    local = root / "WorldNiche/Resources/SocialConfiguration.local.json"
+    path = local if local.exists() else root / "WorldNiche/Resources/SocialConfiguration.json"
     try:
         config = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(config, dict):
             raise ValueError("not a dictionary")
     except (OSError, ValueError, UnicodeError):
         config = {}
-        blockers.append("SocialConfiguration.json is missing or invalid JSON. Restore its five configuration fields.")
+        blockers.append(f"{path.name} is missing or invalid JSON. Restore its five configuration fields.")
     for field in FIELDS:
         value = config.get(field)
         if not isinstance(value, str) or not value.strip():

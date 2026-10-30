@@ -34,4 +34,4 @@ One repo: [`apps/ios`](apps/ios) · [`apps/web`](apps/web) · [`backend`](backen
 
 Version **1.0 (8)** is submitted to App Review, with manual release after approval. [Submission details](docs/app-store-readiness.md).
 
-Working on it? Start with the [handoff](docs/handoff.md), [deployment map](docs/deployment.md) and [architecture](docs/architecture.md).
+Working on it? Start with the [single workspace](docs/local-workspace.md), [handoff](docs/handoff.md), [deployment map](docs/deployment.md) and [architecture](docs/architecture.md).
