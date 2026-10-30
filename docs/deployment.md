@@ -55,7 +55,7 @@ Rollback uses Vercel's previous successful production deployment. Also revert th
 
 Before October 30, 2026, the website ran on Sites project `appgprj_6ad5354a0da481919ffcd3a148d379bf`, using Cloudflare Workers. Version 16 and the `v1.0.0` release record remain historical snapshots. The `sitesProjectID` field and `scripts/prepare_site.py` remain for archival packaging; they are not the production deployment path.
 
-The former apex A records were `162.159.143.30` and `172.66.3.26`. Do not restore them unless intentionally rolling back the hosting migration. Email and domain verification records were preserved. The old private configured checkout is not the source for future website edits.
+The former apex A records were `162.159.143.30` and `172.66.3.26`. Do not restore them unless intentionally rolling back the hosting migration. Email and domain verification records were preserved. All source now lives in the single `/Users/rb/dev/WorldNiche` checkout.
 
 ## Native CI
 
@@ -81,13 +81,13 @@ They were installed and verified before submission. Inspect jobs and recent exec
 
 ## Build and distribute iOS
 
-Open `apps/ios/WorldNiche.xcodeproj`, scheme `WorldNiche`, directly from this repo. The public configuration intentionally supports guest use without service access.
+Open `/Users/rb/dev/WorldNiche/apps/ios/WorldNiche.xcodeproj`, scheme `WorldNiche`, directly from this repo. Editing, signing and release builds use this same checkout. The public configuration intentionally supports guest use without service access.
 
-For a configured build, put the owner's app configuration in ignored `apps/ios/WorldNiche/Resources/SocialConfiguration.local.json` and signing overrides in ignored `apps/ios/Config/Signing.local.xcconfig`. The loader prefers the local JSON. Use the Supabase **publishable/anon client key**, never a service-role key or an OpenAI key. Set the production service URL and `appleSignInEnabled: true`. Use the existing resource JSON as the field template. Do not overwrite the tracked blank template.
+For a configured build, put the owner's app configuration in ignored `apps/ios/WorldNiche/Resources/SocialConfiguration.local.json` and signing overrides in ignored `apps/ios/Config/Signing.local.xcconfig`. The loader prefers the local JSON. Use the Supabase **publishable/anon client key**, never a service-role key or an OpenAI key. Set the production service URL and `appleSignInEnabled: true`. Use the existing resource JSON as the field template. Keep its tracked service URL and client key blank, with Apple sign-in disabled.
 
 Run the Swift suites and affected UI suites on phone and Duo, then live discovery, real Apple sign-in, friend access and account deletion checks when those paths change. Use a disposable account with the owner's authorization for deletion. Inspect the final bundle, privacy manifest, entitlements, source credits and release configuration with `apps/ios/Scripts/check_release_readiness.py` plus the release checklist.
 
-Archive/export using the owner's Apple Distribution certificate and WorldNiche App Store profile, upload via App Store Connect, wait for processing and verify the exact build's public beta group assignment. New uploads need a new build number in `Config/Shared.xcconfig`. Credentials and configured IPAs remain private. GitHub does not currently hold signing or App Store upload credentials, so iOS distribution is an operator-run release step.
+Archive/export using the owner's Apple Distribution certificate and WorldNiche App Store profile. The owner's export settings are in ignored `.local/ExportOptions.local.plist`; they export a local IPA rather than uploading automatically. Put archives, IPAs and validation evidence in `outputs/`. Upload via App Store Connect only for an authorized release, wait for processing and verify the exact build's public beta group assignment. New uploads need a new build number in `apps/ios/Config/Shared.xcconfig`. Credentials and configured IPAs remain private. GitHub does not currently hold signing or App Store upload credentials, so iOS distribution is an operator-run release step.
 
 Listing source lives in `metadata/app-info/` and `metadata/version/`. The frozen submitted listing beside the 1.0 media is a readback snapshot. Use the current App Store metadata sync tools to validate and review a future metadata diff before applying it.
 
@@ -113,7 +113,7 @@ The local `asc` keychain profile is named `Tech Bros Budget`; the verified app/t
 | Apple distribution certificate/private key and ASC API key | Owner's Keychain/private credential storage |
 | App client config | Ignored `SocialConfiguration.local.json`; only public client access |
 
-On the existing Mac, an operator-only OpenAI copy is in `/Users/rb/dev/WorldNiche/Backend/.env.local`. Do not source or print it just to inspect the project. Cloud moderation does not depend on this Mac staying on. New agents can work on code and CI without these secrets; production operations require authenticated service access.
+On the existing Mac, an operator-only OpenAI copy is in `/Users/rb/dev/WorldNiche/backend/.env.local`. Do not source or print it just to inspect the project. Cloud moderation does not depend on this Mac staying on. New agents can work on code and CI without these secrets; production operations require authenticated service access. Private files, local archives and generated build products are ignored and checked by the [repository safeguards](local-workspace.md).
 
 ## Release tags
 

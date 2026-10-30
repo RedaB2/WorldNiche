@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+python3 scripts/check_private_files.py
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo 'Install gitleaks before committing (brew install gitleaks on macOS).' >&2
+  exit 1
+fi
+gitleaks protect --staged --redact --no-banner

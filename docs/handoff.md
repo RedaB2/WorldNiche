@@ -25,7 +25,7 @@ The `v1.0.0` tag marks this first submitted version. Documentation and CI were a
 ## A normal change
 
 1. Pull `main`, check `AGENTS.md`, and create a branch. Inspect existing changes before editing.
-2. Run the relevant suites with `bash scripts/check.sh web`, `backend`, `swift`, or `assets`. `all` runs everything on a Mac with Swift 6, Node 24+ and PostgreSQL installed.
+2. Enable the local commit guard with `git config core.hooksPath .githooks` (Python 3 and Gitleaks required). Run `bash scripts/check.sh private` and the relevant suites: `web`, `backend`, `swift`, or `assets`. `all` runs everything on a Mac with Swift 6, Node 24+ and PostgreSQL installed.
 3. For native UI changes, use XcodeBuildMCP to test the affected scenarios on a phone and an unfolded Duo. CI covers synthetic profile/journal flows; live news, Apple authorization, push-to-device and Duo testing remain release checks.
 4. Review the diff for credentials and private data, then commit under the owner's GitHub identity. Open a PR and inspect [GitHub Actions](https://github.com/RedaB2/WorldNiche/actions).
 5. Merge passing changes. Website changes publish through Vercel automatically; check `/deployment.json` against the merged commit. Backend and iOS publishing remain separate. Follow the [deployment guide](deployment.md) for the affected service.
@@ -49,12 +49,14 @@ The owner monitors `boutayeb.reda@icloud.com` and the private moderation queue. 
 
 ## Existing local files
 
-On Reda's Mac, `/Users/rb/dev/WorldNiche-Public` is this repo. `/Users/rb/dev/WorldNiche` is the older configured build mirror, containing ignored credentials and release evidence. **New changes belong in this repo**, not that mirror.
+On Reda's Mac, **`/Users/rb/dev/WorldNiche` is the single working repository** for the app, website, backend, App Store builds and GitHub PRs. Open this folder as the Codex project for new chats. Open `apps/ios/WorldNiche.xcodeproj` in Xcode, scheme `WorldNiche`.
 
-The audit found matching app implementation/assets and website runtime source. Mirror differences are local signing/service configuration, older test helpers, comments and old paths. The public repo has newer feed/license tests. Do not copy the mirror wholesale over the repo.
+The former `WorldNiche-Public` checkout was moved here without changing Git history. The older configured folder and clean `WorldNiche2` clone were verified and preserved as private recovery archives in `.local/archive/`. They are backups, not alternate workspaces. App source, assets and UI tests matched before consolidation; newer repository tests and website deployment code were preserved.
+
+Private local files are `apps/ios/Config/Signing.local.xcconfig`, `apps/ios/WorldNiche/Resources/SocialConfiguration.local.json`, `backend/.env.local`, and `.local/ExportOptions.local.plist`. They are ignored. Signing certificates and private keys stay in the owner's Keychain. The checked-in service template has no service URL or client key and disables Apple sign-in; public invitation, privacy and support URLs remain populated. See [local workspace setup](local-workspace.md).
 
 Private archives, IPAs and signing diagnostics are under `/Users/rb/dev/WorldNiche/outputs/testflight/1.0-8/`. Private reviewer/deletion evidence is under `/Users/rb/dev/WorldNiche/outputs/app-store-1.0/submission-review/`. The `127.0.0.1:8767` submission preview was just a local review page, not website hosting. These private files are not prerequisites for ordinary development.
 
 ## Brief for another agent
 
-> Work in RedaB2/WorldNiche from current main. Read AGENTS.md, docs/handoff.md and docs/deployment.md. Preserve the submitted v1.0.0 release. Make the requested change on a branch, run relevant checks and simulator tests, and show the diff and deployment target. Website merges to main publish automatically through Vercel; verify the live commit afterward. Use the service IDs in ops/production.json. Keep secrets and reviewer invitations private. Report separately what is committed, what passed CI and what is actually deployed.
+> Work in /Users/rb/dev/WorldNiche, the RedaB2/WorldNiche repository. Read AGENTS.md, docs/handoff.md and docs/deployment.md. Preserve the submitted v1.0.0 release. Make the requested change on a branch or worktree, run the private-file check, relevant suites and simulator tests, and show the diff and deployment target. Use this same source for App Store builds. Website merges to main publish automatically through Vercel; verify the live commit afterward. Use the service IDs in ops/production.json. Keep secrets and reviewer invitations private. Report separately what is committed, what passed CI and what is actually deployed.

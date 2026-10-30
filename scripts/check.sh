@@ -2,6 +2,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 case "${1:-all}" in
+  private)
+    python3 scripts/check_private_files.py
+    python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+    ;;
   web)
     npm --prefix apps/web test
     npm --prefix apps/web run build
@@ -20,7 +24,7 @@ case "${1:-all}" in
     ;;
   assets) python3 scripts/check_assets.py ;;
   all)
-    for suite in assets web backend swift; do bash scripts/check.sh "$suite"; done
+    for suite in private assets web backend swift; do bash scripts/check.sh "$suite"; done
     ;;
-  *) echo "Usage: bash scripts/check.sh [assets|web|backend|swift|all]" >&2; exit 2 ;;
+  *) echo "Usage: bash scripts/check.sh [private|assets|web|backend|swift|all]" >&2; exit 2 ;;
 esac
