@@ -3,7 +3,9 @@
   "private": true,
   "scripts": {
     "build": "npm --prefix invite-hosting run build",
+    "build:vercel": "npm --prefix invite-hosting run build -- --production && node invite-hosting/scripts/build-vercel.mjs && node invite-hosting/scripts/validate-vercel.mjs",
     "test": "npm --prefix invite-hosting test",
     "validate": "npm --prefix invite-hosting run validate"
-  }
+  },
+  "engines": { "node": "24.x" }
 }

@@ -6,7 +6,10 @@ import { gzipSync } from "node:zlib";
 import { readConfiguration } from "./configuration.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const manifest = await readConfiguration(root, "hosting");
+const production = process.argv.includes("--production")
+  ? JSON.parse(await readFile(new URL("../../../../ops/production.json", import.meta.url), "utf8"))
+  : null;
+const manifest = production ? { project_id: production.website.sitesProjectID } : await readConfiguration(root, "hosting");
 if (typeof manifest.project_id !== "string" || !manifest.project_id || "static" in manifest) throw new Error("Configure a Worker hosting project ID without static configuration.");
 const types = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "application/javascript; charset=utf-8", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml", ".mp4": "video/mp4", ".woff2": "font/woff2" };
 const routes = {};
@@ -55,12 +58,15 @@ invitation = invitation.replace("__INSTALL_ACTION__", '<p class="install">WorldN
 add("/invite-template", Buffer.from(invitation), types[".html"], "no-store");
 for (const name of ["style.css", "invite.js"]) add(`/${name}`, await readFile(resolve(root, "content/invite", name)), types[extname(name)]);
 for (const name of ["logo.png", "logo-dark.png"]) routes[`/${name}`] = routes[`/landing/assets/${name}`];
-const parsedAssociation = await readConfiguration(root, "association");
+const parsedAssociation = production ? { applinks: { details: [{
+  appIDs: [`${production.apple.teamID}.${production.apple.bundleID}`],
+  components: [{ "/": "/invite/*", comment: "WorldNiche friend invitations only" }],
+}] } } : await readConfiguration(root, "association");
 if (!parsedAssociation.applinks?.details?.some((detail) => detail.appIDs?.length && detail.components?.some((component) => component["/"] === "/invite/*"))) throw new Error("Association document must identify the app and invitation route");
 const associationBytes = Buffer.from(JSON.stringify(parsedAssociation));
 const association = add(null, associationBytes, "application/json", "public, max-age=300");
 const handler = await readFile(resolve(root, "worker/handler.js"), "utf8");
-const output = `${handler}\nconst payload = ${JSON.stringify({ routes, blobs, association })};\nexport default createHandler(payload);\n`;
+const output = `${handler}\nexport const payload = ${JSON.stringify({ routes, blobs, association })};\nexport default createHandler(payload);\n`;
 const compressed = gzipSync(output).length;
 if (compressed > 8 * 1024 * 1024) throw new Error(`Worker is ${(compressed / 1048576).toFixed(2)} MiB gzip; compress actual media to stay below this package's 8 MiB budget.`);
 await rm(resolve(root, "dist"), { recursive: true, force: true });

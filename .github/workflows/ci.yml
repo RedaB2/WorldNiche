@@ -42,6 +42,7 @@ jobs:
           node-version: '24'
       - run: bash scripts/check.sh assets
       - run: bash scripts/check.sh web
+      - run: npm --prefix apps/web run build:vercel
 
   backend:
     name: Backend security and database
