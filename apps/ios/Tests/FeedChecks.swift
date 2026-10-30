@@ -6,15 +6,17 @@ private final class MockState: @unchecked Sendable {
     private var count = 0
     private var musicCount = 0
     private var musicURLs: [URL] = []
-    func configure(_ value: String) { lock.lock(); defer { lock.unlock() }; mode = value; count = 0; musicCount = 0; musicURLs = [] }
+    private var newsURLs: [URL] = []
+    func configure(_ value: String) { lock.lock(); defer { lock.unlock() }; mode = value; count = 0; musicCount = 0; musicURLs = []; newsURLs = [] }
     func record(isMusic: Bool, url: URL) -> (mode: String, musicAttempt: Int) {
         lock.lock(); defer { lock.unlock() }
         count += 1
-        if isMusic { musicCount += 1; musicURLs.append(url) }
+        if isMusic { musicCount += 1; musicURLs.append(url) } else { newsURLs.append(url) }
         return (mode, musicCount)
     }
     func requestCount() -> Int { lock.lock(); defer { lock.unlock() }; return count }
     func musicRequestCount() -> Int { lock.lock(); defer { lock.unlock() }; return musicCount }
+    func requestedNewsURLs() -> [URL] { lock.lock(); defer { lock.unlock() }; return newsURLs }
     func requestedMusicURLs() -> [URL] { lock.lock(); defer { lock.unlock() }; return musicURLs }
 }
 private func rssDate(daysAgo: Int = 0) -> String {
@@ -24,6 +26,10 @@ private func rssDate(daysAgo: Int = 0) -> String {
     return formatter.string(from: Date().addingTimeInterval(-Double(daysAgo) * 86400))
 }
 private let currentRSSDate = rssDate()
+private let multilingualHeadline = "한국의 음악 · ثقافة المغرب · café · 日本 🎵 & <local>"
+private let forbiddenXMLScalars = (Array(0...31).filter { ![9, 10, 13].contains($0) } + [0xFFFE, 0xFFFF])
+    .compactMap { Unicode.Scalar($0) }
+private let forbiddenXMLText = String(String.UnicodeScalarView(forbiddenXMLScalars))
 private let mockState = MockState()
 private final class MockProtocol: URLProtocol, @unchecked Sendable {
     override class func canInit(with request: URLRequest) -> Bool { true }
@@ -55,6 +61,14 @@ private final class MockProtocol: URLProtocol, @unchecked Sendable {
         } else { chart = music }
         var news = rss
         if mode == "badControl" { news = rss.replacingOccurrences(of: "</item>", with: "<description><![CDATA[Body \u{0008} text]]></description></item>") }
+        if ["allControls", "unicodeTitle", "controlsInTitle"].contains(mode) {
+            let title = multilingualHeadline + (mode == "controlsInTitle" ? forbiddenXMLText : "")
+            news = rss.replacingOccurrences(of: "Fish & Chips", with: title)
+            news = news.replacingOccurrences(of: "</item>", with: "<description><![CDATA[Body \(forbiddenXMLText) text]]></description></item>")
+        }
+        if mode == "truncatedRSS" { news = String(rss.dropLast("</channel></rss>".count)) }
+        if mode == "unescapedEntity" { news = rss.replacingOccurrences(of: "<![CDATA[Fish & Chips]]>", with: "Fish & Chips") }
+        if mode == "badNumericEntity" { news = rss.replacingOccurrences(of: "<![CDATA[Fish & Chips]]>", with: "Fish &#x8; Chips") }
         if mode == "missingAuthor" { news = rss.replacingOccurrences(of: "<dc:creator>Sample Author</dc:creator>", with: "") }
         if mode == "foreignPublisher" { news = rss.replacingOccurrences(of: "https://globalvoices.org/story", with: "https://example.org/story") }
         if mode == "oldNews" { news = rss.replacingOccurrences(of: currentRSSDate, with: rssDate(daysAgo: 400)) }
@@ -62,7 +76,7 @@ private final class MockProtocol: URLProtocol, @unchecked Sendable {
         let payload = mode == "malformed" ? "<html>Not a feed</html>" : (isMusic ? chart : news)
         let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: nil, headerFields: nil)!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didLoad: Data(payload.utf8))
+        client?.urlProtocol(self, didLoad: mode == "invalidUTF8" ? Data(payload.utf8) + Data([0xFF]) : Data(payload.utf8))
         client?.urlProtocolDidFinishLoading(self)
     }
     override func stopLoading() {}
@@ -193,6 +207,7 @@ private final class RaceProtocol: URLProtocol, @unchecked Sendable {
             precondition(absent.items.isEmpty && absent.unavailable?.contains("does not list") == true)
             precondition(mockState.requestCount() == 0, "Do not substitute a different country's reporting")
         }
+        await checkGlobalParserRepair(session: session)
         print("PASS: licensed publisher, bylines, control-character repair, stale/future filtering and unsupported countries.")
         await checkMusicRecovery(country: country, session: session)
         await checkIndependentFeeds(country: country, session: session)
@@ -210,6 +225,33 @@ private final class RaceProtocol: URLProtocol, @unchecked Sendable {
             print("Story source: \(live.stories[0].source); date parsed: \(live.stories[0].publishedAt != nil)")
         }
         if CommandLine.arguments.contains("--live-coverage") { await checkLiveCountryCoverage() }
+    }
+    private static func checkGlobalParserRepair(session: URLSession) async {
+        struct NewsDirectory: Decodable { let feeds: [String: URL] }
+        let path = Bundle.main.url(forResource: "global-voices-feeds", withExtension: "json")!
+        let feeds = try! JSONDecoder().decode(NewsDirectory.self, from: Data(contentsOf: path)).feeds
+        precondition(feeds.count == 193)
+        for (code, expectedURL) in feeds.sorted(by: { $0.key < $1.key }) {
+            mockState.configure("allControls")
+            let result = await DiscoveryFeedService(session: session).fetchNews(for: CountryRepository.country(id: code)!)
+            precondition(result.items.count == 1 && result.unavailable == nil, "Repair must work for \(code)")
+            precondition(result.items[0].title == multilingualHeadline, "Valid Unicode changed for \(code)")
+            precondition(mockState.requestedNewsURLs() == [expectedURL], "Wrong country feed for \(code)")
+        }
+        let country = CountryRepository.country(id: "MA")!
+        mockState.configure("controlsInTitle")
+        let repaired = await DiscoveryFeedService(session: session).fetchNews(for: country)
+        precondition(repaired.items.first?.title == multilingualHeadline + String(repeating: "\u{FFFD}", count: forbiddenXMLScalars.count))
+        for mode in ["truncatedRSS", "unescapedEntity", "badNumericEntity", "invalidUTF8"] {
+            mockState.configure(mode)
+            let service = DiscoveryFeedService(session: session)
+            let broken = await service.fetchNews(for: country)
+            precondition(broken.items.isEmpty && broken.unavailable != nil, "Reject \(mode), including partial items")
+            mockState.configure("success")
+            let recovered = await service.fetchNews(for: country)
+            precondition(recovered.items.count == 1 && mockState.requestCount() == 1, "Do not cache malformed \(mode)")
+        }
+        print("PASS: all 193 country routes repair all 31 forbidden XML scalars, preserve multilingual Unicode, reject broken XML/UTF-8 and recover without a poisoned cache.")
     }
     private static func checkLiveCountryCoverage() async {
         let service = DiscoveryFeedService()
