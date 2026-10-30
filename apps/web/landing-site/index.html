@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="/landing/assets/apple-touch-icon.png?v=niche-20261020">
   <link rel="canonical" href="https://worldniche.app/">
   <link rel="icon" href="/landing/assets/favicon.png?v=niche-20261020" type="image/png">
-  <link rel="stylesheet" href="/landing/style.css?v=duo-fit-20261027">
+  <link rel="stylesheet" href="/landing/style.css?v=friends-20261029">
   <link rel="stylesheet" href="/landing/care.css?v=20261018">
 </head>
 <body>
@@ -105,12 +105,24 @@
 
     <section class="together" id="together" aria-labelledby="together-title">
       <div class="together-inner section-width">
-        <div class="connection-art" aria-hidden="true">
-          <svg class="connection-path" viewBox="0 0 440 300"><path d="M65 195C90 43 347 42 374 195"/><path class="path-dashed" d="M65 195C151 266 282 266 374 195"/><circle cx="65" cy="195" r="5"/><circle cx="374" cy="195" r="5"/></svg>
-          <span class="connection-avatar avatar-sun"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="8"/><path d="M24 5v5m0 28v5M5 24h5m28 0h5M11 11l4 4m18 18 4 4M11 37l4-4m18-18 4-4"/></svg></span>
-          <span class="connection-avatar avatar-moon"><svg viewBox="0 0 48 48"><path d="M35 32A17 17 0 0 1 16 9a17 17 0 1 0 19 23Z"/></svg></span>
-          <span class="connection-world"><span class="brand-mark" aria-hidden="true"></span></span>
-          <span class="connection-caption">Same world. New connections.</span>
+        <div class="connection-art" id="friend-invite" data-state="connected">
+          <div class="connection-scene" role="img" aria-label="An invitation connects Ari and Sam, two friends exploring the world together.">
+            <span class="connection-world"><span class="brand-mark" aria-hidden="true"></span></span>
+            <div class="connection-friends" aria-hidden="true">
+              <div class="connection-person">
+                <span class="connection-portrait"><span class="portrait-crop"><img src="/landing/assets/friend-ari.png" alt="" width="1254" height="1254" loading="lazy" decoding="async"></span><span class="connection-check">✓</span></span>
+                <span>Ari</span>
+              </div>
+              <div class="connection-track"><span class="connection-envelope"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg></span></div>
+              <div class="connection-person">
+                <span class="connection-portrait"><span class="portrait-crop"><img src="/landing/assets/friend-sam.png" alt="" width="1254" height="1254" loading="lazy" decoding="async"></span><span class="connection-check">✓</span></span>
+                <span>Sam</span>
+              </div>
+            </div>
+            <p class="connection-status" aria-hidden="true">You’re connected</p>
+          </div>
+          <button class="connection-replay" type="button" hidden aria-label="Replay the friend invitation animation">Replay invite <span aria-hidden="true">↻</span></button>
+          <p class="connection-caption">Same world. New connections.</p>
         </div>
         <div class="together-copy">
           <p class="eyebrow">BETTER WITH YOUR PEOPLE</p>
@@ -141,5 +153,6 @@
     <p>Duo preview cultural text: Wikipedia contributors, <a href="https://en.wikipedia.org/w/index.php?title=Mawazine&amp;oldid=1380753484">Mawazine</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Shortened and rephrased for the app.</p>
   </details>
   <script src="/landing/landing.js?v=duo-20261025" defer></script>
+  <script src="/landing/friends.js?v=1" defer></script>
 </body>
 </html>
