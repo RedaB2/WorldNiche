@@ -382,6 +382,13 @@ struct LiveCultureChecks {
         let reading = await LiveCultureService(session: session, topics: topics).fetch(for: country).reading
         try require(reading?.image?.attribution == "Example photographer" && reading?.image?.license == "CC BY-SA 4.0", "Licensed article image lost its attribution.")
         try require(reading?.image?.sourceURL.host == "commons.wikimedia.org", "Image source was not the original file page.")
+        let imageJSON = String(data: try JSONSerialization.data(withJSONObject: image), encoding: .utf8)!
+        for license in ["CC BY-NC 4.0", "CC BY-ND 4.0", "CC BY-SA 4.0 plus permission required", "Not public domain"] {
+            let restricted = Data(imageJSON.replacingOccurrences(of: "CC BY-SA 4.0", with: license).utf8)
+            MockCultureURLProtocol.transport.reset([.init(data: try JSONSerialization.data(withJSONObject: article)), .init(data: restricted)])
+            let result = await LiveCultureService(session: session, topics: topics).fetch(for: country)
+            try require(result.reading?.image == nil, "A restricted or ambiguous image license was accepted: \(license)")
+        }
         article["originalimage"] = ["source": "https://upload.wikimedia.org/wikipedia/en/a/ab/Nonfree.jpg"]
         MockCultureURLProtocol.transport.reset([.init(data: try JSONSerialization.data(withJSONObject: article))])
         let nonfree = await LiveCultureService(session: session, topics: topics).fetch(for: country)

@@ -461,7 +461,7 @@ actor LiveCultureService {
                   let source = URL(string: info.descriptionurl), source.scheme == "https", source.host == "commons.wikimedia.org",
                   let licenseRaw = info.extmetadata["LicenseShortName"]?.value else { return nil }
             let license = CultureTopicDiscovery.plainText(licenseRaw)
-            let allowed = license.lowercased().hasPrefix("cc by") || license.lowercased().contains("cc0") || license.lowercased().contains("public domain")
+            let allowed = license.lowercased().range(of: #"^(cc by(?:-sa)? [1-4]\.0|cc0(?: 1\.0)?|public domain)$"#, options: .regularExpression) != nil
             guard allowed else { return nil }
             let attribution = CultureTopicDiscovery.plainText(info.extmetadata["Artist"]?.value ?? info.extmetadata["Credit"]?.value ?? "")
             guard !attribution.isEmpty else { return nil }

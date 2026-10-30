@@ -17,6 +17,13 @@ private final class MockState: @unchecked Sendable {
     func musicRequestCount() -> Int { lock.lock(); defer { lock.unlock() }; return musicCount }
     func requestedMusicURLs() -> [URL] { lock.lock(); defer { lock.unlock() }; return musicURLs }
 }
+private func rssDate(daysAgo: Int = 0) -> String {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+    return formatter.string(from: Date().addingTimeInterval(-Double(daysAgo) * 86400))
+}
+private let currentRSSDate = rssDate()
 private let mockState = MockState()
 private final class MockProtocol: URLProtocol, @unchecked Sendable {
     override class func canInit(with request: URLRequest) -> Bool { true }
@@ -39,14 +46,20 @@ private final class MockProtocol: URLProtocol, @unchecked Sendable {
         let status = mode == "unavailable" ? 404 : (mode == "badRequest" ? 400 :
             (mode == "serverError" ? 500 : (transient502 || failedMusic || failedNews ? 502 : 200)))
         let music = #"{"feed":{"results":[{"id":"one","name":"A song","artistName":"An artist","artworkUrl100":"https://example.org/art.png","url":"https://music.apple.com/track"},{"id":"bad","name":"Unsafe link","artistName":"Artist","url":"javascript:bad"}]}}"#
-        let rss = #"<?xml version="1.0"?><rss><channel><item><title><![CDATA[Fish & Chips - Sample News]]></title><link>https://example.org/story</link><source>Sample News</source><pubDate>Sat, 17 Oct 2026 09:12:00 GMT</pubDate></item><item><title>Duplicate</title><link>https://example.org/story</link><source>Sample News</source></item><item><title>Untrusted URL</title><link>javascript:alert(1)</link></item></channel></rss>"#
+        let rss = #"<?xml version="1.0"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><item><title><![CDATA[Fish & Chips]]></title><link>https://globalvoices.org/story</link><dc:creator>Sample Author</dc:creator><pubDate>Sat, 17 Oct 2026 09:12:00 GMT</pubDate></item><item><title>Duplicate</title><link>https://globalvoices.org/story</link><dc:creator>Sample Author</dc:creator></item><item><title>Untrusted URL</title><link>javascript:alert(1)</link></item></channel></rss>"#.replacingOccurrences(of: "Sat, 17 Oct 2026 09:12:00 GMT", with: currentRSSDate)
         let chart: String
         if mode == "fallback25" {
             let songs = (1...25).map { ["id": String($0), "name": "Song \($0)",
                                       "artistName": "Artist", "url": "https://music.apple.com/track/\($0)"] }
             chart = String(data: try! JSONSerialization.data(withJSONObject: ["feed": ["results": songs]]), encoding: .utf8)!
         } else { chart = music }
-        let payload = mode == "malformed" ? "<html>Not a feed</html>" : (isMusic ? chart : rss)
+        var news = rss
+        if mode == "badControl" { news = rss.replacingOccurrences(of: "</item>", with: "<description><![CDATA[Body \u{0008} text]]></description></item>") }
+        if mode == "missingAuthor" { news = rss.replacingOccurrences(of: "<dc:creator>Sample Author</dc:creator>", with: "") }
+        if mode == "foreignPublisher" { news = rss.replacingOccurrences(of: "https://globalvoices.org/story", with: "https://example.org/story") }
+        if mode == "oldNews" { news = rss.replacingOccurrences(of: currentRSSDate, with: rssDate(daysAgo: 400)) }
+        if mode == "futureNews" { news = rss.replacingOccurrences(of: currentRSSDate, with: rssDate(daysAgo: -5)) }
+        let payload = mode == "malformed" ? "<html>Not a feed</html>" : (isMusic ? chart : news)
         let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: nil, headerFields: nil)!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Data(payload.utf8))
@@ -87,7 +100,7 @@ private final class RaceProtocol: URLProtocol, @unchecked Sendable {
     func deliver(version: Int) {
         let identity = "version-\(version)"
         let music = "{\"feed\":{\"results\":[{\"id\":\"\(identity)\",\"name\":\"Song\",\"artistName\":\"Artist\",\"url\":\"https://music.apple.com/track/\(version)\"}]}}"
-        let news = "<rss><channel><item><title>\(identity)</title><link>https://example.org/\(identity)</link><source>Test</source></item></channel></rss>"
+        let news = "<rss xmlns:dc=\"http://purl.org/dc/elements/1.1/\"><channel><item><title>\(identity)</title><link>https://globalvoices.org/\(identity)</link><dc:creator>Test Author</dc:creator><pubDate>\(currentRSSDate)</pubDate></item></channel></rss>"
         let body = request.url!.host == "rss.marketingtools.apple.com" ? music : news
         client?.urlProtocol(self, didReceive: HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Data(body.utf8))
@@ -129,6 +142,8 @@ private final class RaceProtocol: URLProtocol, @unchecked Sendable {
         precondition(feed.stories.count == 1)
         precondition(feed.stories[0].title == "Fish & Chips")
         precondition(feed.stories[0].publishedAt != nil)
+        precondition(feed.stories[0].author == "Sample Author")
+        precondition(feed.stories[0].source == "Global Voices")
         precondition(feed.musicUnavailable == nil && feed.newsUnavailable == nil)
         _ = await service.fetch(for: country)
         precondition(mockState.requestCount() == 2, "Cache should reuse the two successful requests")
@@ -164,6 +179,21 @@ private final class RaceProtocol: URLProtocol, @unchecked Sendable {
         let cancelled = await task.value
         precondition(cancelled.tracks.isEmpty && cancelled.stories.isEmpty)
         precondition(mockState.requestCount() == 0)
+        mockState.configure("badControl")
+        let repaired = await DiscoveryFeedService(session: session).fetchNews(for: country)
+        precondition(repaired.items.count == 1, "Invalid body controls must not hide valid headlines")
+        for mode in ["missingAuthor", "foreignPublisher", "oldNews", "futureNews"] {
+            mockState.configure(mode)
+            let filtered = await DiscoveryFeedService(session: session).fetchNews(for: country)
+            precondition(filtered.items.isEmpty && filtered.unavailable != nil, "Reject \(mode)")
+        }
+        for code in ["AD", "FM"] {
+            mockState.configure("success")
+            let absent = await DiscoveryFeedService(session: session).fetchNews(for: CountryRepository.country(id: code)!)
+            precondition(absent.items.isEmpty && absent.unavailable?.contains("does not list") == true)
+            precondition(mockState.requestCount() == 0, "Do not substitute a different country's reporting")
+        }
+        print("PASS: licensed publisher, bylines, control-character repair, stale/future filtering and unsupported countries.")
         await checkMusicRecovery(country: country, session: session)
         await checkIndependentFeeds(country: country, session: session)
         await checkConcurrentCacheWrites(country: country)
@@ -172,9 +202,26 @@ private final class RaceProtocol: URLProtocol, @unchecked Sendable {
             let live = await DiscoveryFeedService().fetch(for: country)
             precondition(!live.tracks.isEmpty, live.musicUnavailable ?? "No tracks")
             precondition(!live.stories.isEmpty, live.newsUnavailable ?? "No stories")
-            print("PASS: live France Apple Music \(live.tracks.count) tracks and Google News \(live.stories.count) stories.")
+            print("PASS: live France Apple Music \(live.tracks.count) tracks and Global Voices \(live.stories.count) stories.")
             print("Track: \(live.tracks[0].title) by \(live.tracks[0].artist)")
+            let korea = await DiscoveryFeedService().fetchNews(for: CountryRepository.country(id: "KR")!)
+            precondition(!korea.items.isEmpty, korea.unavailable ?? "Korea feed must load")
+            print("PASS: live South Korea \(korea.items.count) stories despite upstream invalid body control.")
             print("Story source: \(live.stories[0].source); date parsed: \(live.stories[0].publishedAt != nil)")
+        }
+        if CommandLine.arguments.contains("--live-coverage") { await checkLiveCountryCoverage() }
+    }
+    private static func checkLiveCountryCoverage() async {
+        let service = DiscoveryFeedService()
+        for code in ["MA", "FR", "US", "JP", "GE", "CG", "CD", "DM", "BR", "IN", "SN", "NZ", "VA", "KE", "KR", "GB"] {
+            let started = Date()
+            let result = await service.fetchNews(for: CountryRepository.country(id: code)!)
+            precondition(!result.items.isEmpty || result.unavailable?.contains("no recent stories") == true,
+                         "Live feed failed for \(code): \(result.unavailable ?? "unknown")")
+            precondition(result.items.allSatisfy {
+                $0.author?.isEmpty == false && $0.publishedAt != nil && $0.url.host == "globalvoices.org"
+            })
+            print("PASS: live \(code), \(result.items.count) attributed stories, \(String(format: "%.2f", Date().timeIntervalSince(started))) seconds")
         }
     }
     private static func checkMusicRecovery(country: Country, session: URLSession) async {

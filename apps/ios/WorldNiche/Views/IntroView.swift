@@ -316,7 +316,7 @@ struct IntroView: View {
 
     @ViewBuilder
     private var newsPreview: some View {
-        previewHeading("A view of the United States", source: "Recent headlines · Google News")
+        previewHeading("A view of the United States", source: "Local perspectives · Global Voices")
         if previews.newsLoading {
             ProgressView("Finding the latest stories…").font(.subheadline)
         } else if previews.newsUnavailable {
@@ -328,6 +328,12 @@ struct IntroView: View {
                         Text(story.title).font(.subheadline.weight(.medium))
                             .fixedSize(horizontal: false, vertical: true)
                         Text(story.source).font(.caption).foregroundStyle(Palette.muted)
+                        if let author = story.author {
+                            Text("By \(author)").font(.caption).foregroundStyle(Palette.muted)
+                        }
+                        if let date = story.publishedAt {
+                            Text(date.formatted(date: .abbreviated, time: .omitted)).font(.caption2).foregroundStyle(Palette.muted)
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 5)
@@ -335,6 +341,8 @@ struct IntroView: View {
                 .accessibilityIdentifier("introStory\(index)")
             }
             if let fetchedAt = previews.newsFetchedAt, !previews.stories.isEmpty {
+                Link("Headlines: CC BY 3.0", destination: URL(string: "https://creativecommons.org/licenses/by/3.0/")!)
+                    .font(.caption2)
                 Text("Updated \(fetchedAt.formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption2).foregroundStyle(Palette.muted)
             }

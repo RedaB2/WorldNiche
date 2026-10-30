@@ -1,7 +1,7 @@
 import Foundation
 
 /// Public, key-free feeds. A storefront chart is not a national listening survey;
-/// English news search is coverage about a place, not a ranking of local stories.
+/// Global Voices supplies attributed reporting, not a ranking of local stories.
 actor DiscoveryFeedService {
     private let session: URLSession
     private let cacheLifetime: TimeInterval = 15 * 60
@@ -9,6 +9,14 @@ actor DiscoveryFeedService {
     private var newsCache: [String: FeedSnapshot<NewsStory>] = [:]
     private var musicRequests: [String: UUID] = [:]
     private var newsRequests: [String: UUID] = [:]
+
+    private static let newsFeeds: [String: URL] = {
+        struct Directory: Decodable { let feeds: [String: URL] }
+        guard let url = Bundle.main.url(forResource: "global-voices-feeds", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let directory = try? JSONDecoder().decode(Directory.self, from: data) else { return [:] }
+        return directory.feeds.filter { $0.value.scheme == "https" && $0.value.host == "globalvoices.org" }
+    }()
 
     // Apple's public chart builder lists 172 storefronts (162 of our 195 countries).
     // A missing resource falls back to a request rather than inventing unavailability.
@@ -178,30 +186,14 @@ actor DiscoveryFeedService {
     }
 
     private static func loadNews(for country: Country, session: URLSession) async -> FeedResult<NewsStory> {
-        var components = URLComponents(string: "https://news.google.com/rss/search")!
-        let searchName: String
-        switch country.id {
-        case "GE": searchName = "Georgia country -Atlanta -Bulldogs"
-        case "CG": searchName = "Republic of the Congo Brazzaville"
-        case "CD": searchName = "Democratic Republic of the Congo"
-        case "DM": searchName = "Dominica -Dominican"
-        case "VA": searchName = "Vatican"
-        default: searchName = "\"\(country.name)\""
-        }
-        components.queryItems = [
-            URLQueryItem(name: "q", value: "\(searchName) when:7d"),
-            URLQueryItem(name: "hl", value: "en-US"),
-            URLQueryItem(name: "gl", value: "US"),
-            URLQueryItem(name: "ceid", value: "US:en")
-        ]
-        guard let url = components.url else {
-            return FeedResult(items: [], message: "News could not be requested for this location.")
+        guard let url = newsFeeds[country.id.uppercased()] else {
+            return FeedResult(items: [], message: "Global Voices does not list a country feed for this place yet.")
         }
         do {
             let xml = try await data(from: url, session: session)
             let reader = NewsRSSReader()
             let stories = try reader.read(xml)
-            return FeedResult(items: Array(stories.prefix(8)), message: stories.isEmpty ? "No recent English-language coverage was found." : nil)
+            return FeedResult(items: Array(stories.prefix(8)), message: stories.isEmpty ? "Global Voices has no recent stories to share for this place." : nil)
         } catch {
             let cancelled = error is CancellationError || (error as? URLError)?.code == .cancelled
             return FeedResult(items: [], message: cancelled ? "News loading was cancelled." : "The news feed could not load. Try again when you’re connected.", canCache: false)
@@ -230,7 +222,15 @@ private final class NewsRSSReader: NSObject, XMLParserDelegate {
     private var documentIsRSS = false
 
     func read(_ data: Data) throws -> [NewsStory] {
-        let parser = XMLParser(data: data)
+        // A publisher's article body can contain legacy control characters.
+        // Replace only scalars forbidden by XML 1.0, then still require valid XML.
+        guard let xml = String(data: data, encoding: .utf8) else { throw CocoaError(.fileReadCorruptFile) }
+        let scalars = xml.unicodeScalars.map { scalar -> Unicode.Scalar in
+            let value = scalar.value
+            return value == 9 || value == 10 || value == 13 || (32...0xD7FF).contains(value)
+                || (0xE000...0xFFFD).contains(value) || (0x10000...0x10FFFF).contains(value) ? scalar : "\u{FFFD}"
+        }
+        let parser = XMLParser(data: Data(String(String.UnicodeScalarView(scalars)).utf8))
         parser.delegate = self
         parser.shouldResolveExternalEntities = false
         guard parser.parse(), documentIsRSS else {
@@ -247,11 +247,11 @@ private final class NewsRSSReader: NSObject, XMLParserDelegate {
     }
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
-        if inItem { item[element, default: ""] += string }
+        if inItem, ["title", "link", "dc:creator", "pubDate"].contains(element) { item[element, default: ""] += string }
     }
 
     func parser(_ parser: XMLParser, foundCDATA CDATABlock: Data) {
-        if inItem, let text = String(data: CDATABlock, encoding: .utf8) {
+        if inItem, ["title", "link", "dc:creator", "pubDate"].contains(element), let text = String(data: CDATABlock, encoding: .utf8) {
             item[element, default: ""] += text
         }
     }
@@ -263,15 +263,15 @@ private final class NewsRSSReader: NSObject, XMLParserDelegate {
         inItem = false
         let title = item["title", default: ""].trimmingCharacters(in: .whitespacesAndNewlines)
         let link = item["link", default: ""].trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !title.isEmpty, let url = URL(string: link), url.scheme == "https" else { return }
-        let source = item["source", default: "Google News"].trimmingCharacters(in: .whitespacesAndNewlines)
-        let suffix = " - \(source)"
-        let cleanTitle = title.hasSuffix(suffix) ? String(title.dropLast(suffix.count)) : title
+        let author = item["dc:creator", default: ""].trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty, !author.isEmpty, let url = URL(string: link),
+              url.scheme == "https", url.host == "globalvoices.org", url.user == nil else { return }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
-        let date = item["pubDate"].flatMap { formatter.date(from: $0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+        guard let date = item["pubDate"].flatMap({ formatter.date(from: $0.trimmingCharacters(in: .whitespacesAndNewlines)) }),
+              date > Date().addingTimeInterval(-365 * 86400), date <= Date().addingTimeInterval(86400) else { return }
         guard !stories.contains(where: { $0.url == url }) else { return }
-        stories.append(NewsStory(id: link, title: cleanTitle, source: source, url: url, publishedAt: date))
+        stories.append(NewsStory(id: link, title: title, source: "Global Voices", url: url, publishedAt: date, author: author))
     }
 }

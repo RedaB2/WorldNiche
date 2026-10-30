@@ -14,6 +14,7 @@ struct NewsStory: Identifiable, Sendable {
     let source: String
     let url: URL
     let publishedAt: Date?
+    var author: String? = nil
 }
 
 struct CountryFeed: Sendable {

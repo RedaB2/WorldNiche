@@ -280,18 +280,23 @@ struct CountryDetailView: View {
                                 Text(story.source.uppercased()).scaledFont(size: 11, weight: .medium, design: .monospaced).tracking(1)
                                 Spacer()
                             }.foregroundStyle(Palette.muted)
+                            if let author = story.author {
+                                Text("By \(author)").scaledFont(size: 12).foregroundStyle(Palette.muted)
+                            }
                             Text(story.title).scaledFont(size: 19, design: .serif).foregroundStyle(Palette.pine).multilineTextAlignment(.leading)
                             if let date = story.publishedAt {
-                                Text(date, style: .relative).scaledFont(size: 11).foregroundStyle(Palette.muted)
+                                Text(date.formatted(date: .abbreviated, time: .omitted)).scaledFont(size: 11).foregroundStyle(Palette.muted)
                             }
                         }.frame(maxWidth: .infinity, alignment: .leading).editorialCard()
                     }.accessibilityIdentifier("newsStory-\(story.id)")
                 }
-                Text("English-language coverage via Google News. Headlines are links to reporting, not verified cultural facts.")
+                Text("Local perspectives from Global Voices. Coverage varies by country. Headlines link to the original reporting.")
                     .scaledFont(size: 11).lineSpacing(3).foregroundStyle(Palette.muted)
+                Link("Headlines: CC BY 3.0", destination: URL(string: "https://creativecommons.org/licenses/by/3.0/")!)
+                    .scaledFont(size: 11)
                 updatedLabel(news.fetchedAt)
             } else if newsLoading {
-                loadingRow("Opening a window to today…").accessibilityIdentifier("newsLoading")
+                loadingRow("Finding another point of view…").accessibilityIdentifier("newsLoading")
             } else {
                 unavailable(news?.unavailable ?? "Headlines are unavailable right now.", retryID: "retryNews") {
                     newsRefreshID += 1

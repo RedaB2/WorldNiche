@@ -150,9 +150,9 @@ final class IntroPreviewStore {
     private static func newsFixture() -> FeedSnapshot<NewsStory> {
         let items = [
             NewsStory(id: "intro-news-0", title: "A neighborhood festival brings a city together", source: "Preview News",
-                      url: URL(string: "https://news.google.com")!, publishedAt: Date()),
+                      url: URL(string: "https://globalvoices.org")!, publishedAt: Date()),
             NewsStory(id: "intro-news-1", title: "Inside a community's favorite gathering place", source: "Preview News",
-                      url: URL(string: "https://news.google.com")!, publishedAt: Date())
+                      url: URL(string: "https://globalvoices.org")!, publishedAt: Date())
         ]
         return FeedSnapshot(items: items, fetchedAt: Date(), unavailable: nil)
     }
