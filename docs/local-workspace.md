@@ -21,7 +21,7 @@ For a new task, pull current `main` and create a branch. Use a Git worktree when
 - `.local/ExportOptions.local.plist`: private App Store export settings. The destination is a local export, not an automatic upload.
 - Signing private keys and distribution certificates remain in Keychain; provisioning profiles remain in Xcode's local profile store.
 
-The tracked `SocialConfiguration.json` stays blank. Its local override is loaded automatically. Source paths are relative so the repository can also be cloned elsewhere.
+The tracked `SocialConfiguration.json` has no service URL or client key and disables Apple sign-in. Public invitation, privacy and support URLs remain populated. Its local override is loaded automatically. Source paths are relative so the repository can also be cloned elsewhere.
 
 ## Keep private files private
 
@@ -32,7 +32,7 @@ git config core.hooksPath .githooks
 bash scripts/check.sh private
 ```
 
-The guard checks Git's index before a commit, rejects ignored files that were force-added, keeps the tracked service template blank, and runs Gitleaks on staged changes with secret values redacted. GitHub CI repeats the private-file checks and scans commit history. `.gitignore` covers local settings, credentials, signing material, archives, database dumps, build outputs and private evidence. Public screenshots and source stay tracked.
+The guard checks Git's index before a commit, rejects ignored files that were force-added, keeps service credentials out of the tracked template, and runs Gitleaks on staged changes with secret values redacted. GitHub CI repeats the private-file checks and scans commit history. `.gitignore` covers local settings, credentials, signing material, archives, database dumps, build outputs and private evidence. Public screenshots and source stay tracked.
 
 These checks prevent common accidents. Git ignore rules and local hooks can be bypassed deliberately, so do not use `git add -f` or `--no-verify` to publish private files. If a secret is ever pushed, revoke it immediately; adding it to `.gitignore` afterward does not remove it from history.
 

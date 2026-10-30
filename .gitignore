@@ -54,6 +54,7 @@ __pycache__/
 *.db
 *.db-wal
 *.db-shm
+*.db-journal
 *.sql.gz
 
 # Generated site sources and local diagnostics

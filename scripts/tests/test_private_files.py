@@ -51,6 +51,7 @@ class PrivateFilesTests(unittest.TestCase):
             "profile.mobileprovision",
             "ExportOptions.plist", "release/WorldNiche.xcarchive/Info.plist",
             "WorldNiche.ipa", "WorldNiche.app/Info.plist", "accounts.dump", "journal.sqlite",
+            "accounts.db-journal",
             "outputs/reviewer-notes.txt", "work/private-fixture.json",
             ".xcodebuildmcp/config.yaml", "apps/web/.vercel/output/config.json",
         ]

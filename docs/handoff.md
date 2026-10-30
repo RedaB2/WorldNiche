@@ -53,7 +53,7 @@ On Reda's Mac, **`/Users/rb/dev/WorldNiche` is the single working repository** f
 
 The former `WorldNiche-Public` checkout was moved here without changing Git history. The older configured folder and clean `WorldNiche2` clone were verified and preserved as private recovery archives in `.local/archive/`. They are backups, not alternate workspaces. App source, assets and UI tests matched before consolidation; newer repository tests and website deployment code were preserved.
 
-Private local files are `apps/ios/Config/Signing.local.xcconfig`, `apps/ios/WorldNiche/Resources/SocialConfiguration.local.json`, `backend/.env.local`, and `.local/ExportOptions.local.plist`. They are ignored. Signing certificates and private keys stay in the owner's Keychain. The checked-in service JSON remains a blank template. See [local workspace setup](local-workspace.md).
+Private local files are `apps/ios/Config/Signing.local.xcconfig`, `apps/ios/WorldNiche/Resources/SocialConfiguration.local.json`, `backend/.env.local`, and `.local/ExportOptions.local.plist`. They are ignored. Signing certificates and private keys stay in the owner's Keychain. The checked-in service template has no service URL or client key and disables Apple sign-in; public invitation, privacy and support URLs remain populated. See [local workspace setup](local-workspace.md).
 
 Private archives, IPAs and signing diagnostics are under `/Users/rb/dev/WorldNiche/outputs/testflight/1.0-8/`. Private reviewer/deletion evidence is under `/Users/rb/dev/WorldNiche/outputs/app-store-1.0/submission-review/`. The `127.0.0.1:8767` submission preview was just a local review page, not website hosting. These private files are not prerequisites for ordinary development.
 
