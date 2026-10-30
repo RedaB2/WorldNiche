@@ -28,8 +28,8 @@ association = {'applinks': {'details': [{
     'components': [{'/': '/invite/*', 'comment': 'WorldNiche friend invitations only'}]
 }]}}
 # These IDs are public routing configuration. No local overrides enter this snapshot.
-(hosting / 'hosting.example.json').write_text(json.dumps(manifest, indent=2) + '\n')
-(hosting / 'association.example.json').write_text(json.dumps(association, indent=2) + '\n')
+(hosting / 'hosting.production.json').write_text(json.dumps(manifest, indent=2) + '\n')
+(hosting / 'association.production.json').write_text(json.dumps(association, indent=2) + '\n')
 (output / '.openai').mkdir()
 (output / '.openai/hosting.json').write_text(json.dumps(manifest, indent=2) + '\n')
 (output / '.gitignore').write_text('dist/\nnode_modules/\napps/web/invite-hosting/dist/\napps/web/invite-hosting/content/\n')
