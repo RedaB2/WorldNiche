@@ -36,8 +36,7 @@ final class GlobeInteractionUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["countryTitle"].exists)
         capture("Small European countries at four times zoom", app: app)
 
-        // UIKit's pan recognition slop varies by device. Use a long move and a
-        // country's interior to check hit testing without assuming zero slop.
+        // Geographic hit testing follows the same view translation as the rendered sphere.
         let delta = CGPoint(x: -85, y: 30)
         move(globe, by: delta)
         capture("Two-finger movement before the next selection", app: app)
@@ -62,34 +61,59 @@ final class GlobeInteractionUITests: XCTestCase {
     }
 
     @MainActor
-    func testPinchAndMoveTogetherThenSingleFingerRotationRemainUsable() {
+    func testMovingPinchCentroidAndOneFingerDragKeepTheGrabbedCountry() {
         let app = launch()
         let globe = focusEurope(app)
         let center = CGPoint(x: globe.frame.midX, y: globe.frame.midY)
-        let error = GlobeTestGestures.moveFirst(CGPoint(x: center.x - 35, y: center.y),
-            second: CGPoint(x: center.x + 35, y: center.y),
-            toFirst: CGPoint(x: center.x - 45, y: center.y + 20),
-            toSecond: CGPoint(x: center.x + 95, y: center.y + 20), duration: 1)
-        XCTAssertNil(error)
-        XCTAssertNotEqual(globe.value as? String, "100% zoom")
+        XCTAssertNil(GlobeTestGestures.moveFirst(CGPoint(x: center.x - 30, y: center.y),
+            second: CGPoint(x: center.x + 30, y: center.y),
+            toFirst: CGPoint(x: center.x - 60, y: center.y),
+            toSecond: CGPoint(x: center.x + 60, y: center.y), duration: 0.8))
+        waitForZoom("200% zoom", globe: globe)
+        let anchor = screenPoint(latitude: 46.8, longitude: 8.2, on: globe, centeredAt: (46, 2), zoom: 2)
+        let destination = CGPoint(x: anchor.x + 45, y: anchor.y + 25)
+        XCTAssertNil(GlobeTestGestures.moveFirst(CGPoint(x: anchor.x - 28, y: anchor.y),
+            second: CGPoint(x: anchor.x + 28, y: anchor.y),
+            toFirst: CGPoint(x: destination.x - 42, y: destination.y),
+            toSecond: CGPoint(x: destination.x + 42, y: destination.y), duration: 1.2))
+        waitForZoom("300% zoom", globe: globe)
+        // Switzerland must travel with the moving midpoint, before any reset or recentering.
+        coordinate(destination, on: globe).tap()
+        expectCountry("Switzerland", app: app)
+        capture("Moving pinch keeps Switzerland under its centroid", app: app)
+        let dragged = CGPoint(x: destination.x - 75, y: destination.y + 20)
+        coordinate(destination, on: globe).press(forDuration: 0.05, thenDragTo: coordinate(dragged, on: globe))
+        coordinate(dragged, on: globe).tap()
+        expectCountry("Switzerland", app: app)
         XCTAssertFalse(app.staticTexts["countryTitle"].exists)
-        for _ in 0..<3 {
-            globe.coordinate(withNormalizedOffset: CGVector(dx: 0.4, dy: 0.4))
-                .press(forDuration: 0.05, thenDragTo: globe.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.6)))
-        }
+        capture("One finger carries the same Swiss surface point", app: app)
         app.buttons["resetGlobe"].tap()
         waitForZoom("100% zoom", globe: globe)
-        tap(latitude: 46.8, longitude: 8.2, on: globe, centeredAt: (46, 2), zoom: 1)
+        globe.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         expectCountry("Switzerland", app: app)
         XCTAssertTrue(app.buttons["spinButton"].isHittable, "Globe movement must not scroll the containing page")
-        app.buttons["spinButton"].tap()
-        XCTAssertFalse(app.staticTexts["countryTitle"].exists)
-        XCTAssertEqual(globe.value as? String, "100% zoom")
-        XCTAssertTrue(app.buttons["landingCountry"].isHittable)
     }
 
     @MainActor
-    func testOceanAndOutsideCircleDoNotSelectCountries() {
+    func testGlobeCenterCanLeaveTheViewAndResetRecoversIt() {
+        let app = launch()
+        let globe = focusEurope(app)
+        zoomIn(globe)
+        // Two successive moves can carry the planet center beyond the right edge.
+        for _ in 0..<2 { move(globe, by: CGPoint(x: 140, y: 15)) }
+        XCTAssertEqual(globe.value as? String, "400% zoom")
+        capture("Planet center outside the viewport", app: app)
+        // This French point started at the center. Moving it back remains reversible.
+        for _ in 0..<2 { move(globe, by: CGPoint(x: -140, y: -15)) }
+        globe.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        expectCountry("France", app: app)
+        app.buttons["resetGlobe"].tap()
+        waitForZoom("100% zoom", globe: globe)
+        capture("Reset restores the whole globe", app: app)
+    }
+
+    @MainActor
+    func testOceanAndTransparentCornersDoNotSelectCountries() {
         let app = launch()
         let globe = globe(in: app)
         tap(latitude: 25, longitude: -35, on: globe, centeredAt: (32, -5), zoom: 1)
@@ -102,6 +126,54 @@ final class GlobeInteractionUITests: XCTestCase {
         app.buttons["spinButton"].tap()
         waitForZoom("100% zoom", globe: globe)
         XCTAssertFalse(app.staticTexts["countryTitle"].exists)
+    }
+
+    @MainActor
+    func testTransparentCornerLeavesPageScrollingAvailable() {
+        let app = launch()
+        let globe = globe(in: app)
+        let originalY = globe.frame.minY
+        let start = globe.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: 0.12))
+        start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -140)))
+        XCTAssertLessThan(globe.frame.minY, originalY - 30, "Dragging blank space should scroll the page")
+    }
+
+    @MainActor
+    func testExplorationDemo() {
+        let app = launch()
+        let globe = globe(in: app)
+        capture("Initial globe composition", app: app)
+        tap(latitude: 46, longitude: 2, on: globe, centeredAt: (32, -5), zoom: 1)
+        expectCountry("France", app: app)
+        app.buttons["resetGlobe"].tap()
+        let anchor = screenPoint(latitude: 46.8, longitude: 8.2, on: globe, centeredAt: (46, 2), zoom: 1)
+        let destination = CGPoint(x: anchor.x + 35, y: anchor.y + 18)
+        XCTAssertNil(GlobeTestGestures.moveFirst(CGPoint(x: anchor.x - 25, y: anchor.y),
+            second: CGPoint(x: anchor.x + 25, y: anchor.y),
+            toFirst: CGPoint(x: destination.x - 50, y: destination.y),
+            toSecond: CGPoint(x: destination.x + 50, y: destination.y), duration: 2))
+        coordinate(destination, on: globe).tap()
+        expectCountry("Switzerland", app: app)
+        capture("Off-center zoom beyond the original silhouette", app: app)
+        XCTAssertNil(GlobeTestGestures.moveFirst(CGPoint(x: destination.x - 25, y: destination.y),
+            second: CGPoint(x: destination.x + 25, y: destination.y),
+            toFirst: CGPoint(x: destination.x - 50, y: destination.y),
+            toSecond: CGPoint(x: destination.x + 50, y: destination.y), duration: 2))
+        waitForZoom("400% zoom", globe: globe)
+        capture("Crisp borders at maximum zoom", app: app)
+        let dragged = CGPoint(x: destination.x - 60, y: destination.y + 28)
+        coordinate(destination, on: globe).press(forDuration: 0.05, thenDragTo: coordinate(dragged, on: globe))
+        coordinate(dragged, on: globe).tap()
+        expectCountry("Switzerland", app: app)
+        for _ in 0..<2 { move(globe, by: CGPoint(x: 140, y: 15)) }
+        capture("Exploration with the center offscreen", app: app)
+        app.buttons["resetGlobe"].tap()
+        waitForZoom("100% zoom", globe: globe)
+        capture("Smooth return to the selected country", app: app)
+        app.buttons["landingCountry"].tap()
+        XCTAssertTrue(app.staticTexts["countryTitle"].waitForExistence(timeout: 8))
+        XCTAssertEqual(app.staticTexts["countryTitle"].label, "Switzerland")
+        app.buttons["Close"].firstMatch.tap()
     }
 
     @MainActor
@@ -156,13 +228,24 @@ final class GlobeInteractionUITests: XCTestCase {
     @MainActor
     private func tap(latitude: Double, longitude: Double, on globe: XCUIElement,
                      centeredAt center: (Double, Double), zoom: Double, offset: CGPoint = .zero) {
+        coordinate(screenPoint(latitude: latitude, longitude: longitude, on: globe, centeredAt: center,
+                               zoom: zoom, offset: offset), on: globe).tap()
+    }
+
+    @MainActor
+    private func screenPoint(latitude: Double, longitude: Double, on globe: XCUIElement,
+                             centeredAt center: (Double, Double), zoom: Double, offset: CGPoint = .zero) -> CGPoint {
         let lat = latitude * .pi / 180, deltaLon = (longitude - center.1) * .pi / 180
         let tilt = center.0 * .pi / 180
         let radius = min(globe.frame.width, globe.frame.height) / (2 * 1.18) * zoom
-        let x = cos(lat) * sin(deltaLon) * radius + offset.x
-        let y = -(cos(tilt) * sin(lat) - sin(tilt) * cos(lat) * cos(deltaLon)) * radius + offset.y
-        globe.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-            .withOffset(CGVector(dx: x, dy: y)).tap()
+        return CGPoint(x: globe.frame.midX + cos(lat) * sin(deltaLon) * radius + offset.x,
+            y: globe.frame.midY - (cos(tilt) * sin(lat) - sin(tilt) * cos(lat) * cos(deltaLon)) * radius + offset.y)
+    }
+
+    @MainActor
+    private func coordinate(_ point: CGPoint, on globe: XCUIElement) -> XCUICoordinate {
+        globe.coordinate(withNormalizedOffset: .zero)
+            .withOffset(CGVector(dx: point.x - globe.frame.minX, dy: point.y - globe.frame.minY))
     }
 
     @MainActor

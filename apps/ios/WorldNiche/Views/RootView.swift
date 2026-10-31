@@ -100,7 +100,7 @@ struct ExploreView: View {
                         .padding(.top, 12)
 
                         globe(height: max(200, min(geometry.size.width - 30, 355)))
-                            .padding(.horizontal, -24)
+                            .padding(.horizontal, -26)
                             .padding(.top, 2)
 
                         Button {

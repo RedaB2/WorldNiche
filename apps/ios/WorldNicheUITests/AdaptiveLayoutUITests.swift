@@ -119,7 +119,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
         waitForValue("400% zoom", on: globe)
         globe.pinch(withScale: 1.3, velocity: 1)
         XCTAssertEqual(globe.value as? String, "400% zoom")
-        capture("Globe at the circular zoom limit", app: app)
+        capture("Globe at maximum zoom", app: app)
 
         // Tap the rendered surface, rather than the overlaid country button,
         // to exercise SceneKit hit testing after the camera has zoomed.

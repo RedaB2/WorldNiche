@@ -43,14 +43,58 @@ struct GlobeChecks {
         expect(viewport.offset.x > 0 && viewport.offset.y > 0, "Two-finger movement follows both screen axes")
         expect(viewport.zoomPercent == 300, "Moving does not also zoom")
         viewport.move(by: CGPoint(x: 100_000, y: -100_000), in: size)
-        expect(hypot(viewport.offset.x, viewport.offset.y) < 1, "A long diagonal pan cannot lose the globe")
+        let visibleDistance = hypot(max(0, abs(viewport.offset.x) - viewport.scale * size.width / size.height),
+                                    max(0, abs(viewport.offset.y) - viewport.scale))
+        expect(visibleDistance <= 0.850001, "A long diagonal pan leaves a reachable slice of the globe")
+        expect(abs(viewport.offset.x) > viewport.scale * size.width / size.height,
+               "The planet center can move completely outside the viewport")
         viewport.zoom(by: 0.001, around: center, in: size)
-        expect(hypot(viewport.offset.x, viewport.offset.y) <= 0.250001, "Zooming back out constrains an old pan")
+        expect(viewport.offset.x.isFinite && viewport.offset.y.isFinite, "Zooming out from an offscreen center stays finite")
         viewport = GlobeViewport()
         expect(viewport.offset == .zero && viewport.zoomPercent == 100, "Reset restores the original camera")
         viewport.move(by: CGPoint(x: 20, y: 20), in: .zero)
         viewport.zoom(by: 2, around: .zero, in: .zero)
         expect(viewport.offset == .zero && viewport.zoomPercent == 100, "A transient zero-sized layout is safe")
+
+        let start = CGPoint(x: center.x + 35, y: center.y - 25)
+        let finish = CGPoint(x: center.x - 50, y: center.y + 35)
+        let initial = GlobeViewport()
+        let geographicPoint = initial.scenePoint(at: start, in: size)
+        var combined = initial
+        combined.transform(from: start, to: finish, magnification: 2.5, in: size)
+        let movedPoint = combined.scenePoint(at: finish, in: size)
+        expect(hypot(geographicPoint.x - movedPoint.x, geographicPoint.y - movedPoint.y) < 0.000001,
+               "A geographic point follows a moving pinch centroid exactly")
+        for step in 1...100 {
+            let t = Double(step) / 100
+            var sampled = initial
+            let point = CGPoint(x: start.x + (finish.x - start.x) * t, y: start.y + (finish.y - start.y) * t)
+            sampled.transform(from: start, to: point, magnification: 1 + 1.5 * t, in: size)
+            let under = sampled.scenePoint(at: point, in: size)
+            expect(hypot(under.x - geographicPoint.x, under.y - geographicPoint.y) < 0.000001,
+                   "Pinch anchoring does not accumulate sample drift")
+        }
+        combined.transform(from: finish, to: start, magnification: 1 / 2.5, in: size)
+        expect(abs(combined.scale - initial.scale) < 0.000001 && hypot(combined.offset.x, combined.offset.y) < 0.000001,
+               "Reversing combined movement and pinch restores the starting frame")
+        viewport.move(by: CGPoint(x: 60, y: 40), in: size)
+        let halfway = viewport.interpolated(to: initial, fraction: 0.5)
+        expect(halfway.offset.x != 0 && halfway.offset != viewport.offset, "Reset framing has an intermediate state")
+        expect(viewport.interpolated(to: initial, fraction: 1).offset == .zero, "Reset ends at the exact initial position")
+
+        for latitude in stride(from: -40.0, through: 40, by: 20) {
+            for longitude in stride(from: -170.0, through: 170, by: 34) {
+                let startOrientation = GlobeOrientation(latitude: latitude, longitude: longitude)
+                let sphere = initial.surfacePoint(at: start, in: size)!
+                let grabbed = startOrientation.quaternion.inverse.act(sphere)
+                let target = initial.surfacePoint(at: finish, in: size)!
+                let followed = startOrientation.following(grabbed, to: target)
+                expect(simd_length(followed.quaternion.act(grabbed) - target) < 0.00001,
+                       "One-finger dragging keeps the grabbed geography under the finger")
+            }
+        }
+        expect(initial.surfacePoint(at: .zero, in: size) == nil, "Transparent corners are not the sphere")
+        expect(initial.surfacePoint(at: center, in: size) != nil, "Visible surface receives gestures")
 
         var orientation = GlobeOrientation(latitude: 32, longitude: -5)
         for step in 0..<2_000 {
