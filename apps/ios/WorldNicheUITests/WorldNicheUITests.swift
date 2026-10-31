@@ -9,7 +9,7 @@ final class WorldNicheUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-worldniche-skip-intro"]
         app.launch()
-        app.tabBars.buttons["Discover"].tap()
+        app.buttons["Discover"].firstMatch.tap()
         assertDiscoverGuidanceOrdering(app)
         let globe = app.descendants(matching: .any)["interactiveGlobe"].firstMatch
         XCTAssertEqual(globe.label, "Interactive world globe")
@@ -31,7 +31,7 @@ final class WorldNicheUITests: XCTestCase {
         app.launchArguments = ["-worldniche-skip-intro"]
         app.launchArguments = ["-worldniche-skip-intro", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
         app.launch()
-        app.tabBars.buttons["Discover"].tap()
+        app.buttons["Discover"].firstMatch.tap()
         assertDiscoverGuidanceOrdering(app)
         let guidance = app.staticTexts["discoverGuidance"]
         XCTAssertGreaterThanOrEqual(guidance.frame.minX, app.frame.minX)
@@ -65,7 +65,7 @@ final class WorldNicheUITests: XCTestCase {
         XCTAssertTrue(headline.waitForExistence(timeout: 10))
         XCTAssertTrue(guidance.exists)
         XCTAssertEqual(app.staticTexts.matching(identifier: "discoverGuidance").count, 1)
-        XCTAssertEqual(guidance.label, "Turn the globe. Tap a country. Stay curious.")
+        XCTAssertEqual(guidance.label, "Drag to turn. Pinch to zoom. Two fingers to move.")
         XCTAssertTrue(globe.exists)
         XCTAssertGreaterThan(guidance.frame.height, 0)
         XCTAssertLessThanOrEqual(headline.frame.maxY, guidance.frame.minY)

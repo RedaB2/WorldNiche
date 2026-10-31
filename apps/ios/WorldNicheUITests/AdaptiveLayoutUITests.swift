@@ -104,7 +104,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += ["-worldniche-skip-intro"]
         app.launch()
-        app.tabBars.buttons["Discover"].tap()
+        app.buttons["Discover"].firstMatch.tap()
         let globe = app.descendants(matching: .any)["interactiveGlobe"].firstMatch
         XCTAssertTrue(globe.waitForExistence(timeout: 10))
         waitUntilHittable(globe)
@@ -116,21 +116,25 @@ final class AdaptiveLayoutUITests: XCTestCase {
         // Repeated gestures reach the new limit and cannot overshoot it.
         globe.pinch(withScale: 2, velocity: 1)
         globe.pinch(withScale: 2, velocity: 1)
-        waitForValue("197% zoom", on: globe)
+        waitForValue("400% zoom", on: globe)
         globe.pinch(withScale: 1.3, velocity: 1)
-        XCTAssertEqual(globe.value as? String, "197% zoom")
-        capture("Globe at the modestly extended zoom limit", app: app)
+        XCTAssertEqual(globe.value as? String, "400% zoom")
+        capture("Globe at maximum zoom", app: app)
 
         // Tap the rendered surface, rather than the overlaid country button,
         // to exercise SceneKit hit testing after the camera has zoomed.
         globe.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         let title = app.staticTexts["countryTitle"]
+        XCTAssertFalse(title.exists)
+        let selectedName = app.buttons["landingCountry"].label
+        app.buttons["landingCountry"].tap()
         XCTAssertTrue(title.waitForExistence(timeout: 8))
-        XCTAssertEqual(title.label, "Morocco")
-        app.navigationBars["A little more local"].buttons["Close"].tap()
+        XCTAssertTrue(selectedName.contains(title.label))
+        app.buttons["Close"].firstMatch.tap()
         waitUntilHittable(globe)
-        XCTAssertEqual(globe.value as? String, "197% zoom")
+        XCTAssertEqual(globe.value as? String, "400% zoom")
 
+        globe.pinch(withScale: 0.4, velocity: -1)
         globe.pinch(withScale: 0.4, velocity: -1)
         globe.pinch(withScale: 0.4, velocity: -1)
         waitForValue("72% zoom", on: globe)

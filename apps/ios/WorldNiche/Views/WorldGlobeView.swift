@@ -1,6 +1,7 @@
 import SwiftUI
 import SceneKit
 import UIKit
+import UIKit.UIGestureRecognizerSubclass
 import simd
 
 /// An offline, tactile world. The texture and hit tests use the same country polygons.
@@ -8,15 +9,18 @@ struct WorldGlobeView: UIViewRepresentable {
     let countries: [Country]
     let selectedCountry: Country?
     let spinToken: Int
+    var resetToken = 0
     var allowsCountrySelection = true
+    var onInteraction: () -> Void = {}
     var onSelect: (Country) -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(onSelect: onSelect) }
 
-    func makeUIView(context: Context) -> SCNView {
-        let view = SCNView(frame: .zero)
+    func makeUIView(context: Context) -> GlobeSceneView {
+        let view = GlobeSceneView(frame: .zero)
         view.backgroundColor = .clear
         view.isOpaque = false
+        view.isMultipleTouchEnabled = true
         view.antialiasingMode = .multisampling4X
         view.preferredFramesPerSecond = 60
         view.rendersContinuously = false
@@ -26,25 +30,30 @@ struct WorldGlobeView: UIViewRepresentable {
         updateAccessibility(view)
         view.accessibilityTraits = [.image]
         context.coordinator.allowsCountrySelection = allowsCountrySelection
+        context.coordinator.onInteraction = onInteraction
         context.coordinator.configure(view: view, countries: countries)
         return view
     }
 
-    func updateUIView(_ uiView: SCNView, context: Context) {
+    func updateUIView(_ uiView: GlobeSceneView, context: Context) {
         context.coordinator.countries = countries
         context.coordinator.onSelect = onSelect
         context.coordinator.allowsCountrySelection = allowsCountrySelection
+        context.coordinator.onInteraction = onInteraction
         updateAccessibility(uiView)
         context.coordinator.updateSelection(selectedCountry, spinToken: spinToken)
+        context.coordinator.resetIfNeeded(token: resetToken, country: selectedCountry)
     }
 
     private func updateAccessibility(_ view: SCNView) {
         view.accessibilityHint = allowsCountrySelection
-            ? "Drag to turn the world. Pinch to zoom. Tap a country to explore it. All destinations are also available in the country list."
-            : "Drag to turn the world. Pinch to zoom. This practice globe does not open countries."
+            ? "Drag with one finger to turn. Use two fingers to move and pinch to zoom. Tap a country to show its name, then tap the name to explore. All destinations are also available in Atlas."
+            : "Drag with one finger to turn. Use two fingers to move and pinch to zoom. This practice globe does not open countries."
     }
 
-    static func dismantleUIView(_ uiView: SCNView, coordinator: Coordinator) {
+    static func dismantleUIView(_ uiView: GlobeSceneView, coordinator: Coordinator) {
+        coordinator.stopAnimation()
+        uiView.onLayout = nil
         uiView.scene?.rootNode.enumerateChildNodes { node, _ in node.removeAllActions() }
         uiView.scene = nil
     }
@@ -54,6 +63,8 @@ struct WorldGlobeView: UIViewRepresentable {
         var countries: [Country] = []
         var onSelect: (Country) -> Void
         var allowsCountrySelection = true
+        var onInteraction: () -> Void = {}
+        private var hasInteracted = false
         private weak var view: SCNView?
         private let worldNode = SCNNode()
         private let surfaceNode = SCNNode()
@@ -61,13 +72,31 @@ struct WorldGlobeView: UIViewRepresentable {
         private let cameraNode = SCNNode()
         private var selectedID: String?
         private var lastSpinToken: Int?
-        private static let initialZoomScale = 1.18
-        private var pinchScale = Coordinator.initialZoomScale
+        private var lastResetToken: Int?
+        private var viewport = GlobeViewport()
+        private var orientation = GlobeOrientation(latitude: 22, longitude: 18)
+        private var gestureGeneration = -1
+        private var gestureViewport = GlobeViewport()
+        private var gesturePoint = CGPoint.zero
+        private var displayLink: CADisplayLink?
+        private var animation: NavigationAnimation?
+        private var momentum: GlobeMomentum?
+        private var borderGeometry: SCNGeometry?
+
+        private struct NavigationAnimation {
+            let started: TimeInterval
+            let duration: TimeInterval
+            let start: GlobeOrientation
+            let destination: GlobeOrientation
+            let viewport: GlobeViewport
+            let destinationViewport: GlobeViewport
+            let extraTurn: Double
+        }
         private let atlas = GlobeAtlas.shared
 
         init(onSelect: @escaping (Country) -> Void) { self.onSelect = onSelect }
 
-        func configure(view: SCNView, countries: [Country]) {
+        func configure(view: GlobeSceneView, countries: [Country]) {
             self.view = view
             self.countries = countries
             let scene = SCNScene()
@@ -76,7 +105,7 @@ struct WorldGlobeView: UIViewRepresentable {
 
             cameraNode.camera = SCNCamera()
             cameraNode.camera?.usesOrthographicProjection = true
-            updateZoom()
+            cameraNode.camera?.projectionDirection = .vertical
             cameraNode.camera?.zNear = 0.1
             cameraNode.camera?.zFar = 30
             cameraNode.position = SCNVector3(0, 0, 4.5)
@@ -108,20 +137,26 @@ struct WorldGlobeView: UIViewRepresentable {
             material.isDoubleSided = false
             surfaceNode.geometry?.materials = [material]
             worldNode.addChildNode(surfaceNode)
+            let borders = atlas.makeBorders()
+            borderGeometry = borders
+            worldNode.addChildNode(SCNNode(geometry: borders))
             scene.rootNode.addChildNode(worldNode)
-            worldNode.simdOrientation = Self.orientation(latitude: 22, longitude: 18)
+            worldNode.simdOrientation = orientation.quaternion
             buildMarker()
             worldNode.addChildNode(markerNode)
+            view.onLayout = { [weak self] in self?.updateViewport() }
+            updateViewport()
 
-            let pan = UIPanGestureRecognizer(target: self, action: #selector(pan(_:)))
-            pan.maximumNumberOfTouches = 1
-            pan.delegate = self
-            view.addGestureRecognizer(pan)
-            let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinch(_:)))
-            pinch.delegate = self
-            view.addGestureRecognizer(pinch)
+            let navigation = GlobeNavigationGesture(target: self, action: #selector(explore(_:)))
+            navigation.delegate = self
+            navigation.canBegin = { [weak self, weak view] point in
+                guard let self, let view else { return false }
+                return self.viewport.surfacePoint(at: point, in: view.bounds.size) != nil
+            }
+            view.addGestureRecognizer(navigation)
             let tap = UITapGestureRecognizer(target: self, action: #selector(tap(_:)))
-            tap.require(toFail: pan)
+            tap.require(toFail: navigation)
+            tap.delegate = self
             view.addGestureRecognizer(tap)
         }
 
@@ -140,22 +175,59 @@ struct WorldGlobeView: UIViewRepresentable {
             markerNode.simdPosition = direction * 1.014
             markerNode.simdOrientation = simd_quatf(from: SIMD3<Float>(0, 1, 0), to: direction)
             markerNode.isHidden = false
-            let destination = Self.orientation(latitude: country.latitude, longitude: country.longitude)
-            stopRotation()
-            guard !isFirstUpdate && !UIAccessibility.isReduceMotionEnabled else {
-                worldNode.simdOrientation = destination
+            // Browsing changes only the marker. Surprise navigation is explicitly requested.
+            guard isFirstUpdate || shouldSpin else { return }
+            navigate(to: country, spinning: shouldSpin, animated: !isFirstUpdate)
+        }
+
+        func resetIfNeeded(token: Int, country: Country?) {
+            defer { lastResetToken = token }
+            guard let previous = lastResetToken, previous != token else { return }
+            navigate(to: country, spinning: false, animated: true)
+        }
+
+        private func navigate(to country: Country?, spinning: Bool, animated: Bool) {
+            stopAnimation()
+            let destination = GlobeOrientation(latitude: country?.latitude ?? 22, longitude: country?.longitude ?? 18)
+            guard animated && !UIAccessibility.isReduceMotionEnabled else {
+                orientation = destination
+                viewport = GlobeViewport()
+                worldNode.simdOrientation = orientation.quaternion
+                updateViewport()
                 return
             }
-            let start = worldNode.simdOrientation
-            let duration: TimeInterval = shouldSpin ? 1.8 : 0.8
-            let animation = SCNAction.customAction(duration: duration) { node, time in
-                let fraction = min(1, Float(time) / Float(duration))
-                let eased = fraction * fraction * (3 - 2 * fraction)
-                let base = simd_slerp(start, destination, eased)
-                let turn = shouldSpin ? Float.pi * 2 * (1 - eased) : 0
-                node.simdOrientation = simd_quatf(angle: turn, axis: SIMD3<Float>(0, 1, 0)) * base
+            animation = NavigationAnimation(started: CACurrentMediaTime(), duration: spinning ? 1.8 : 0.55,
+                start: orientation, destination: destination, viewport: viewport,
+                destinationViewport: GlobeViewport(), extraTurn: spinning ? 2 * .pi : 0)
+            let link = CADisplayLink(target: self, selector: #selector(animate(_:)))
+            displayLink = link
+            link.add(to: .main, forMode: .common)
+        }
+
+        @objc private func animate(_ link: CADisplayLink) {
+            if let momentum {
+                orientation = momentum.orientation(at: link.timestamp)
+                worldNode.simdOrientation = orientation.quaternion
+                if link.timestamp - momentum.started >= GlobeMomentum.duration { stopAnimation() }
+                return
             }
-            worldNode.runAction(animation, forKey: "navigation")
+            guard let animation else { return }
+            let t = min(1, max(0, (link.timestamp - animation.started) / animation.duration))
+            let eased = t * t * (3 - 2 * t)
+            let longitudeChange = (animation.destination.longitude - animation.start.longitude).remainder(dividingBy: 2 * .pi)
+            orientation = animation.start.rotated(horizontal: (-longitudeChange + animation.extraTurn) * eased,
+                vertical: (animation.destination.latitude - animation.start.latitude) * eased)
+            viewport = animation.viewport.interpolated(to: animation.destinationViewport, fraction: eased)
+            worldNode.simdOrientation = orientation.quaternion
+            updateViewport()
+            if t == 1 { stopAnimation() }
+        }
+
+        func stopAnimation() {
+            displayLink?.invalidate()
+            displayLink = nil
+            animation = nil
+            momentum = nil
         }
 
         private func buildMarker() {
@@ -178,58 +250,64 @@ struct WorldGlobeView: UIViewRepresentable {
             markerNode.isHidden = true
         }
 
-        private func stopRotation() {
-            let visibleOrientation = worldNode.presentation.simdOrientation
-            worldNode.removeAllActions()
-            worldNode.simdOrientation = visibleOrientation
+        private func noteInteraction() {
+            guard !hasInteracted else { return }
+            hasInteracted = true
+            onInteraction()
         }
 
-        @objc private func pan(_ recognizer: UIPanGestureRecognizer) {
+        @objc private func explore(_ recognizer: GlobeNavigationGesture) {
             guard let view else { return }
-            if recognizer.state == .began { stopRotation() }
-            if recognizer.state == .changed {
-                let translation = recognizer.translation(in: view)
-                let factor = Float(pinchScale) / max(120, Float(view.bounds.height)) * 1.8
-                let horizontal = simd_quatf(angle: Float(translation.x) * factor, axis: SIMD3<Float>(0, 1, 0))
-                let vertical = simd_quatf(angle: Float(translation.y) * factor, axis: SIMD3<Float>(1, 0, 0))
-                worldNode.simdOrientation = simd_normalize(horizontal * vertical * worldNode.simdOrientation)
-                recognizer.setTranslation(.zero, in: view)
+            let ending = recognizer.state == .ended
+            guard ending || recognizer.state == .began || recognizer.state == .changed else { return }
+            let fingerCount = ending ? recognizer.releaseFingerCount : recognizer.fingerCount
+            noteInteraction()
+            if gestureGeneration != recognizer.generation {
+                stopAnimation()
+                gestureGeneration = recognizer.generation
+                gestureViewport = viewport
+                gesturePoint = recognizer.startCenter
             }
-            if recognizer.state == .ended && !UIAccessibility.isReduceMotionEnabled {
-                let velocity = recognizer.velocity(in: view)
-                let axis = SIMD3<Float>(Float(velocity.y), Float(velocity.x), 0)
-                let speed = simd_length(axis)
-                guard speed > 100 else { return }
-                let normalizedAxis = simd_normalize(axis)
-                let angle = min(1.4, speed / 2200)
-                let initial = worldNode.simdOrientation
-                let inertia = SCNAction.customAction(duration: 1.15) { node, elapsed in
-                    let t = min(1, Float(elapsed) / 1.15)
-                    let deceleration = 1 - pow(1 - t, 3)
-                    node.simdOrientation = simd_quatf(angle: angle * deceleration, axis: normalizedAxis) * initial
+            if fingerCount == 2 {
+                viewport = gestureViewport
+                viewport.transform(from: recognizer.startCenter, to: recognizer.center,
+                    magnification: recognizer.span / max(1, recognizer.startSpan), in: view.bounds.size)
+            } else if fingerCount == 1 {
+                orientation = orientation.dragging(from: gesturePoint, to: recognizer.center,
+                    in: view.bounds.size, viewport: gestureViewport)
+                worldNode.simdOrientation = orientation.quaternion
+            }
+            gesturePoint = recognizer.center
+            updateViewport()
+            if ending {
+                momentum = GlobeMomentum(orientation: orientation, velocity: recognizer.releaseVelocity,
+                    viewport: viewport, size: view.bounds.size, started: CACurrentMediaTime(),
+                    reduceMotion: UIAccessibility.isReduceMotionEnabled)
+                if momentum != nil {
+                    let link = CADisplayLink(target: self, selector: #selector(animate(_:)))
+                    displayLink = link
+                    link.add(to: .main, forMode: .common)
                 }
-                worldNode.runAction(inertia, forKey: "inertia")
             }
         }
 
-        @objc private func pinch(_ recognizer: UIPinchGestureRecognizer) {
-            if recognizer.state == .began { stopRotation() }
-            // Orthographic magnification is inverse scale: 0.76 to 0.60
-            // adds about 27% more maximum zoom without changing the starting view.
-            pinchScale = min(1.65, max(0.60, pinchScale / Double(recognizer.scale)))
-            updateZoom()
-            recognizer.scale = 1
-        }
-
-        private func updateZoom() {
-            cameraNode.camera?.orthographicScale = pinchScale
-            view?.accessibilityValue = "\(Int((Self.initialZoomScale / pinchScale * 100).rounded()))% zoom"
+        private func updateViewport() {
+            guard let view else { return }
+            let diameter = max(1, min(view.bounds.width, view.bounds.height))
+            cameraNode.camera?.orthographicScale = viewport.scale * max(1, view.bounds.height) / diameter
+            cameraNode.position.x = -Float(viewport.offset.x)
+            cameraNode.position.y = -Float(viewport.offset.y)
+            borderGeometry?.setValue(Float(viewport.scale * 0.65 / diameter), forKey: "borderWidth")
+            // A selection marker must not cover neighboring countries when zoomed in.
+            markerNode.simdScale = SIMD3<Float>(repeating: Float(min(1, viewport.scale / GlobeViewport.initialScale)))
+            view.accessibilityValue = "\(viewport.zoomPercent)% zoom"
         }
 
         @objc private func tap(_ recognizer: UITapGestureRecognizer) {
             guard allowsCountrySelection, let view else { return }
-            stopRotation()
-            let results = view.hitTest(recognizer.location(in: view), options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
+            let location = recognizer.location(in: view)
+            stopAnimation()
+            let results = view.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
             guard let hit = results.first(where: { $0.node === surfaceNode }) else { return }
             let point = hit.localCoordinates
             let latitude = asin(Double(point.y) / max(0.0001, Double(sqrt(point.x * point.x + point.y * point.y + point.z * point.z)))) * 180 / .pi
@@ -246,19 +324,29 @@ struct WorldGlobeView: UIViewRepresentable {
             onSelect(country)
         }
 
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+            guard let view else { return false }
+            let point = touch.location(in: view)
+            let onSurface = viewport.surfacePoint(at: point, in: view.bounds.size) != nil
+            if gestureRecognizer is GlobeNavigationGesture {
+                if onSurface {
+                    stopAnimation()
+                    noteInteraction()
+                }
+                // A pinch can straddle the silhouette. Decide using its midpoint once both fingers arrive.
+                return true
+            }
+            return point.y > 12 && point.y < view.bounds.height - 12 && onSurface
+        }
+
         func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-            gestureRecognizer is UIPinchGestureRecognizer || otherGestureRecognizer is UIPinchGestureRecognizer
+            false
         }
 
         private static func position(latitude: Double, longitude: Double) -> SIMD3<Float> {
             let lat = Float(latitude * .pi / 180)
             let lon = Float(longitude * .pi / 180)
             return SIMD3<Float>(cos(lat) * sin(lon), sin(lat), cos(lat) * cos(lon))
-        }
-
-        private static func orientation(latitude: Double, longitude: Double) -> simd_quatf {
-            simd_quatf(angle: Float(latitude * .pi / 180), axis: SIMD3<Float>(1, 0, 0)) *
-            simd_quatf(angle: Float(-longitude * .pi / 180), axis: SIMD3<Float>(0, 1, 0))
         }
 
         private static func angularDistance(_ lat1: Double, _ lon1: Double, _ lat2: Double, _ lon2: Double) -> Double {
@@ -296,6 +384,96 @@ struct WorldGlobeView: UIViewRepresentable {
             }
             return SCNGeometry(sources: [SCNGeometrySource(vertices: vertices), SCNGeometrySource(normals: normals), SCNGeometrySource(textureCoordinates: uv)], elements: [SCNGeometryElement(indices: indices, primitiveType: .triangles)])
         }
+    }
+}
+
+/// The real sphere silhouette can leave the canvas. Its vertical edges blend into the page.
+final class GlobeSceneView: SCNView {
+    var onLayout: (() -> Void)?
+    private let edgeMask = CAGradientLayer()
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        edgeMask.frame = bounds
+        let fade = min(0.12, 24 / max(1, bounds.height))
+        edgeMask.colors = [UIColor.clear.cgColor, UIColor.black.cgColor, UIColor.black.cgColor, UIColor.clear.cgColor]
+        edgeMask.locations = [0, NSNumber(value: fade), NSNumber(value: 1 - fade), 1]
+        layer.mask = edgeMask
+        CATransaction.commit()
+        onLayout?()
+    }
+}
+
+/// One touch stream owns rotation, scale and movement, so callback order cannot introduce drift.
+private final class GlobeNavigationGesture: UIGestureRecognizer {
+    var canBegin: ((CGPoint) -> Bool)?
+    private var fingers = Set<UITouch>()
+    private(set) var generation = 0
+    private(set) var startCenter = CGPoint.zero
+    private(set) var startSpan: CGFloat = 1
+    private(set) var center = CGPoint.zero
+    private(set) var span: CGFloat = 1
+    var fingerCount: Int { fingers.count }
+    private var velocity = GlobeDragVelocity()
+    private(set) var releaseVelocity = CGPoint.zero
+    private(set) var releaseFingerCount = 0
+
+    private func sample() {
+        let points = fingers.map { $0.location(in: view) }
+        guard let first = points.first else { return }
+        center = points.count == 2 ? CGPoint(x: (first.x + points[1].x) / 2, y: (first.y + points[1].y) / 2) : first
+        span = points.count == 2 ? hypot(first.x - points[1].x, first.y - points[1].y) : 1
+    }
+
+    private func rebase(at time: TimeInterval) {
+        sample()
+        startCenter = center
+        startSpan = span
+        velocity = GlobeDragVelocity()
+        releaseVelocity = .zero
+        velocity.record(center, at: time)
+        generation += 1
+        if state == .began || state == .changed { state = .changed }
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+        fingers.formUnion(touches)
+        guard fingers.count <= 2 else { state = state == .possible ? .failed : .cancelled; return }
+        rebase(at: event.timestamp)
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
+        sample()
+        if fingerCount == 1 { velocity.record(center, at: event.timestamp) }
+        if state == .possible {
+            if hypot(center.x - startCenter.x, center.y - startCenter.y) > 3 || abs(span - startSpan) > 3 {
+                let withinEdges = startCenter.y > 12 && startCenter.y < (view?.bounds.height ?? 0) - 12
+                state = withinEdges && canBegin?(startCenter) == true ? .began : .failed
+            }
+        } else { state = .changed }
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
+        sample()
+        releaseFingerCount = fingerCount
+        if fingerCount == 1 {
+            velocity.record(center, at: event.timestamp)
+            releaseVelocity = velocity.velocity(at: event.timestamp)
+        } else { releaseVelocity = .zero }
+        fingers.subtract(touches)
+        if fingers.isEmpty { state = state == .possible ? .failed : .ended }
+        else { rebase(at: event.timestamp) }
+    }
+
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {
+        state = state == .possible ? .failed : .cancelled
+    }
+
+    override func reset() {
+        fingers.removeAll()
+        super.reset()
     }
 }
 
@@ -356,6 +534,52 @@ private final class GlobeAtlas {
         return ids
     }
 
+    func makeBorders() -> SCNGeometry {
+        var vertices: [SCNVector3] = []
+        var sides: [SCNVector3] = []
+        var indices: [Int32] = []
+        func position(_ point: CGPoint) -> SIMD3<Float> {
+            let lat = Float(point.y * .pi / 180), lon = Float(point.x * .pi / 180)
+            return SIMD3(cos(lat) * sin(lon), sin(lat), cos(lat) * cos(lon))
+        }
+        for ring in regions.flatMap({ $0.rings.flatMap { $0 } }) {
+            for (first, second) in zip(ring, ring.dropFirst()) {
+                let a = position(first), b = position(second)
+                let cross = simd_cross(a, b)
+                guard simd_length(cross) > 0.000001 else { continue }
+                let side = simd_normalize(cross)
+                // Subdivision keeps long border segments on the sphere, including at the horizon.
+                let steps = max(1, Int(ceil(acos(min(1, max(-1, simd_dot(a, b)))) / 0.005)))
+                for step in 0..<steps {
+                    let p = simd_normalize(simd_mix(a, b, SIMD3(repeating: Float(step) / Float(steps)))) * 1.001
+                    let q = simd_normalize(simd_mix(a, b, SIMD3(repeating: Float(step + 1) / Float(steps)))) * 1.001
+                    let base = Int32(vertices.count)
+                    for (point, normal) in [(p, side), (p, -side), (q, side), (q, -side)] {
+                        vertices.append(SCNVector3(point.x, point.y, point.z))
+                        sides.append(SCNVector3(normal.x, normal.y, normal.z))
+                    }
+                    indices.append(contentsOf: [base, base + 1, base + 2, base + 2, base + 1, base + 3])
+                }
+            }
+        }
+        let geometry = SCNGeometry(sources: [SCNGeometrySource(vertices: vertices), SCNGeometrySource(normals: sides)],
+                                   elements: [SCNGeometryElement(indices: indices, primitiveType: .triangles)])
+        let material = SCNMaterial()
+        material.diffuse.contents = UIColor(red: 0.46, green: 0.60, blue: 0.49, alpha: 1)
+        material.lightingModel = .constant
+        material.isDoubleSided = true
+        geometry.materials = [material]
+        // The normals carry ribbon sides. Width is in scene units and follows the camera scale.
+        geometry.shaderModifiers = [.geometry: """
+            #pragma arguments
+            float borderWidth;
+            #pragma body
+            _geometry.position.xyz += _geometry.normal * borderWidth;
+            """]
+        geometry.setValue(Float(0.002), forKey: "borderWidth")
+        return geometry
+    }
+
     private static func contains(_ point: CGPoint, ring: [CGPoint]) -> Bool {
         guard ring.count > 2 else { return false }
         var inside = false
@@ -393,9 +617,6 @@ private final class GlobeAtlas {
             for region in regions {
                 let shade = CGFloat(region.iso.unicodeScalars.reduce(0) { $0 + Int($1.value) } % 5) * 0.008
                 context.setFillColor(UIColor(red: 0.92 - shade, green: 0.935 - shade, blue: 0.87 - shade, alpha: 1).cgColor)
-                context.setStrokeColor(UIColor(red: 0.46, green: 0.60, blue: 0.49, alpha: 0.65).cgColor)
-                context.setLineWidth(1.9)
-                context.setLineJoin(.round)
                 for polygon in region.rings {
                     let path = CGMutablePath()
                     for ring in polygon {
@@ -408,7 +629,7 @@ private final class GlobeAtlas {
                         path.closeSubpath()
                     }
                     context.addPath(path)
-                    context.drawPath(using: .eoFillStroke)
+                    context.drawPath(using: .eoFill)
                 }
             }
         }
