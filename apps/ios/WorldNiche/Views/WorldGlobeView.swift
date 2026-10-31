@@ -8,13 +8,14 @@ struct WorldGlobeView: UIViewRepresentable {
     let countries: [Country]
     let selectedCountry: Country?
     let spinToken: Int
+    var resetToken = 0
     var allowsCountrySelection = true
     var onSelect: (Country) -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(onSelect: onSelect) }
 
-    func makeUIView(context: Context) -> SCNView {
-        let view = SCNView(frame: .zero)
+    func makeUIView(context: Context) -> GlobeSceneView {
+        let view = GlobeSceneView(frame: .zero)
         view.backgroundColor = .clear
         view.isOpaque = false
         view.antialiasingMode = .multisampling4X
@@ -30,21 +31,23 @@ struct WorldGlobeView: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ uiView: SCNView, context: Context) {
+    func updateUIView(_ uiView: GlobeSceneView, context: Context) {
         context.coordinator.countries = countries
         context.coordinator.onSelect = onSelect
         context.coordinator.allowsCountrySelection = allowsCountrySelection
         updateAccessibility(uiView)
         context.coordinator.updateSelection(selectedCountry, spinToken: spinToken)
+        context.coordinator.resetIfNeeded(token: resetToken, country: selectedCountry)
     }
 
     private func updateAccessibility(_ view: SCNView) {
         view.accessibilityHint = allowsCountrySelection
-            ? "Drag to turn the world. Pinch to zoom. Tap a country to explore it. All destinations are also available in the country list."
-            : "Drag to turn the world. Pinch to zoom. This practice globe does not open countries."
+            ? "Drag with one finger to turn. Use two fingers to move and pinch to zoom. Tap a country to show its name, then tap the name to explore. All destinations are also available in Atlas."
+            : "Drag with one finger to turn. Use two fingers to move and pinch to zoom. This practice globe does not open countries."
     }
 
-    static func dismantleUIView(_ uiView: SCNView, coordinator: Coordinator) {
+    static func dismantleUIView(_ uiView: GlobeSceneView, coordinator: Coordinator) {
+        uiView.onLayout = nil
         uiView.scene?.rootNode.enumerateChildNodes { node, _ in node.removeAllActions() }
         uiView.scene = nil
     }
@@ -61,13 +64,17 @@ struct WorldGlobeView: UIViewRepresentable {
         private let cameraNode = SCNNode()
         private var selectedID: String?
         private var lastSpinToken: Int?
-        private static let initialZoomScale = 1.18
-        private var pinchScale = Coordinator.initialZoomScale
+        private var lastResetToken: Int?
+        private var viewport = GlobeViewport()
+        private var orientation = GlobeOrientation(latitude: 22, longitude: 18)
+        private var rotationInterrupted = false
+        private weak var moveGesture: UIPanGestureRecognizer?
+        private weak var zoomGesture: UIPinchGestureRecognizer?
         private let atlas = GlobeAtlas.shared
 
         init(onSelect: @escaping (Country) -> Void) { self.onSelect = onSelect }
 
-        func configure(view: SCNView, countries: [Country]) {
+        func configure(view: GlobeSceneView, countries: [Country]) {
             self.view = view
             self.countries = countries
             let scene = SCNScene()
@@ -76,7 +83,7 @@ struct WorldGlobeView: UIViewRepresentable {
 
             cameraNode.camera = SCNCamera()
             cameraNode.camera?.usesOrthographicProjection = true
-            updateZoom()
+            cameraNode.camera?.projectionDirection = .vertical
             cameraNode.camera?.zNear = 0.1
             cameraNode.camera?.zFar = 30
             cameraNode.position = SCNVector3(0, 0, 4.5)
@@ -109,19 +116,30 @@ struct WorldGlobeView: UIViewRepresentable {
             surfaceNode.geometry?.materials = [material]
             worldNode.addChildNode(surfaceNode)
             scene.rootNode.addChildNode(worldNode)
-            worldNode.simdOrientation = Self.orientation(latitude: 22, longitude: 18)
+            worldNode.simdOrientation = orientation.quaternion
             buildMarker()
             worldNode.addChildNode(markerNode)
+            view.onLayout = { [weak self] in self?.updateViewport() }
+            updateViewport()
 
             let pan = UIPanGestureRecognizer(target: self, action: #selector(pan(_:)))
             pan.maximumNumberOfTouches = 1
             pan.delegate = self
             view.addGestureRecognizer(pan)
+            let move = UIPanGestureRecognizer(target: self, action: #selector(move(_:)))
+            move.minimumNumberOfTouches = 2
+            move.maximumNumberOfTouches = 2
+            move.delegate = self
+            view.addGestureRecognizer(move)
+            moveGesture = move
             let pinch = UIPinchGestureRecognizer(target: self, action: #selector(pinch(_:)))
             pinch.delegate = self
             view.addGestureRecognizer(pinch)
+            zoomGesture = pinch
             let tap = UITapGestureRecognizer(target: self, action: #selector(tap(_:)))
             tap.require(toFail: pan)
+            tap.require(toFail: move)
+            tap.require(toFail: pinch)
             view.addGestureRecognizer(tap)
         }
 
@@ -140,20 +158,39 @@ struct WorldGlobeView: UIViewRepresentable {
             markerNode.simdPosition = direction * 1.014
             markerNode.simdOrientation = simd_quatf(from: SIMD3<Float>(0, 1, 0), to: direction)
             markerNode.isHidden = false
-            let destination = Self.orientation(latitude: country.latitude, longitude: country.longitude)
+            // Browsing changes only the marker. Surprise navigation is explicitly requested.
+            guard isFirstUpdate || shouldSpin else { return }
+            viewport = GlobeViewport()
+            updateViewport()
+            navigate(to: country, spinning: shouldSpin, animated: !isFirstUpdate)
+        }
+
+        func resetIfNeeded(token: Int, country: Country?) {
+            defer { lastResetToken = token }
+            guard let previous = lastResetToken, previous != token else { return }
+            viewport = GlobeViewport()
+            updateViewport()
+            navigate(to: country, spinning: false, animated: true)
+        }
+
+        private func navigate(to country: Country?, spinning: Bool, animated: Bool) {
             stopRotation()
-            guard !isFirstUpdate && !UIAccessibility.isReduceMotionEnabled else {
+            orientation = GlobeOrientation(latitude: country?.latitude ?? 22, longitude: country?.longitude ?? 18)
+            let destination = orientation.quaternion
+            guard animated && !UIAccessibility.isReduceMotionEnabled else {
                 worldNode.simdOrientation = destination
                 return
             }
-            let start = worldNode.simdOrientation
-            let duration: TimeInterval = shouldSpin ? 1.8 : 0.8
+            let start = GlobeOrientation(quaternion: worldNode.simdOrientation)
+            let latitudeChange = orientation.latitude - start.latitude
+            let longitudeChange = (orientation.longitude - start.longitude).remainder(dividingBy: 2 * .pi)
+            let duration: TimeInterval = spinning ? 1.8 : 0.45
             let animation = SCNAction.customAction(duration: duration) { node, time in
-                let fraction = min(1, Float(time) / Float(duration))
+                let fraction = min(1, Double(time) / duration)
                 let eased = fraction * fraction * (3 - 2 * fraction)
-                let base = simd_slerp(start, destination, eased)
-                let turn = shouldSpin ? Float.pi * 2 * (1 - eased) : 0
-                node.simdOrientation = simd_quatf(angle: turn, axis: SIMD3<Float>(0, 1, 0)) * base
+                let turn = spinning ? Double.pi * 2 * eased : 0
+                node.simdOrientation = start.rotated(horizontal: -longitudeChange * eased + turn,
+                                                     vertical: latitudeChange * eased).quaternion
             }
             worldNode.runAction(animation, forKey: "navigation")
         }
@@ -179,57 +216,96 @@ struct WorldGlobeView: UIViewRepresentable {
         }
 
         private func stopRotation() {
-            let visibleOrientation = worldNode.presentation.simdOrientation
-            worldNode.removeAllActions()
-            worldNode.simdOrientation = visibleOrientation
+            if worldNode.hasActions {
+                let visibleOrientation = worldNode.presentation.simdOrientation
+                worldNode.removeAllActions()
+                worldNode.simdOrientation = visibleOrientation
+            }
+            orientation = GlobeOrientation(quaternion: worldNode.simdOrientation)
         }
 
         @objc private func pan(_ recognizer: UIPanGestureRecognizer) {
             guard let view else { return }
-            if recognizer.state == .began { stopRotation() }
-            if recognizer.state == .changed {
+            if recognizer.state == .began {
+                stopRotation()
+                rotationInterrupted = false
+            }
+            let isMoving = moveGesture?.state == .began || moveGesture?.state == .changed
+            let isZooming = zoomGesture?.state == .began || zoomGesture?.state == .changed
+            if isMoving || isZooming || recognizer.numberOfTouches > 1 { rotationInterrupted = true }
+            guard !rotationInterrupted else {
+                recognizer.setTranslation(.zero, in: view)
+                return
+            }
+            let factor = viewport.scale * 2 / max(120, min(view.bounds.width, view.bounds.height))
+            if recognizer.state == .began || recognizer.state == .changed {
                 let translation = recognizer.translation(in: view)
-                let factor = Float(pinchScale) / max(120, Float(view.bounds.height)) * 1.8
-                let horizontal = simd_quatf(angle: Float(translation.x) * factor, axis: SIMD3<Float>(0, 1, 0))
-                let vertical = simd_quatf(angle: Float(translation.y) * factor, axis: SIMD3<Float>(1, 0, 0))
-                worldNode.simdOrientation = simd_normalize(horizontal * vertical * worldNode.simdOrientation)
+                orientation = orientation.rotated(horizontal: translation.x * factor, vertical: translation.y * factor)
+                worldNode.simdOrientation = orientation.quaternion
                 recognizer.setTranslation(.zero, in: view)
             }
             if recognizer.state == .ended && !UIAccessibility.isReduceMotionEnabled {
                 let velocity = recognizer.velocity(in: view)
-                let axis = SIMD3<Float>(Float(velocity.y), Float(velocity.x), 0)
-                let speed = simd_length(axis)
+                let speed = hypot(velocity.x, velocity.y)
                 guard speed > 100 else { return }
-                let normalizedAxis = simd_normalize(axis)
-                let angle = min(1.4, speed / 2200)
-                let initial = worldNode.simdOrientation
-                let inertia = SCNAction.customAction(duration: 1.15) { node, elapsed in
-                    let t = min(1, Float(elapsed) / 1.15)
+                let distance = min(0.6, speed * factor * 0.12)
+                let initial = orientation
+                let inertia = SCNAction.customAction(duration: 0.65) { node, elapsed in
+                    let t = min(1, Double(elapsed) / 0.65)
                     let deceleration = 1 - pow(1 - t, 3)
-                    node.simdOrientation = simd_quatf(angle: angle * deceleration, axis: normalizedAxis) * initial
+                    node.simdOrientation = initial.rotated(horizontal: velocity.x / speed * distance * deceleration,
+                                                            vertical: velocity.y / speed * distance * deceleration).quaternion
                 }
                 worldNode.runAction(inertia, forKey: "inertia")
             }
         }
 
         @objc private func pinch(_ recognizer: UIPinchGestureRecognizer) {
-            if recognizer.state == .began { stopRotation() }
-            // Orthographic magnification is inverse scale: 0.76 to 0.60
-            // adds about 27% more maximum zoom without changing the starting view.
-            pinchScale = min(1.65, max(0.60, pinchScale / Double(recognizer.scale)))
-            updateZoom()
+            guard let view else { return }
+            if recognizer.state == .began {
+                rotationInterrupted = true
+                stopRotation()
+            }
+            guard recognizer.state == .began || recognizer.state == .changed else { return }
+            viewport.zoom(by: recognizer.scale, around: recognizer.location(in: view), in: view.bounds.size)
+            updateViewport()
             recognizer.scale = 1
         }
 
-        private func updateZoom() {
-            cameraNode.camera?.orthographicScale = pinchScale
-            view?.accessibilityValue = "\(Int((Self.initialZoomScale / pinchScale * 100).rounded()))% zoom"
+        @objc private func move(_ recognizer: UIPanGestureRecognizer) {
+            guard let view else { return }
+            if recognizer.state == .began {
+                rotationInterrupted = true
+                stopRotation()
+            }
+            guard recognizer.state == .began || recognizer.state == .changed else { return }
+            guard recognizer.numberOfTouches == 2 else {
+                recognizer.setTranslation(.zero, in: view)
+                return
+            }
+            viewport.move(by: recognizer.translation(in: view), in: view.bounds.size)
+            recognizer.setTranslation(.zero, in: view)
+            updateViewport()
+        }
+
+        private func updateViewport() {
+            guard let view else { return }
+            let diameter = max(1, min(view.bounds.width, view.bounds.height))
+            cameraNode.camera?.orthographicScale = viewport.scale * max(1, view.bounds.height) / diameter
+            cameraNode.position.x = -Float(viewport.offset.x)
+            cameraNode.position.y = -Float(viewport.offset.y)
+            // A selection marker must not cover neighboring countries when zoomed in.
+            markerNode.simdScale = SIMD3<Float>(repeating: Float(min(1, viewport.scale / GlobeViewport.initialScale)))
+            view.accessibilityValue = "\(viewport.zoomPercent)% zoom"
         }
 
         @objc private func tap(_ recognizer: UITapGestureRecognizer) {
             guard allowsCountrySelection, let view else { return }
+            let location = recognizer.location(in: view)
+            guard hypot(location.x - view.bounds.midX, location.y - view.bounds.midY)
+                    <= min(view.bounds.width, view.bounds.height) / 2 else { return }
             stopRotation()
-            let results = view.hitTest(recognizer.location(in: view), options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
+            let results = view.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
             guard let hit = results.first(where: { $0.node === surfaceNode }) else { return }
             let point = hit.localCoordinates
             let latitude = asin(Double(point.y) / max(0.0001, Double(sqrt(point.x * point.x + point.y * point.y + point.z * point.z)))) * 180 / .pi
@@ -247,18 +323,16 @@ struct WorldGlobeView: UIViewRepresentable {
         }
 
         func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-            gestureRecognizer is UIPinchGestureRecognizer || otherGestureRecognizer is UIPinchGestureRecognizer
+            // Do not let the page scroll or a tap win while manipulating the globe.
+            guard gestureRecognizer.view === view, otherGestureRecognizer.view === view else { return false }
+            return (gestureRecognizer is UIPanGestureRecognizer || gestureRecognizer is UIPinchGestureRecognizer)
+                && (otherGestureRecognizer is UIPanGestureRecognizer || otherGestureRecognizer is UIPinchGestureRecognizer)
         }
 
         private static func position(latitude: Double, longitude: Double) -> SIMD3<Float> {
             let lat = Float(latitude * .pi / 180)
             let lon = Float(longitude * .pi / 180)
             return SIMD3<Float>(cos(lat) * sin(lon), sin(lat), cos(lat) * cos(lon))
-        }
-
-        private static func orientation(latitude: Double, longitude: Double) -> simd_quatf {
-            simd_quatf(angle: Float(latitude * .pi / 180), axis: SIMD3<Float>(1, 0, 0)) *
-            simd_quatf(angle: Float(-longitude * .pi / 180), axis: SIMD3<Float>(0, 1, 0))
         }
 
         private static func angularDistance(_ lat1: Double, _ lon1: Double, _ lat2: Double, _ lon2: Double) -> Double {
@@ -296,6 +370,25 @@ struct WorldGlobeView: UIViewRepresentable {
             }
             return SCNGeometry(sources: [SCNGeometrySource(vertices: vertices), SCNGeometrySource(normals: normals), SCNGeometrySource(textureCoordinates: uv)], elements: [SCNGeometryElement(indices: indices, primitiveType: .triangles)])
         }
+    }
+}
+
+/// The enlarged sphere is viewed through a round window, never a rectangular crop.
+final class GlobeSceneView: SCNView {
+    var onLayout: (() -> Void)?
+    private let roundMask = CAShapeLayer()
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let diameter = min(bounds.width, bounds.height)
+        let circle = CGRect(x: bounds.midX - diameter / 2, y: bounds.midY - diameter / 2,
+                            width: diameter, height: diameter)
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        roundMask.path = UIBezierPath(ovalIn: circle).cgPath
+        layer.mask = roundMask
+        CATransaction.commit()
+        onLayout?()
     }
 }
 

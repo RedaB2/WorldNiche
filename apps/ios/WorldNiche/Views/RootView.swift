@@ -63,6 +63,7 @@ struct ExploreView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selected = CountryRepository.country(id: "MA") ?? CountryRepository.countries[0]
     @State private var spinToken = 0
+    @State private var globeResetToken = 0
     @State private var isSpinning = false
     @State private var detail: Country?
     @State private var showAbout = false
@@ -90,7 +91,7 @@ struct ExploreView: View {
 
                         HStack(spacing: 6) {
                             Image(systemName: "hand.draw").accessibilityHidden(true)
-                            Text("Turn the globe. Tap a country. Stay curious.")
+                            Text("Drag to turn. Pinch to zoom. Two fingers to move.")
                                 .accessibilityIdentifier("discoverGuidance")
                         }
                         .scaledFont(size: 11)
@@ -184,13 +185,12 @@ struct ExploreView: View {
 
     private func globe(height: CGFloat) -> some View {
         ZStack(alignment: .bottom) {
-            WorldGlobeView(countries: CountryRepository.countries, selectedCountry: selected, spinToken: spinToken) { country in
+            WorldGlobeView(countries: CountryRepository.countries, selectedCountry: selected,
+                           spinToken: spinToken, resetToken: globeResetToken) { country in
                 selected = country
                 journal.visit(country)
-                detail = country
             }
             .accessibilityLabel("Interactive world globe")
-            .accessibilityHint("Drag to rotate. Use the Atlas tab for an accessible country list.")
             .accessibilityIdentifier("interactiveGlobe")
             .frame(height: height)
 
@@ -210,6 +210,7 @@ struct ExploreView: View {
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("landingCountry")
+            .accessibilityHint("Opens discoveries from \(selected.name).")
             .padding(.bottom, 13)
         }
         .overlay(alignment: .topLeading) {
@@ -221,6 +222,20 @@ struct ExploreView: View {
             .foregroundStyle(Palette.muted.opacity(0.8))
             .padding(.leading, 30).padding(.top, 25)
             .accessibilityHidden(true)
+        }
+        .overlay(alignment: .topTrailing) {
+            Button { globeResetToken += 1 } label: {
+                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                    .font(.system(size: 14, weight: .medium))
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.glass)
+            .buttonBorderShape(.circle)
+            .foregroundStyle(Palette.pine)
+            .accessibilityLabel("Reset globe view")
+            .accessibilityHint("Zooms out and centers \(selected.name).")
+            .accessibilityIdentifier("resetGlobe")
+            .padding(.trailing, 24).padding(.top, 18)
         }
     }
 
