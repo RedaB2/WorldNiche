@@ -11,6 +11,7 @@ struct WorldGlobeView: UIViewRepresentable {
     let spinToken: Int
     var resetToken = 0
     var allowsCountrySelection = true
+    var onInteraction: () -> Void = {}
     var onSelect: (Country) -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(onSelect: onSelect) }
@@ -29,6 +30,7 @@ struct WorldGlobeView: UIViewRepresentable {
         updateAccessibility(view)
         view.accessibilityTraits = [.image]
         context.coordinator.allowsCountrySelection = allowsCountrySelection
+        context.coordinator.onInteraction = onInteraction
         context.coordinator.configure(view: view, countries: countries)
         return view
     }
@@ -37,6 +39,7 @@ struct WorldGlobeView: UIViewRepresentable {
         context.coordinator.countries = countries
         context.coordinator.onSelect = onSelect
         context.coordinator.allowsCountrySelection = allowsCountrySelection
+        context.coordinator.onInteraction = onInteraction
         updateAccessibility(uiView)
         context.coordinator.updateSelection(selectedCountry, spinToken: spinToken)
         context.coordinator.resetIfNeeded(token: resetToken, country: selectedCountry)
@@ -60,6 +63,8 @@ struct WorldGlobeView: UIViewRepresentable {
         var countries: [Country] = []
         var onSelect: (Country) -> Void
         var allowsCountrySelection = true
+        var onInteraction: () -> Void = {}
+        private var hasInteracted = false
         private weak var view: SCNView?
         private let worldNode = SCNNode()
         private let surfaceNode = SCNNode()
@@ -75,6 +80,7 @@ struct WorldGlobeView: UIViewRepresentable {
         private var gesturePoint = CGPoint.zero
         private var displayLink: CADisplayLink?
         private var animation: NavigationAnimation?
+        private var momentum: GlobeMomentum?
         private var borderGeometry: SCNGeometry?
 
         private struct NavigationAnimation {
@@ -199,6 +205,12 @@ struct WorldGlobeView: UIViewRepresentable {
         }
 
         @objc private func animate(_ link: CADisplayLink) {
+            if let momentum {
+                orientation = momentum.orientation(at: link.timestamp)
+                worldNode.simdOrientation = orientation.quaternion
+                if link.timestamp - momentum.started >= GlobeMomentum.duration { stopAnimation() }
+                return
+            }
             guard let animation else { return }
             let t = min(1, max(0, (link.timestamp - animation.started) / animation.duration))
             let eased = t * t * (3 - 2 * t)
@@ -215,6 +227,7 @@ struct WorldGlobeView: UIViewRepresentable {
             displayLink?.invalidate()
             displayLink = nil
             animation = nil
+            momentum = nil
         }
 
         private func buildMarker() {
@@ -237,25 +250,45 @@ struct WorldGlobeView: UIViewRepresentable {
             markerNode.isHidden = true
         }
 
+        private func noteInteraction() {
+            guard !hasInteracted else { return }
+            hasInteracted = true
+            onInteraction()
+        }
+
         @objc private func explore(_ recognizer: GlobeNavigationGesture) {
-            guard let view, recognizer.state == .began || recognizer.state == .changed else { return }
+            guard let view else { return }
+            let ending = recognizer.state == .ended
+            guard ending || recognizer.state == .began || recognizer.state == .changed else { return }
+            let fingerCount = ending ? recognizer.releaseFingerCount : recognizer.fingerCount
+            noteInteraction()
             if gestureGeneration != recognizer.generation {
                 stopAnimation()
                 gestureGeneration = recognizer.generation
                 gestureViewport = viewport
                 gesturePoint = recognizer.startCenter
             }
-            if recognizer.fingerCount == 2 {
+            if fingerCount == 2 {
                 viewport = gestureViewport
                 viewport.transform(from: recognizer.startCenter, to: recognizer.center,
                     magnification: recognizer.span / max(1, recognizer.startSpan), in: view.bounds.size)
-            } else if recognizer.fingerCount == 1 {
+            } else if fingerCount == 1 {
                 orientation = orientation.dragging(from: gesturePoint, to: recognizer.center,
                     in: view.bounds.size, viewport: gestureViewport)
                 worldNode.simdOrientation = orientation.quaternion
             }
             gesturePoint = recognizer.center
             updateViewport()
+            if ending {
+                momentum = GlobeMomentum(orientation: orientation, velocity: recognizer.releaseVelocity,
+                    viewport: viewport, size: view.bounds.size, started: CACurrentMediaTime(),
+                    reduceMotion: UIAccessibility.isReduceMotionEnabled)
+                if momentum != nil {
+                    let link = CADisplayLink(target: self, selector: #selector(animate(_:)))
+                    displayLink = link
+                    link.add(to: .main, forMode: .common)
+                }
+            }
         }
 
         private func updateViewport() {
@@ -296,7 +329,10 @@ struct WorldGlobeView: UIViewRepresentable {
             let point = touch.location(in: view)
             let onSurface = viewport.surfacePoint(at: point, in: view.bounds.size) != nil
             if gestureRecognizer is GlobeNavigationGesture {
-                if onSurface { stopAnimation() }
+                if onSurface {
+                    stopAnimation()
+                    noteInteraction()
+                }
                 // A pinch can straddle the silhouette. Decide using its midpoint once both fingers arrive.
                 return true
             }
@@ -380,6 +416,9 @@ private final class GlobeNavigationGesture: UIGestureRecognizer {
     private(set) var center = CGPoint.zero
     private(set) var span: CGFloat = 1
     var fingerCount: Int { fingers.count }
+    private var velocity = GlobeDragVelocity()
+    private(set) var releaseVelocity = CGPoint.zero
+    private(set) var releaseFingerCount = 0
 
     private func sample() {
         let points = fingers.map { $0.location(in: view) }
@@ -388,10 +427,13 @@ private final class GlobeNavigationGesture: UIGestureRecognizer {
         span = points.count == 2 ? hypot(first.x - points[1].x, first.y - points[1].y) : 1
     }
 
-    private func rebase() {
+    private func rebase(at time: TimeInterval) {
         sample()
         startCenter = center
         startSpan = span
+        velocity = GlobeDragVelocity()
+        releaseVelocity = .zero
+        velocity.record(center, at: time)
         generation += 1
         if state == .began || state == .changed { state = .changed }
     }
@@ -399,11 +441,12 @@ private final class GlobeNavigationGesture: UIGestureRecognizer {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
         fingers.formUnion(touches)
         guard fingers.count <= 2 else { state = state == .possible ? .failed : .cancelled; return }
-        rebase()
+        rebase(at: event.timestamp)
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
         sample()
+        if fingerCount == 1 { velocity.record(center, at: event.timestamp) }
         if state == .possible {
             if hypot(center.x - startCenter.x, center.y - startCenter.y) > 3 || abs(span - startSpan) > 3 {
                 let withinEdges = startCenter.y > 12 && startCenter.y < (view?.bounds.height ?? 0) - 12
@@ -413,9 +456,15 @@ private final class GlobeNavigationGesture: UIGestureRecognizer {
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
+        sample()
+        releaseFingerCount = fingerCount
+        if fingerCount == 1 {
+            velocity.record(center, at: event.timestamp)
+            releaseVelocity = velocity.velocity(at: event.timestamp)
+        } else { releaseVelocity = .zero }
         fingers.subtract(touches)
         if fingers.isEmpty { state = state == .possible ? .failed : .ended }
-        else { rebase() }
+        else { rebase(at: event.timestamp) }
     }
 
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {

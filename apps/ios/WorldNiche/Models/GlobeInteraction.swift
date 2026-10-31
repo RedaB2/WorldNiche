@@ -30,39 +30,15 @@ struct GlobeOrientation {
         return result
     }
 
-    /// A surface drag changes orientation only, using the current framing for projection.
+    /// Screen-distance rotation has independent axes and no surface-projection singularity.
     func dragging(from start: CGPoint, to end: CGPoint, in size: CGSize, viewport: GlobeViewport) -> Self {
-        guard let surface = viewport.surfacePoint(at: start, in: size, clampToEdge: true),
-              let target = viewport.surfacePoint(at: end, in: size, clampToEdge: true) else { return self }
-        let desired = following(quaternion.inverse.act(surface), to: target)
-        let longitudeChange = (desired.longitude - longitude).remainder(dividingBy: 2 * .pi)
-        let latitudeChange = desired.latitude - latitude
-        let distance = hypot(end.x - start.x, end.y - start.y)
-        // The exact surface solution becomes singular at a pole or the limb. Bound its
-        // angular response by finger travel, then re-grab at the next sample to avoid lag.
-        let maximumStep = distance * 2 * viewport.scale / max(1, min(size.width, size.height)) * 4
-        let fraction = min(1, maximumStep / max(0.0000001, hypot(longitudeChange, latitudeChange)))
-        return rotated(horizontal: -longitudeChange * fraction, vertical: latitudeChange * fraction)
+        let diameter = min(size.width, size.height)
+        guard diameter > 0, start.x.isFinite, start.y.isFinite, end.x.isFinite, end.y.isFinite else { return self }
+        let radiansPerPoint = 2 * viewport.scale / diameter
+        return rotated(horizontal: (end.x - start.x) * radiansPerPoint,
+                       vertical: (end.y - start.y) * radiansPerPoint)
     }
 
-    /// Solve the north-upright rotation that puts a grabbed surface point under the finger.
-    func following(_ anchor: SIMD3<Float>, to target: SIMD3<Float>) -> Self {
-        let radius = hypot(Double(anchor.x), Double(anchor.z))
-        guard radius > 0.00001 else { return self }
-        let angle = asin(min(1, max(-1, Double(target.x) / radius)))
-        let anchorLongitude = atan2(Double(anchor.x), Double(anchor.z))
-        let targetTilt = atan2(Double(target.y), Double(target.z))
-        // There are two meridians with this screen x. Choose the continuous solution.
-        return [angle, .pi - angle].map { meridian in
-            let tilt = atan2(Double(anchor.y), radius * cos(meridian)) - targetTilt
-            return Self(latitude: tilt * 180 / .pi, longitude: (anchorLongitude - meridian) * 180 / .pi)
-        }.min { a, b in
-            func distance(_ value: Self) -> Double {
-                pow(value.latitude - latitude, 2) + pow((value.longitude - longitude).remainder(dividingBy: 2 * .pi), 2)
-            }
-            return distance(a) < distance(b)
-        } ?? self
-    }
 }
 
 /// The sphere has radius one. Screen coordinates are measured in view points.
@@ -123,5 +99,52 @@ struct GlobeViewport {
         result.offset = CGPoint(x: offset.x + (destination.offset.x - offset.x) * fraction,
                                 y: offset.y + (destination.offset.y - offset.y) * fraction)
         return result
+    }
+}
+
+/// Estimate release speed over a short time window, independent of the touch event rate.
+struct GlobeDragVelocity {
+    private var samples: [(point: CGPoint, time: TimeInterval)] = []
+
+    mutating func record(_ point: CGPoint, at time: TimeInterval) {
+        guard time.isFinite, point.x.isFinite, point.y.isFinite else { return }
+        if let last = samples.last, time <= last.time { return }
+        samples.append((point, time))
+        while samples.count > 2 && samples[1].time < time - 0.1 { samples.removeFirst() }
+    }
+
+    func velocity(at time: TimeInterval) -> CGPoint {
+        guard let first = samples.first, let last = samples.last,
+              time - last.time <= 0.08, last.time - first.time > 0.001 else { return .zero }
+        let duration = last.time - first.time
+        let dx = (last.point.x - first.point.x) / duration
+        let dy = (last.point.y - first.point.y) / duration
+        let fraction = min(1, 900 / max(1, hypot(dx, dy)))
+        return CGPoint(x: dx * fraction, y: dy * fraction)
+    }
+}
+
+/// A brief release glide integrates velocity analytically and reaches zero speed exactly.
+struct GlobeMomentum {
+    static let duration = 0.36
+    let started: TimeInterval
+    private let initial: GlobeOrientation
+    private let velocity: CGPoint
+
+    init?(orientation: GlobeOrientation, velocity: CGPoint, viewport: GlobeViewport,
+          size: CGSize, started: TimeInterval, reduceMotion: Bool) {
+        let diameter = min(size.width, size.height)
+        guard !reduceMotion, diameter > 0, velocity.x.isFinite, velocity.y.isFinite,
+              hypot(velocity.x, velocity.y) > 120 else { return nil }
+        self.initial = orientation
+        self.started = started
+        let factor = 2 * viewport.scale / diameter
+        self.velocity = CGPoint(x: velocity.x * factor, y: velocity.y * factor)
+    }
+
+    func orientation(at time: TimeInterval) -> GlobeOrientation {
+        let t = min(1, max(0, (time - started) / Self.duration))
+        let travel = Self.duration / 4 * (1 - pow(1 - t, 4))
+        return initial.rotated(horizontal: velocity.x * travel, vertical: velocity.y * travel)
     }
 }

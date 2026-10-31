@@ -64,6 +64,7 @@ struct ExploreView: View {
     @State private var selected = CountryRepository.country(id: "MA") ?? CountryRepository.countries[0]
     @State private var spinToken = 0
     @State private var globeResetToken = 0
+    @State private var hasTouchedGlobe = false
     @State private var isSpinning = false
     @State private var detail: Country?
     @State private var showAbout = false
@@ -186,7 +187,8 @@ struct ExploreView: View {
     private func globe(height: CGFloat) -> some View {
         ZStack(alignment: .bottom) {
             WorldGlobeView(countries: CountryRepository.countries, selectedCountry: selected,
-                           spinToken: spinToken, resetToken: globeResetToken) { country in
+                           spinToken: spinToken, resetToken: globeResetToken,
+                           onInteraction: { hasTouchedGlobe = true }) { country in
                 selected = country
                 journal.visit(country)
             }
@@ -224,18 +226,20 @@ struct ExploreView: View {
             .accessibilityHidden(true)
         }
         .overlay(alignment: .topTrailing) {
-            Button { globeResetToken += 1 } label: {
-                Image(systemName: "arrow.counterclockwise")
-                    .font(.system(size: 14, weight: .medium))
-                    .frame(width: 44, height: 44)
+            if hasTouchedGlobe {
+                Button { globeResetToken += 1 } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.system(size: 14, weight: .medium))
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                .foregroundStyle(Palette.pine)
+                .accessibilityLabel("Reset globe view")
+                .accessibilityHint("Zooms out and centers \(selected.name).")
+                .accessibilityIdentifier("resetGlobe")
+                .padding(.trailing, 24).padding(.top, 18)
             }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
-            .foregroundStyle(Palette.pine)
-            .accessibilityLabel("Reset globe view")
-            .accessibilityHint("Zooms out and centers \(selected.name).")
-            .accessibilityIdentifier("resetGlobe")
-            .padding(.trailing, 24).padding(.top, 18)
         }
     }
 

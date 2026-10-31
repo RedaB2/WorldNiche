@@ -9,5 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
                         duration:(NSTimeInterval)duration;
 + (nullable NSString *)transitionFirst:(CGPoint)first second:(CGPoint)second
                           translation:(CGPoint)translation finalPoint:(CGPoint)finalPoint;
++ (nullable NSString *)trace:(NSArray<NSValue *> *)points duration:(NSTimeInterval)duration hold:(NSTimeInterval)hold;
++ (nullable NSString *)resetAt:(CGPoint)resetPoint thenTrace:(NSArray<NSValue *> *)points duration:(NSTimeInterval)duration;
 @end
 NS_ASSUME_NONNULL_END

@@ -5,6 +5,37 @@ final class GlobeInteractionUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     @MainActor
+    func testHorizontalSweepDoesNotPullTowardAPole() {
+        let app = launch()
+        let globe = globe(in: app)
+        let start = CGPoint(x: globe.frame.midX, y: globe.frame.midY)
+        let distance: CGFloat = 140
+        let points = (0...90).map { NSValue(cgPoint: CGPoint(x: start.x + distance * CGFloat($0) / 90, y: start.y)) }
+        capture("Before the horizontal sweep", app: app)
+        XCTAssertNil(GlobeTestGestures.trace(points, duration: 1.5, hold: 0.2))
+        capture("Horizontal sweep must preserve latitude", app: app)
+        let longitude = -5 - Double(distance * 2 * 1.18 / min(globe.frame.width, globe.frame.height)) * 180 / .pi
+        tap(latitude: 39, longitude: -98, on: globe, centeredAt: (32, longitude), zoom: 1)
+        expectCountry("United States", app: app)
+    }
+
+    @MainActor
+    func testResetAppearsOnlyAfterTouchingVisibleGlobe() {
+        let app = launch()
+        let globe = globe(in: app)
+        XCTAssertFalse(app.buttons["resetGlobe"].exists, "Startup must not offer a reset action")
+        let originalFrame = globe.frame
+        tap(latitude: 25, longitude: -35, on: globe, centeredAt: (32, -5), zoom: 1)
+        XCTAssertTrue(app.buttons["resetGlobe"].waitForExistence(timeout: 2), "An ocean tap still counts as touching the globe")
+        XCTAssertEqual(globe.frame, originalFrame, "Revealing Reset must not move the layout")
+        app.buttons["resetGlobe"].tap()
+        XCTAssertTrue(app.buttons["resetGlobe"].exists)
+        app.terminate()
+        app.launch()
+        XCTAssertFalse(app.buttons["resetGlobe"].exists, "Touch history must not persist across launches")
+    }
+
+    @MainActor
     func testOneFingerLimbDragKeepsThePlanetCentered() throws {
         let app = launch()
         let globe = globe(in: app)
@@ -174,7 +205,7 @@ final class GlobeInteractionUITests: XCTestCase {
     }
 
     @MainActor
-    func testMovingPinchCentroidAndOneFingerDragKeepTheGrabbedCountry() {
+    func testMovingPinchAnchorAndPredictableOneFingerRotation() {
         let app = launch()
         let globe = focusEurope(app)
         let center = CGPoint(x: globe.frame.midX, y: globe.frame.midY)
@@ -195,11 +226,14 @@ final class GlobeInteractionUITests: XCTestCase {
         expectCountry("Switzerland", app: app)
         capture("Moving pinch keeps Switzerland under its centroid", app: app)
         let dragged = CGPoint(x: destination.x - 75, y: destination.y + 20)
-        coordinate(destination, on: globe).press(forDuration: 0.05, thenDragTo: coordinate(dragged, on: globe))
-        coordinate(dragged, on: globe).tap()
+        trace(from: destination, to: dragged, duration: 0.8)
+        let factor = 2 * 1.18 / (3 * min(globe.frame.width, globe.frame.height)) * 180 / .pi
+        let newCenter = (46 + Double(20 * factor), 2 + Double(75 * factor))
+        let offset = CGPoint(x: 45 - (anchor.x - center.x) * 0.5, y: 25 - (anchor.y - center.y) * 0.5)
+        tap(latitude: 46.8, longitude: 8.2, on: globe, centeredAt: newCenter, zoom: 3, offset: offset)
         expectCountry("Switzerland", app: app)
         XCTAssertFalse(app.staticTexts["countryTitle"].exists)
-        capture("One finger carries the same Swiss surface point", app: app)
+        capture("Predictable one-finger rotation preserves country hit testing", app: app)
         app.buttons["resetGlobe"].tap()
         waitForZoom("100% zoom", globe: globe)
         globe.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
@@ -246,22 +280,33 @@ final class GlobeInteractionUITests: XCTestCase {
         let app = launch()
         let globe = globe(in: app)
         let originalY = globe.frame.minY
+        XCTAssertFalse(app.buttons["resetGlobe"].exists)
         let start = globe.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: 0.12))
         start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -140)))
         XCTAssertLessThan(globe.frame.minY, originalY - 30, "Dragging blank space should scroll the page")
+        XCTAssertFalse(app.buttons["resetGlobe"].exists, "Blank page scrolling is not a globe interaction")
     }
 
     @MainActor
     func testExplorationDemo() {
         let app = launch()
         let globe = globe(in: app)
-        capture("Initial globe composition", app: app)
-        for end in [CGVector(dx: 0.98, dy: 0.5), .init(dx: 0.02, dy: 0.5),
-                    .init(dx: 0.9, dy: 0.9), .init(dx: 0.1, dy: 0.1)] {
-            globe.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).press(forDuration: 0.05,
-                thenDragTo: globe.coordinate(withNormalizedOffset: end))
+        XCTAssertFalse(app.buttons["resetGlobe"].exists)
+        capture("Initial globe has no Reset button", app: app)
+        Thread.sleep(forTimeInterval: 0.8)
+        let origin = CGPoint(x: globe.frame.midX, y: globe.frame.midY)
+        XCTAssertNil(GlobeTestGestures.trace([NSValue(cgPoint: origin)], duration: 0, hold: 0.15))
+        XCTAssertTrue(app.buttons["resetGlobe"].exists)
+        capture("Reset appears after the first globe touch", app: app)
+        trace(from: origin, to: CGPoint(x: origin.x + 130, y: origin.y), duration: 1.5)
+        trace(from: origin, to: CGPoint(x: origin.x - 110, y: origin.y), duration: 0.25, hold: 0)
+        trace(from: origin, to: CGPoint(x: origin.x + 55, y: origin.y - 45), duration: 1)
+        let circle = (0...60).map { step in
+            let angle = Double(step) / 60 * 2 * .pi
+            return NSValue(cgPoint: CGPoint(x: origin.x + 40 * cos(angle), y: origin.y + 40 * sin(angle)))
         }
-        capture("Aggressive one-finger spins keep the full globe centered", app: app)
+        XCTAssertNil(GlobeTestGestures.trace(circle, duration: 1.5, hold: 0.2))
+        capture("Smooth horizontal, diagonal, flick and circular turns", app: app)
         app.buttons["resetGlobe"].tap()
         waitForZoom("100% zoom", globe: globe)
         tap(latitude: 46, longitude: 2, on: globe, centeredAt: (32, -5), zoom: 1)
@@ -282,10 +327,7 @@ final class GlobeInteractionUITests: XCTestCase {
             toSecond: CGPoint(x: destination.x + 50, y: destination.y), duration: 2))
         waitForZoom("400% zoom", globe: globe)
         capture("Crisp borders at maximum zoom", app: app)
-        let dragged = CGPoint(x: destination.x - 60, y: destination.y + 28)
-        coordinate(destination, on: globe).press(forDuration: 0.05, thenDragTo: coordinate(dragged, on: globe))
-        coordinate(dragged, on: globe).tap()
-        expectCountry("Switzerland", app: app)
+        trace(from: destination, to: CGPoint(x: destination.x - 60, y: destination.y + 28), duration: 1)
         for _ in 0..<2 { move(globe, by: CGPoint(x: 140, y: 15)) }
         capture("Exploration with the center offscreen", app: app)
         app.buttons["resetGlobe"].tap()
@@ -295,6 +337,57 @@ final class GlobeInteractionUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["countryTitle"].waitForExistence(timeout: 8))
         XCTAssertEqual(app.staticTexts["countryTitle"].label, "Switzerland")
         app.buttons["Close"].firstMatch.tap()
+    }
+
+    @MainActor
+    func testZoomedSweepsAndCircularReversalsKeepPredictableOrientation() {
+        let app = launch()
+        let globe = focusEurope(app)
+        zoomIn(globe)
+        let offset = CGPoint(x: -75, y: 20)
+        move(globe, by: offset)
+        let origin = CGPoint(x: globe.frame.midX, y: globe.frame.midY)
+        // Let synthesized input settle before assertions that intentionally exclude release glide.
+        trace(from: origin, to: CGPoint(x: origin.x + 100, y: origin.y), duration: 1.2, hold: 0.5)
+        trace(from: origin, to: CGPoint(x: origin.x, y: origin.y - 40), duration: 0.3, hold: 0.5)
+        let circle = (0...90).map { step in
+            let angle = Double(step) / 90 * 2 * .pi
+            return NSValue(cgPoint: CGPoint(x: origin.x + 30 * cos(angle), y: origin.y + 30 * sin(angle)))
+        }
+        XCTAssertNil(GlobeTestGestures.trace(circle, duration: 1.5, hold: 0.5))
+        let factor = 2 * 1.18 / (4 * min(globe.frame.width, globe.frame.height)) * 180 / .pi
+        tap(latitude: 46.8, longitude: 8.2, on: globe,
+            centeredAt: (46 - Double(40 * factor), 2 - Double(100 * factor)), zoom: 4, offset: offset)
+        expectCountry("Switzerland", app: app)
+        capture("Slow and fast close-up sweeps with circular reversal preserve orientation", app: app)
+    }
+
+    @MainActor
+    func testTouchInterruptsResetWithoutCompletingItsCameraMovement() {
+        let app = launch()
+        let globe = focusEurope(app)
+        zoomIn(globe)
+        move(globe, by: CGPoint(x: 60, y: 15))
+        let reset = app.buttons["resetGlobe"].frame
+        let origin = CGPoint(x: globe.frame.midX, y: globe.frame.midY)
+        let points = (0...60).map { NSValue(cgPoint: CGPoint(x: origin.x + CGFloat($0), y: origin.y)) }
+        XCTAssertNil(GlobeTestGestures.reset(at: CGPoint(x: reset.midX, y: reset.midY), thenTrace: points, duration: 1))
+        let interrupted = globe.value as? String ?? ""
+        let percent = Int(interrupted.replacingOccurrences(of: "% zoom", with: "")) ?? 0
+        XCTAssertGreaterThan(percent, 100, "Touch must stop the reset at its visible intermediate zoom")
+        XCTAssertLessThan(percent, 400)
+        trace(from: origin, to: CGPoint(x: origin.x - 60, y: origin.y + 20), duration: 0.5)
+        XCTAssertEqual(globe.value as? String, interrupted, "Subsequent one-finger turning keeps the interrupted framing")
+        capture("Reset interruption holds the current frame", app: app)
+    }
+
+    @MainActor
+    private func trace(from start: CGPoint, to end: CGPoint, duration: Double, hold: Double = 0.2) {
+        let points = (0...60).map { step in
+            let t = CGFloat(step) / 60
+            return NSValue(cgPoint: CGPoint(x: start.x + (end.x - start.x) * t, y: start.y + (end.y - start.y) * t))
+        }
+        XCTAssertNil(GlobeTestGestures.trace(points, duration: duration, hold: hold))
     }
 
     @MainActor

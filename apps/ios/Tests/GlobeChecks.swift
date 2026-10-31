@@ -82,83 +82,100 @@ struct GlobeChecks {
         expect(halfway.offset.x != 0 && halfway.offset != viewport.offset, "Reset framing has an intermediate state")
         expect(viewport.interpolated(to: initial, fraction: 1).offset == .zero, "Reset ends at the exact initial position")
 
-        for latitude in stride(from: -40.0, through: 40, by: 20) {
-            for longitude in stride(from: -170.0, through: 170, by: 34) {
-                let startOrientation = GlobeOrientation(latitude: latitude, longitude: longitude)
-                let sphere = initial.surfacePoint(at: start, in: size)!
-                let grabbed = startOrientation.quaternion.inverse.act(sphere)
-                let target = initial.surfacePoint(at: finish, in: size)!
-                let followed = startOrientation.following(grabbed, to: target)
-                expect(simd_length(followed.quaternion.act(grabbed) - target) < 0.00001,
-                       "One-finger dragging keeps the grabbed geography under the finger")
-            }
-        }
         expect(initial.surfacePoint(at: .zero, in: size) == nil, "Transparent corners are not the sphere")
         expect(initial.surfacePoint(at: center, in: size) != nil, "Visible surface receives gestures")
-
-        // A near-pole grab used to turn over forty degrees for less than one point of travel.
-        var polarTurn = GlobeOrientation(latitude: -34, longitude: 0)
-        let polarSize = CGSize(width: 400, height: 360)
-        var previous = CGPoint(x: 200, y: 306)
-        for step in 1...500 {
-            let t = Double(step) / 500
-            let point = CGPoint(x: 200 - 280 * t, y: 306 - 378 * t)
-            let next = polarTurn.dragging(from: previous, to: point, in: polarSize, viewport: initial)
-            let angle = 2 * acos(min(1, abs(Double(simd_dot(polarTurn.quaternion.vector, next.quaternion.vector)))))
-            expect(angle < 0.03, "Tiny finger movement near a pole must not jump longitude")
-            polarTurn = next
-            previous = point
-        }
-
         var closeUp = initial
         closeUp.zoom(by: 4, around: center, in: size)
         var shifted = closeUp
         shifted.move(by: CGPoint(x: 560, y: 0), in: size)
         for frame in [initial, closeUp, shifted] {
-            func screen(_ x: Double, _ y: Double) -> CGPoint {
-                let radius = min(size.width, size.height) / (2 * frame.scale)
-                return CGPoint(x: center.x + (x + frame.offset.x) * radius,
-                               y: center.y - (y + frame.offset.y) * radius)
-            }
-            for latitude in [-85.0, -60, -34, 0, 34, 60, 85] {
-                for anchor in [CGPoint.zero, CGPoint(x: 0.8, y: 0), CGPoint(x: 0, y: 0.8),
-                               CGPoint(x: 0, y: -0.8), CGPoint(x: 0.6, y: 0.6)] {
-                    for end in [CGPoint(x: -1.3, y: -1.3), CGPoint(x: 1.3, y: 1.3),
-                                CGPoint(x: -1.3, y: 1.3), CGPoint(x: 1.3, y: -1.3)] {
-                        var turn = GlobeOrientation(latitude: latitude, longitude: 179)
-                        var previous = screen(anchor.x, anchor.y)
-                        // Go past the limb and reverse without lifting the finger.
-                        for step in 1...240 {
-                            let t = Double(step <= 120 ? step : 240 - step) / 120
-                            let point = screen(anchor.x + (end.x - anchor.x) * t, anchor.y + (end.y - anchor.y) * t)
-                            let next = turn.dragging(from: previous, to: point, in: size, viewport: frame)
-                            let limit = hypot(point.x - previous.x, point.y - previous.y) * 8 * frame.scale / min(size.width, size.height)
-                            let angle = 2 * acos(min(1, abs(Double(simd_dot(turn.quaternion.vector, next.quaternion.vector)))))
-                            expect(angle.isFinite && angle <= limit + 0.001,
-                                   "Limb, pole, diagonal and reversed drags remain continuous at every zoom and offset")
-                            let north = next.quaternion.act(SIMD3<Float>(0, 1, 0))
-                            expect(abs(north.x) < 0.00001 && north.y > 0, "Surface dragging never rolls or flips north")
-                            turn = next
+            for latitude in [-85.0, -60, -32, 0, 32, 60, 85] {
+                let original = GlobeOrientation(latitude: latitude, longitude: 179)
+                for samples in [1, 15, 30, 60, 120, 240] {
+                    for origin in [center, CGPoint(x: 40, y: 60), CGPoint(x: 340, y: 290)] {
+                        var turn = original
+                        var previous = origin
+                        for step in 1...samples {
+                            let point = CGPoint(x: origin.x + 140 * Double(step) / Double(samples), y: origin.y)
+                            turn = turn.dragging(from: previous, to: point, in: size, viewport: frame)
+                            expect(abs(turn.latitude - original.latitude) < 0.0000001,
+                                   "A horizontal sweep must not pull toward either pole, including at the limb")
                             previous = point
                         }
-                        let stopped = turn.dragging(from: previous, to: previous, in: size, viewport: frame)
-                        expect(stopped.latitude == turn.latitude && stopped.longitude == turn.longitude,
-                               "A stationary finger does not accumulate rotation")
+                        let single = original.dragging(from: origin, to: previous, in: size, viewport: frame)
+                        expect(abs((turn.longitude - single.longitude).remainder(dividingBy: 2 * .pi)) < 0.0000001,
+                               "The same horizontal travel gives the same turn at every event rate and touch location")
+                        let vertical = original.dragging(from: origin, to: CGPoint(x: origin.x, y: origin.y + 80), in: size, viewport: frame)
+                        expect(abs(vertical.longitude - original.longitude) < 0.0000001,
+                               "A vertical sweep never introduces a ninety-degree longitude turn")
+                        let reverse = turn.dragging(from: previous, to: origin, in: size, viewport: frame)
+                        expect(abs((reverse.longitude - original.longitude).remainder(dividingBy: 2 * .pi)) < 0.0000001,
+                               "Reversing a horizontal drag returns to the same orientation")
                     }
                 }
             }
         }
+        // Slow and fast circles and reversals have identical checkpoints and no accumulated pull.
+        let waypoints = [center, CGPoint(x: center.x + 60, y: center.y + 35),
+                         CGPoint(x: center.x - 40, y: center.y - 45), center]
+        for samples in [1, 12, 60, 240] {
+            let original = GlobeOrientation(latitude: 32, longitude: -5)
+            var turn = original
+            for (a, b) in zip(waypoints, waypoints.dropFirst()) {
+                var previous = a
+                for step in 1...samples {
+                    let t = Double(step) / Double(samples)
+                    let point = CGPoint(x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t)
+                    turn = turn.dragging(from: previous, to: point, in: size, viewport: initial)
+                    previous = point
+                }
+                let direct = original.dragging(from: center, to: b, in: size, viewport: initial)
+                expect(abs(turn.latitude - direct.latitude) < 0.0000001 && abs(turn.longitude - direct.longitude) < 0.0000001,
+                       "Diagonal path checkpoints do not depend on sample count")
+            }
+            for step in 1...(samples * 10) {
+                let a = Double(step - 1) / Double(samples * 10) * 2 * .pi
+                let b = Double(step) / Double(samples * 10) * 2 * .pi
+                turn = turn.dragging(from: CGPoint(x: center.x + 40 * cos(a), y: center.y + 40 * sin(a)),
+                    to: CGPoint(x: center.x + 40 * cos(b), y: center.y + 40 * sin(b)), in: size, viewport: initial)
+            }
+            expect(abs(turn.latitude - original.latitude) < 0.0000001 && abs(turn.longitude - original.longitude) < 0.0000001,
+                   "A small circular drag cannot accumulate roll, pole pull or angular drift")
+        }
+        let atPole = GlobeOrientation(latitude: 85, longitude: 25)
+        let reversed = atPole.dragging(from: center, to: CGPoint(x: center.x, y: center.y - 1), in: size, viewport: initial)
+        expect(reversed.latitude < atPole.latitude && reversed.longitude == atPole.longitude,
+               "Reversal away from the pole limit responds immediately without overshoot debt")
 
-        var preciseTurn = GlobeOrientation(latitude: 46, longitude: 2)
-        let held = preciseTurn.quaternion.inverse.act(initial.surfacePoint(at: start, in: size)!)
-        var last = start
-        for step in 1...100 {
-            let t = Double(step) / 100
-            let point = CGPoint(x: start.x + (finish.x - start.x) * t, y: start.y + (finish.y - start.y) * t)
-            preciseTurn = preciseTurn.dragging(from: last, to: point, in: size, viewport: initial)
-            expect(simd_length(preciseTurn.quaternion.act(held) - initial.surfacePoint(at: point, in: size)!) < 0.0001,
-                   "Ordinary country dragging retains its geographic anchor through sampled input")
-            last = point
+        for rate in [15, 30, 60, 120, 240] {
+            var estimator = GlobeDragVelocity()
+            for sample in 0...rate {
+                let t = Double(sample) / Double(rate)
+                estimator.record(CGPoint(x: 600 * t, y: -150 * t), at: t)
+            }
+            let velocity = estimator.velocity(at: 1)
+            expect(abs(velocity.x - 600) < 0.00001 && abs(velocity.y + 150) < 0.00001,
+                   "Release velocity reflects time and travel, not callback count")
+            expect(estimator.velocity(at: 1.2) == .zero, "A pause before release suppresses inertia")
+            estimator.record(CGPoint(x: 600, y: -150), at: 1.2)
+            expect(estimator.velocity(at: 1.2) == .zero, "Holding still does not release an old flick")
+            let startTurn = GlobeOrientation(latitude: 32, longitude: -5)
+            let coast = GlobeMomentum(orientation: startTurn, velocity: velocity, viewport: initial,
+                                      size: size, started: 10, reduceMotion: false)!
+            expect(coast.orientation(at: 10).latitude == startTurn.latitude && coast.orientation(at: 10).longitude == startTurn.longitude,
+                   "Release starts at the exact dragged orientation")
+            let stop = coast.orientation(at: 11)
+            expect(stop.latitude == coast.orientation(at: 20).latitude && stop.longitude == coast.orientation(at: 20).longitude,
+                   "The short release glide finishes without endless drift")
+            let almost = coast.orientation(at: 10 + GlobeMomentum.duration - 0.01)
+            expect(abs(almost.longitude - stop.longitude) < 0.00001, "Release speed approaches zero smoothly")
+            let interrupted = coast.orientation(at: 10.07)
+            let regrab = interrupted.dragging(from: center, to: center, in: size, viewport: initial)
+            expect(regrab.latitude == interrupted.latitude && regrab.longitude == interrupted.longitude,
+                   "Regrabbing an in-flight glide does not reorient or snap north")
+            expect(GlobeMomentum(orientation: startTurn, velocity: velocity, viewport: initial,
+                                 size: size, started: 10, reduceMotion: true) == nil,
+                   "Reduce Motion disables release inertia")
         }
 
         var orientation = GlobeOrientation(latitude: 32, longitude: -5)
