@@ -225,7 +225,7 @@ struct ExploreView: View {
         }
         .overlay(alignment: .topTrailing) {
             Button { globeResetToken += 1 } label: {
-                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                Image(systemName: "arrow.counterclockwise")
                     .font(.system(size: 14, weight: .medium))
                     .frame(width: 44, height: 44)
             }
