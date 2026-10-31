@@ -7,5 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)moveFirst:(CGPoint)first second:(CGPoint)second
                          toFirst:(CGPoint)firstEnd toSecond:(CGPoint)secondEnd
                         duration:(NSTimeInterval)duration;
++ (nullable NSString *)transitionFirst:(CGPoint)first second:(CGPoint)second
+                          translation:(CGPoint)translation finalPoint:(CGPoint)finalPoint;
 @end
 NS_ASSUME_NONNULL_END

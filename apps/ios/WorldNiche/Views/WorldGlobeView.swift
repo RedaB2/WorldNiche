@@ -72,7 +72,7 @@ struct WorldGlobeView: UIViewRepresentable {
         private var orientation = GlobeOrientation(latitude: 22, longitude: 18)
         private var gestureGeneration = -1
         private var gestureViewport = GlobeViewport()
-        private var grabbedPoint: SIMD3<Float>?
+        private var gesturePoint = CGPoint.zero
         private var displayLink: CADisplayLink?
         private var animation: NavigationAnimation?
         private var borderGeometry: SCNGeometry?
@@ -243,25 +243,18 @@ struct WorldGlobeView: UIViewRepresentable {
                 stopAnimation()
                 gestureGeneration = recognizer.generation
                 gestureViewport = viewport
-                grabbedPoint = viewport.surfacePoint(at: recognizer.startCenter, in: view.bounds.size)
-                    .map { orientation.quaternion.inverse.act($0) }
+                gesturePoint = recognizer.startCenter
             }
             if recognizer.fingerCount == 2 {
                 viewport = gestureViewport
                 viewport.transform(from: recognizer.startCenter, to: recognizer.center,
                     magnification: recognizer.span / max(1, recognizer.startSpan), in: view.bounds.size)
-            } else if let grabbedPoint,
-                      let target = gestureViewport.surfacePoint(at: recognizer.center, in: view.bounds.size, clampToEdge: true) {
-                orientation = orientation.following(grabbedPoint, to: target)
+            } else if recognizer.fingerCount == 1 {
+                orientation = orientation.dragging(from: gesturePoint, to: recognizer.center,
+                    in: view.bounds.size, viewport: gestureViewport)
                 worldNode.simdOrientation = orientation.quaternion
-                viewport = gestureViewport
-                let desired = viewport.scenePoint(at: recognizer.center, in: view.bounds.size)
-                let actual = orientation.quaternion.act(grabbedPoint)
-                let pointsPerUnit = min(view.bounds.width, view.bounds.height) / (2 * viewport.scale)
-                // At a pole or the horizon, carry the sphere with the finger instead of slipping or flipping.
-                viewport.move(by: CGPoint(x: (desired.x - Double(actual.x)) * pointsPerUnit,
-                                          y: -(desired.y - Double(actual.y)) * pointsPerUnit), in: view.bounds.size)
             }
+            gesturePoint = recognizer.center
             updateViewport()
         }
 

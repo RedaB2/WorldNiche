@@ -5,6 +5,119 @@ final class GlobeInteractionUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     @MainActor
+    func testOneFingerLimbDragKeepsThePlanetCentered() throws {
+        let app = launch()
+        let globe = globe(in: app)
+        let originalFrame = globe.frame
+        let before = try silhouetteEdges(of: globe)
+        XCTAssertEqual((before[0] + before[1]) / 2, globe.frame.width / 2, accuracy: 3)
+        let paths: [(CGVector, CGVector)] = [
+            (.init(dx: 0.5, dy: 0.5), .init(dx: 0.98, dy: 0.5)),
+            (.init(dx: 0.5, dy: 0.5), .init(dx: 0.02, dy: 0.5)),
+            (.init(dx: 0.5, dy: 0.5), .init(dx: 0.5, dy: 0.96)),
+            (.init(dx: 0.5, dy: 0.5), .init(dx: 0.5, dy: 0.04)),
+            (.init(dx: 0.3, dy: 0.3), .init(dx: 0.95, dy: 0.95)),
+            (.init(dx: 0.7, dy: 0.7), .init(dx: 0.05, dy: 0.05)),
+            // The lower center is covered by the country-name button on the Duo.
+            (.init(dx: 0.5, dy: 0.15), .init(dx: 0.02, dy: 0.98)),
+            (.init(dx: 0.85, dy: 0.5), .init(dx: 0.1, dy: 0.9))
+        ]
+        for (start, end) in paths {
+            globe.coordinate(withNormalizedOffset: start).press(forDuration: 0.05,
+                thenDragTo: globe.coordinate(withNormalizedOffset: end))
+            XCTAssertEqual(globe.frame, originalFrame, "A drag on exposed geography must not scroll the page")
+            try assertFraming(before, globe: globe, zoom: "100% zoom")
+        }
+        Thread.sleep(forTimeInterval: 0.5)
+        try assertFraming(before, globe: globe, zoom: "100% zoom")
+        capture("Repeated limb, pole and diagonal spins keep the sphere centered", app: app)
+    }
+
+    @MainActor
+    func testOneFingerSpinsPreserveAnOffscreenMaximumZoomFrame() throws {
+        let app = launch()
+        let globe = focusEurope(app)
+        zoomIn(globe)
+        // Leave an observable curved silhouette in the viewport at 400% zoom.
+        let radius = min(globe.frame.width, globe.frame.height) * 4 / (2 * 1.18)
+        let shift = radius - globe.frame.width * 0.1
+        let steps = Int(ceil(shift / 100))
+        for _ in 0..<steps { move(globe, by: CGPoint(x: shift / CGFloat(steps), y: 0)) }
+        let before = try silhouetteEdges(of: globe)
+        XCTAssertGreaterThan(before[0], 20, "The shifted sphere must have a visible left edge")
+        for end in [CGVector(dx: 0.99, dy: 0.05), .init(dx: 0.3, dy: 0.9),
+                    .init(dx: 0.99, dy: 0.95), .init(dx: 0.3, dy: 0.1)] {
+            globe.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.5)).press(forDuration: 0.05,
+                thenDragTo: globe.coordinate(withNormalizedOffset: end))
+            try assertFraming(before, globe: globe, zoom: "400% zoom")
+        }
+        capture("One-finger spins preserve the intentionally shifted close-up", app: app)
+        app.buttons["resetGlobe"].tap()
+        waitForZoom("100% zoom", globe: globe)
+    }
+
+    @MainActor
+    func testFingerCountTransitionsOnlyTranslateDuringTwoFingerMovement() throws {
+        let app = launch()
+        let globe = globe(in: app)
+        let delta = CGPoint(x: 35, y: -20)
+        move(globe, by: delta)
+        let expected = try silhouetteEdges(of: globe)
+        app.buttons["resetGlobe"].tap()
+        waitForZoom("100% zoom", globe: globe)
+        let first = CGPoint(x: globe.frame.midX - 30, y: globe.frame.midY + 40)
+        let second = CGPoint(x: globe.frame.midX + 30, y: globe.frame.midY + 40)
+        XCTAssertNil(GlobeTestGestures.transitionFirst(first, second: second, translation: delta,
+            finalPoint: CGPoint(x: globe.frame.maxX - 8, y: globe.frame.minY + 20)))
+        try assertFraming(expected, globe: globe, zoom: "100% zoom")
+        capture("Adding and lifting a finger preserve the intentional two-finger framing", app: app)
+    }
+
+    @MainActor
+    private func assertFraming(_ expected: [CGFloat], globe: XCUIElement, zoom: String,
+                               file: StaticString = #filePath, line: UInt = #line) throws {
+        XCTAssertEqual(globe.value as? String, zoom, file: file, line: line)
+        let actualEdges = try silhouetteEdges(of: globe)
+        if zip(actualEdges, expected).contains(where: { abs($0 - $1) > 3 }) {
+            let attachment = XCTAttachment(screenshot: globe.screenshot())
+            attachment.name = "Sphere outline mismatch"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+        for (actual, edge) in zip(actualEdges, expected) {
+            XCTAssertEqual(actual, edge, accuracy: 3,
+                "One-finger spinning changed the rendered sphere's position or size", file: file, line: line)
+        }
+    }
+
+    @MainActor
+    private func silhouetteEdges(of globe: XCUIElement) throws -> [CGFloat] {
+        let image = try XCTUnwrap(globe.screenshot().image.cgImage)
+        let width = image.width, height = image.height
+        var pixels = [UInt8](repeating: 0, count: width * height * 4)
+        let context = try XCTUnwrap(CGContext(data: &pixels, width: width, height: height, bitsPerComponent: 8,
+            bytesPerRow: width * 4, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+        let background = Array(pixels[0..<3])
+        func isSphere(x: Int, y: Int) -> Bool {
+            let pixel = (y * width + x) * 4
+            return (0..<3).reduce(0) { $0 + abs(Int(pixels[pixel + $1]) - Int(background[$1])) } > 8
+        }
+        // Multiple horizontal and vertical chords detect translation even in a clipped close-up.
+        // Exclude the page's 24-point fade, whose opacity varies with land and ocean colors.
+        let inset = Int(ceil(26 * CGFloat(height) / globe.frame.height))
+        return [0.5, 0.25, 0.75].flatMap { fraction -> [CGFloat] in
+            let row = (0..<width).filter { isSphere(x: $0, y: Int(Double(height) * fraction)) }
+            let column = (inset..<(height - inset)).filter { isSphere(x: Int(Double(width) * fraction), y: $0) }
+            return [CGFloat(row.first ?? -1) * globe.frame.width / CGFloat(width),
+                    CGFloat(row.last ?? -1) * globe.frame.width / CGFloat(width),
+                    CGFloat(column.first ?? -1) * globe.frame.height / CGFloat(height),
+                    CGFloat(column.last ?? -1) * globe.frame.height / CGFloat(height)]
+        }
+    }
+
+    @MainActor
     func testCountryTapsPreviewWithoutMovingTheGlobeOrOpeningDetails() {
         let app = launch()
         let globe = globe(in: app)
@@ -143,6 +256,14 @@ final class GlobeInteractionUITests: XCTestCase {
         let app = launch()
         let globe = globe(in: app)
         capture("Initial globe composition", app: app)
+        for end in [CGVector(dx: 0.98, dy: 0.5), .init(dx: 0.02, dy: 0.5),
+                    .init(dx: 0.9, dy: 0.9), .init(dx: 0.1, dy: 0.1)] {
+            globe.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).press(forDuration: 0.05,
+                thenDragTo: globe.coordinate(withNormalizedOffset: end))
+        }
+        capture("Aggressive one-finger spins keep the full globe centered", app: app)
+        app.buttons["resetGlobe"].tap()
+        waitForZoom("100% zoom", globe: globe)
         tap(latitude: 46, longitude: 2, on: globe, centeredAt: (32, -5), zoom: 1)
         expectCountry("France", app: app)
         app.buttons["resetGlobe"].tap()

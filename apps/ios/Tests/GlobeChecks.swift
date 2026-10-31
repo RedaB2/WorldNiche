@@ -96,6 +96,71 @@ struct GlobeChecks {
         expect(initial.surfacePoint(at: .zero, in: size) == nil, "Transparent corners are not the sphere")
         expect(initial.surfacePoint(at: center, in: size) != nil, "Visible surface receives gestures")
 
+        // A near-pole grab used to turn over forty degrees for less than one point of travel.
+        var polarTurn = GlobeOrientation(latitude: -34, longitude: 0)
+        let polarSize = CGSize(width: 400, height: 360)
+        var previous = CGPoint(x: 200, y: 306)
+        for step in 1...500 {
+            let t = Double(step) / 500
+            let point = CGPoint(x: 200 - 280 * t, y: 306 - 378 * t)
+            let next = polarTurn.dragging(from: previous, to: point, in: polarSize, viewport: initial)
+            let angle = 2 * acos(min(1, abs(Double(simd_dot(polarTurn.quaternion.vector, next.quaternion.vector)))))
+            expect(angle < 0.03, "Tiny finger movement near a pole must not jump longitude")
+            polarTurn = next
+            previous = point
+        }
+
+        var closeUp = initial
+        closeUp.zoom(by: 4, around: center, in: size)
+        var shifted = closeUp
+        shifted.move(by: CGPoint(x: 560, y: 0), in: size)
+        for frame in [initial, closeUp, shifted] {
+            func screen(_ x: Double, _ y: Double) -> CGPoint {
+                let radius = min(size.width, size.height) / (2 * frame.scale)
+                return CGPoint(x: center.x + (x + frame.offset.x) * radius,
+                               y: center.y - (y + frame.offset.y) * radius)
+            }
+            for latitude in [-85.0, -60, -34, 0, 34, 60, 85] {
+                for anchor in [CGPoint.zero, CGPoint(x: 0.8, y: 0), CGPoint(x: 0, y: 0.8),
+                               CGPoint(x: 0, y: -0.8), CGPoint(x: 0.6, y: 0.6)] {
+                    for end in [CGPoint(x: -1.3, y: -1.3), CGPoint(x: 1.3, y: 1.3),
+                                CGPoint(x: -1.3, y: 1.3), CGPoint(x: 1.3, y: -1.3)] {
+                        var turn = GlobeOrientation(latitude: latitude, longitude: 179)
+                        var previous = screen(anchor.x, anchor.y)
+                        // Go past the limb and reverse without lifting the finger.
+                        for step in 1...240 {
+                            let t = Double(step <= 120 ? step : 240 - step) / 120
+                            let point = screen(anchor.x + (end.x - anchor.x) * t, anchor.y + (end.y - anchor.y) * t)
+                            let next = turn.dragging(from: previous, to: point, in: size, viewport: frame)
+                            let limit = hypot(point.x - previous.x, point.y - previous.y) * 8 * frame.scale / min(size.width, size.height)
+                            let angle = 2 * acos(min(1, abs(Double(simd_dot(turn.quaternion.vector, next.quaternion.vector)))))
+                            expect(angle.isFinite && angle <= limit + 0.001,
+                                   "Limb, pole, diagonal and reversed drags remain continuous at every zoom and offset")
+                            let north = next.quaternion.act(SIMD3<Float>(0, 1, 0))
+                            expect(abs(north.x) < 0.00001 && north.y > 0, "Surface dragging never rolls or flips north")
+                            turn = next
+                            previous = point
+                        }
+                        let stopped = turn.dragging(from: previous, to: previous, in: size, viewport: frame)
+                        expect(stopped.latitude == turn.latitude && stopped.longitude == turn.longitude,
+                               "A stationary finger does not accumulate rotation")
+                    }
+                }
+            }
+        }
+
+        var preciseTurn = GlobeOrientation(latitude: 46, longitude: 2)
+        let held = preciseTurn.quaternion.inverse.act(initial.surfacePoint(at: start, in: size)!)
+        var last = start
+        for step in 1...100 {
+            let t = Double(step) / 100
+            let point = CGPoint(x: start.x + (finish.x - start.x) * t, y: start.y + (finish.y - start.y) * t)
+            preciseTurn = preciseTurn.dragging(from: last, to: point, in: size, viewport: initial)
+            expect(simd_length(preciseTurn.quaternion.act(held) - initial.surfacePoint(at: point, in: size)!) < 0.0001,
+                   "Ordinary country dragging retains its geographic anchor through sampled input")
+            last = point
+        }
+
         var orientation = GlobeOrientation(latitude: 32, longitude: -5)
         for step in 0..<2_000 {
             orientation = orientation.rotated(horizontal: 0.2, vertical: step % 2 == 0 ? 0.1 : -0.1)

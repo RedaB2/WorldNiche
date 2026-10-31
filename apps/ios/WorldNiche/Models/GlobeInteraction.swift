@@ -30,6 +30,21 @@ struct GlobeOrientation {
         return result
     }
 
+    /// A surface drag changes orientation only, using the current framing for projection.
+    func dragging(from start: CGPoint, to end: CGPoint, in size: CGSize, viewport: GlobeViewport) -> Self {
+        guard let surface = viewport.surfacePoint(at: start, in: size, clampToEdge: true),
+              let target = viewport.surfacePoint(at: end, in: size, clampToEdge: true) else { return self }
+        let desired = following(quaternion.inverse.act(surface), to: target)
+        let longitudeChange = (desired.longitude - longitude).remainder(dividingBy: 2 * .pi)
+        let latitudeChange = desired.latitude - latitude
+        let distance = hypot(end.x - start.x, end.y - start.y)
+        // The exact surface solution becomes singular at a pole or the limb. Bound its
+        // angular response by finger travel, then re-grab at the next sample to avoid lag.
+        let maximumStep = distance * 2 * viewport.scale / max(1, min(size.width, size.height)) * 4
+        let fraction = min(1, maximumStep / max(0.0000001, hypot(longitudeChange, latitudeChange)))
+        return rotated(horizontal: -longitudeChange * fraction, vertical: latitudeChange * fraction)
+    }
+
     /// Solve the north-upright rotation that puts a grabbed surface point under the finger.
     func following(_ anchor: SIMD3<Float>, to target: SIMD3<Float>) -> Self {
         let radius = hypot(Double(anchor.x), Double(anchor.z))
