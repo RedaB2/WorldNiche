@@ -1,5 +1,15 @@
 # Public beta
 
+## Owner globe candidate: November 1, 2026
+
+The owner authorized TestFlight preparation of **1.0.1 (9)** from the approved globe implementation at `8352c453f18b94155786b1e7557bf5173a21d9e8` on `feat/globe-interactions` / [PR #4](https://github.com/RedaB2/WorldNiche/pull/4). App Store Connect confirms the production release is 1.0 (8), Ready for Distribution. Its latest processed and in-flight build number is 8, so 9 is the next unique build. Only the marketing version and build number change in app configuration; the owner-approved runtime is preserved.
+
+This candidate is being prepared for owner testing through the existing internal Release Checks group. It must not be assigned to WorldNiche Public Beta or notify unrelated testers. No App Store version, submission, release, public access, main merge or production deployment is authorized by this beta upload.
+
+The approved source passed Swift checks including 32,676 globe assertions. Exact full and focused phone/Duo outcomes remain in [globe review notes](globe-interactions.md). Its GitHub secret, website, backend and Swift checks passed; the simulator job failed when the XCTest runner exited while bootstrapping, before completing its profile/journal selection. Archive validation and candidate checks are tracked separately. Private evidence belongs in `outputs/testflight/globe-preparation-2026-11-01/` and the versioned archive directory, not in git.
+
+## Existing public beta
+
 The external **WorldNiche Public Beta** group has a [public signup link](https://testflight.apple.com/join/kqpQhYFw) with 100 places. Build 1.0 (8) is in external testing, with licensed Global Voices news, visible author/date credits and updated privacy declarations. Private journal notes, cloud sync and friend features remain available.
 
 Build 5 adds a practice globe, expandable live music and news previews, a local-culture example, and an animated friend invitation. Only one preview opens at a time. The intro adapts to folded and unfolded displays and larger text. All email sign-in and recovery screens are removed. The matching website help is live in site version 12.

@@ -2,7 +2,7 @@
 
 October 31, 2026. Branch: `feat/globe-interactions`, based on `24d1ac0`.
 
-This work is for a future update. The submitted build 8, `v1.0.0` tag, App Store metadata and version/build settings are unchanged. Development builds are installed directly on the owner's RBDUO. No archive, upload or release was performed. Assign the next build number when preparing the eventual update.
+The owner approved this behavior on their physical RBDUO. The October 31 development build was installed directly as 1.0 (8). On November 1, the owner authorized preparing 1.0.1 (9) for their TestFlight testing; see [TestFlight status](testflight.md). The published App Store 1.0 (8), immutable `v1.0.0` tag and listing remain unchanged. App Store submission and release are separate actions.
 
 ## Behavior
 
