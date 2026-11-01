@@ -39,7 +39,8 @@
 .device-selector button{min-height:44px;min-width:104px;padding:10px 20px;border:0;border-radius:24px;background:transparent;color:var(--muted);font-size:12px;font-weight:550}
 .device-selector button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 4px #203c3314}
 .device-selector button:hover{color:var(--ink)}
-.beta-link{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 12px;font-size:12px;color:var(--ink)}
+.app-store-link{display:inline-flex;align-items:center;justify-content:center;margin-top:4px;padding:12px}
+.app-store-link img{width:auto;height:48px}
 .preview-no-script{max-width:520px;padding:0 22px 30px;margin:auto;text-align:center;font-size:12px;color:var(--muted)}
 .app-stage figcaption{position:absolute;top:40px;left:calc(50% - 440px);max-width:130px;font-size:22px;line-height:1.25;text-align:left;margin:0;transform:rotate(-5deg)}
 .playback-control{position:absolute;top:72px;right:calc(50% - 400px);font-size:11px;min-height:44px;z-index:2}
