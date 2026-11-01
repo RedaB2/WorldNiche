@@ -129,7 +129,7 @@ test('the default stays iPhone, with a native no-JavaScript fallback and lazy Du
   assert.match(html, /id="preview-duo"[^>]*hidden/);
   assert.match(html, /data-src="\/landing\/assets\/duo-demo\.mp4/);
   assert.match(html, /<noscript>[\s\S]*duo-demo\.mp4/);
-  assert.match(html, /https:\/\/testflight\.apple\.com\/join\/kqpQhYFw/);
+  assert.match(html, /https:\/\/apps\.apple\.com\/app\/id6824807927/);
   const s = setup();
   assert.equal(s.duoSource.getAttribute('src'), null);
   assert.equal(s.duo.loadCalls, 0);
