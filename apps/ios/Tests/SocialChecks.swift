@@ -311,6 +311,13 @@ private final class CheckSuite {
     func cleanup() { for name in domains { UserDefaults.standard.removePersistentDomain(forName: name) }; try? FileManager.default.removeItem(at: photoDirectory) }
 
     func links() {
+        var profile = ExplorerProfile(displayName: "Mira", avatar: "globe", shareExploration: false)
+        check(profile.invitationTitle == "Share cultures with Mira", "Invitation preview names the friend")
+        profile.pendingDisplayName = "Unreviewed name"
+        profile.nameModerationStatus = .pending
+        check(profile.invitationTitle == "Share cultures with Mira", "Invitation never shares a pending name")
+        profile.displayName = "Explorer"
+        check(profile.invitationTitle == "Share cultures with me", "Unapproved first name uses a friend-specific fallback")
         check(InvitationLink.token(from: URL(string: "https://friends.example.test/invite/\(inviteToken)")!, allowedHost: configuration.invitationHost) == inviteToken, "Canonical HTTPS invitation must parse")
         check(InvitationLink.token(from: URL(string: "worldniche://invite/\(inviteToken)")!, allowedHost: nil) == inviteToken, "Canonical app invitation must parse")
         let invalid = [
