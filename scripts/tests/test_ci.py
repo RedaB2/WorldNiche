@@ -117,7 +117,7 @@ class SimulatorVerdictTests(unittest.TestCase):
             (["passed"], 0, 1), (["runner-startup", "passed"], 0, 2),
             (["runner-startup", "runner-startup"], 1, 2),
             (["runner-startup", "test-failure"], 1, 2),
-            (["test-failure"], 1, 1), (["unverified"], 1, 1),
+            (["test-failure"], 1, 1), (["unverified"], 1, 1), (["environment-failure"], 1, 1),
         ]:
             with self.subTest(outcomes=outcomes), patch.object(SIMULATOR, "report"):
                 attempt = Mock(side_effect=outcomes)
@@ -161,7 +161,7 @@ class SimulatorVerdictTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as directory, patch.object(SIMULATOR, "OUTPUT", Path(directory)), \
                 patch.object(SIMULATOR, "capture", side_effect=capture), patch.object(SIMULATOR, "report"):
-            self.assertEqual(SIMULATOR.run_attempt(1), "unverified")
+            self.assertEqual(SIMULATOR.run_attempt(1), "environment-failure")
         self.assertFalse(any(command[0] == "xcodebuild" for command in commands))
         self.assertEqual([command[2] for command in commands[-2:]], ["shutdown", "delete"])
 

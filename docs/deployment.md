@@ -59,7 +59,7 @@ The former apex A records were `162.159.143.30` and `172.66.3.26`. Do not restor
 
 ## Native CI
 
-The app supports iOS 26 at runtime but needs Xcode 27 to compile its availability-guarded APIs. GitHub's `xcode-27` runner uses an explicit Xcode 27.1 installation and iOS 27.0 runtime. `Swift logic tests` and `iOS build and UI tests` report separately. Native jobs skip only when every changed file is under `apps/web/`, `docs/`, `marketing/` or `metadata/`. Native, backend, shared configuration, CI and unknown paths still run them. Manual `Checks` runs always run the full suite. Secret, website and backend checks run on every PR and main push.
+The app supports iOS 26 at runtime but needs Xcode 27 to compile its availability-guarded APIs. GitHub's `xcode-27` runner uses an explicit Xcode 27.1 installation and iOS 27.1 runtime. `Swift logic tests` and `iOS build and UI tests` report separately. Native jobs skip only when every changed file is under `apps/web/`, `docs/`, `marketing/` or `metadata/`. Native, backend, shared configuration, CI and unknown paths still run them. Manual `Checks` runs always run the full suite. Secret, website and backend checks run on every PR and main push.
 
 The UI job compiles first, then creates a disposable iPhone 17 Pro Max, waits for `simctl bootstatus` and captures its ready screen before running the nine synthetic profile/journal tests. It preserves the build log, environment inventory, per-attempt logs, summaries and `.xcresult` bundles in `simulator-results` for seven days. Update the Xcode/runtime pins together with a passing native CI run when the runner image changes. A missing pinned toolchain/runtime is an environment error, not an application test failure.
 

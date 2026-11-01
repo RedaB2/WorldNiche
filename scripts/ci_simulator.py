@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 OUTPUT = Path("outputs/ci/simulator")
-RUNTIME = "com.apple.CoreSimulator.SimRuntime.iOS-27-0"
+RUNTIME = "com.apple.CoreSimulator.SimRuntime.iOS-27-1"
 DEVICE = "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max"
 
 
@@ -40,9 +40,11 @@ def report(message, level=None):
 
 def capture(command, path, timeout, check=True):
     print("+ " + " ".join(map(str, command)), flush=True)
-    with path.open("w") as log:
-        result = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, timeout=timeout)
-    print(path.read_text(errors="replace"), flush=True)
+    try:
+        with path.open("w") as log:
+            result = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, timeout=timeout)
+    finally:
+        print(path.read_text(errors="replace"), flush=True)
     if check and result.returncode:
         raise RuntimeError(f"Command failed ({result.returncode}); see {path}")
     return result.returncode
@@ -91,7 +93,7 @@ def run_attempt(number):
         return verdict
     except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as error:
         report(f"Could not complete {phase}: {error}. No automatic retry; inspect simulator-results.", "error")
-        return "unverified"
+        return "environment-failure" if phase == "simulator setup" else "unverified"
     finally:
         # Only touch the disposable simulator created by this attempt.
         if device_id:
@@ -112,9 +114,12 @@ def run_tests(attempt=run_attempt):
         if verdict == "runner-startup" and number == 1:
             report("XCTest stalled before any test began. Preserving attempt 1 and retrying once on a fresh simulator.", "warning")
             continue
-        message = ("XCTest startup failed twice; the runner could not validate this build."
-                   if verdict == "runner-startup" else
-                   "UI validation failed. Application failures and unknown errors are not retried.")
+        if verdict == "environment-failure":
+            message = "CI environment failed before application tests started; the build could not be validated."
+        elif verdict == "runner-startup":
+            message = "XCTest startup failed twice; the runner could not validate this build."
+        else:
+            message = "UI validation failed. Application failures and unknown errors are not retried."
         report(message + " See the simulator-results artifact.", "error")
         return 1
 
