@@ -4,9 +4,9 @@
 
 ## Current release
 
-As checked October 29, 2026, WorldNiche **1.0 (8)** is **Waiting for Review** in App Store Connect. It was submitted at 6:28 p.m. Pacific and will require manual release after approval. Build 8 is also available in the [public TestFlight beta](https://testflight.apple.com/join/kqpQhYFw). The app status is a dated snapshot, not a live feed. The website moved from Sites version 16 to Vercel on October 30; merges to `main` now publish it automatically.
+As checked November 1, 2026, App Store Connect confirms WorldNiche **1.0 (8)** is **Ready for Distribution** (`READY_FOR_SALE` / `READY_FOR_DISTRIBUTION`). Build 8 is also available in the [public TestFlight beta](https://testflight.apple.com/join/kqpQhYFw). The app status is a dated snapshot, not a live feed. The website moved from Sites version 16 to Vercel on October 30; merges to `main` now publish it automatically.
 
-The `v1.0.0` tag marks this first submitted version. Documentation and CI were added after submission; app runtime source is unchanged. [Machine-readable release record](../ops/releases/1.0.json) · [submission checklist](app-store-readiness.md).
+The `v1.0.0` tag remains immutable. The owner-approved globe update **1.0.1 (9)** is processed and in internal TestFlight testing through **Release Checks**, with only the owner invited. Its archive source is `f912909c7dd302d349c8428782380ae2f4fff8f2` on `feat/globe-interactions`. Owner acceptance/installation is pending. The App Store release stays on 1.0 (8); no App Store submission, release, main merge or broader public beta distribution occurred. See [TestFlight status](testflight.md) for package validation and current CI evidence, and the [globe review notes](globe-interactions.md). [Machine-readable first-release record](../ops/releases/1.0.json) · [submission checklist](app-store-readiness.md).
 
 ## Find the right place
 

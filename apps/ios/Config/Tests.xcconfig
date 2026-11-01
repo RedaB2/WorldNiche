@@ -8,6 +8,7 @@
 // ==========================================
 PRODUCT_BUNDLE_IDENTIFIER = io.worldniche.app.UITests
 TEST_TARGET_NAME = WorldNiche
+SWIFT_OBJC_BRIDGING_HEADER = WorldNicheUITests/GlobeTestGestures.h
 
 // Fix duplicate module name issue
 PRODUCT_MODULE_NAME = $(PRODUCT_NAME)UITests

@@ -18,7 +18,7 @@ case "${1:-all}" in
     npm --prefix backend run test:database
     ;;
   swift)
-    for suite in intro journal avatars feeds live_culture social; do
+    for suite in globe intro journal avatars feeds live_culture social; do
       bash "apps/ios/Scripts/test_${suite}.sh"
     done
     ;;
