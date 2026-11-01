@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 OUTPUT = Path("outputs/ci/simulator")
-RUNTIME = "com.apple.CoreSimulator.SimRuntime.iOS-27-1"
+RUNTIME = "com.apple.CoreSimulator.SimRuntime.iOS-27-0"
 DEVICE = "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max"
 
 
@@ -50,13 +50,20 @@ def capture(command, path, timeout, check=True):
     return result.returncode
 
 
+def validate_runtime(runtimes):
+    runtime = next((item for item in runtimes if item["identifier"] == RUNTIME and item.get("isAvailable")), None)
+    if runtime is None:
+        raise RuntimeError(f"Required simulator runtime is unavailable: {RUNTIME}. Update the reviewed CI pin.")
+    if not any(device["identifier"] == DEVICE for device in runtime.get("supportedDeviceTypes", [])):
+        raise RuntimeError(f"The pinned runtime {RUNTIME} does not support {DEVICE}.")
+
+
 def check_environment():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     capture(["xcodebuild", "-version"], OUTPUT / "xcode.txt", 30)
     capture(["xcrun", "simctl", "list", "runtimes", "--json"], OUTPUT / "runtimes.json", 60)
     runtimes = json.loads((OUTPUT / "runtimes.json").read_text())["runtimes"]
-    if not any(item["identifier"] == RUNTIME and item.get("isAvailable") for item in runtimes):
-        raise RuntimeError(f"Required simulator runtime is unavailable: {RUNTIME}. Update the reviewed CI pin.")
+    validate_runtime(runtimes)
 
 
 def run_attempt(number):
@@ -70,9 +77,7 @@ def run_attempt(number):
                 directory / "device.txt", 60)
         device_id = (directory / "device.txt").read_text().strip()
         capture(["xcrun", "simctl", "boot", device_id], directory / "boot.log", 60)
-        capture(["xcrun", "simctl", "bootstatus", device_id, "-b"], directory / "bootstatus.log", 180)
-        capture(["xcrun", "simctl", "io", device_id, "screenshot", str(directory / "ready.png")],
-                directory / "readiness.log", 30)
+        capture(["xcrun", "simctl", "bootstatus", device_id, "-b"], directory / "bootstatus.log", 300)
         phase = "UI test execution"
         code = capture([
             "xcodebuild", "test-without-building",

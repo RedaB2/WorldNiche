@@ -143,10 +143,10 @@ class SimulatorVerdictTests(unittest.TestCase):
             self.assertEqual(SIMULATOR.run_attempt(1), "passed")
             self.assertTrue((Path(directory) / "attempt-1/summary.json").exists())
         actions = [command[2] if command[0] == "xcrun" else command[1] for command in commands]
-        self.assertEqual(actions, ["create", "boot", "bootstatus", "io", "test-without-building", "get", "shutdown", "delete"])
+        self.assertEqual(actions, ["create", "boot", "bootstatus", "test-without-building", "get", "shutdown", "delete"])
         self.assertIn(SIMULATOR.RUNTIME, commands[0])
         self.assertIn("-b", commands[2])
-        self.assertIn("platform=iOS Simulator,id=fixture-device", commands[4])
+        self.assertIn("platform=iOS Simulator,id=fixture-device", commands[3])
         self.assertTrue(all(command[-1] == "fixture-device" for command in commands[-2:]))
 
     def test_boot_timeout_never_starts_tests_and_still_cleans_up(self):
@@ -164,6 +164,15 @@ class SimulatorVerdictTests(unittest.TestCase):
             self.assertEqual(SIMULATOR.run_attempt(1), "environment-failure")
         self.assertFalse(any(command[0] == "xcodebuild" for command in commands))
         self.assertEqual([command[2] for command in commands[-2:]], ["shutdown", "delete"])
+
+    def test_runtime_must_be_available_and_support_the_selected_phone(self):
+        valid = {"identifier": SIMULATOR.RUNTIME, "isAvailable": True,
+                 "supportedDeviceTypes": [{"identifier": SIMULATOR.DEVICE}]}
+        SIMULATOR.validate_runtime([valid])
+        for runtimes in [[], [{**valid, "isAvailable": False}],
+                         [{**valid, "supportedDeviceTypes": [{"identifier": "iPhone-Duo"}]}]]:
+            with self.subTest(runtimes=runtimes), self.assertRaises(RuntimeError):
+                SIMULATOR.validate_runtime(runtimes)
 
 
 if __name__ == "__main__":
