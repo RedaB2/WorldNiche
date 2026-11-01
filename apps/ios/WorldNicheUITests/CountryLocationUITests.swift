@@ -144,7 +144,15 @@ final class CountryLocationUITests: XCTestCase {
                 }
             }
         }
-        XCTAssertGreaterThan(pin.count, 12, "A visible pin must be rendered on the globe")
+        let minY = try XCTUnwrap(pin.map(\.y).min())
+        let maxY = try XCTUnwrap(pin.map(\.y).max())
+        let minX = try XCTUnwrap(pin.map(\.x).min())
+        let maxX = try XCTUnwrap(pin.map(\.x).max())
+        XCTAssertGreaterThan(maxY - minY, (maxX - minX) * 2,
+            "The upright native pin must extend above the circular surface marker")
+        // Use the pin's upper silhouette; the torus and center dot share its color below.
+        pin = pin.filter { $0.y < minY + (maxY - minY) * 0.6 }
+        XCTAssertGreaterThan(pin.count, 12, "A visible native pin must be rendered on the globe")
         let count = CGFloat(max(1, pin.count))
         let center = CGPoint(x: pin.reduce(0) { $0 + $1.x } / count * globe.frame.width / CGFloat(width),
             y: pin.reduce(0) { $0 + $1.y } / count * globe.frame.height / CGFloat(height))

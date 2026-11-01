@@ -171,6 +171,8 @@ struct CountryDetailView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 210)
                         .clipped()
+                        // Cropped image pixels must not intercept the country controls above.
+                        .contentShape(Rectangle())
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         .accessibilityLabel("Photo illustrating \(cultureReading?.title ?? country.name)")
                 }
@@ -244,14 +246,18 @@ struct CountryDetailView: View {
                     Label(showsGlobe ? "Hide globe" : "Show on globe", systemImage: "globe.europe.africa")
                         .scaledFont(size: 13, weight: .medium)
                         .frame(minHeight: 44)
+                        .contentShape(Rectangle())
                 }
                 .accessibilityIdentifier("toggleCountryGlobe")
                 .accessibilityValue(showsGlobe ? "Expanded" : "Collapsed")
                 Spacer()
                 if showsGlobe {
-                    Button("Recenter", systemImage: "location") { globeResetToken += 1 }
-                        .labelStyle(.iconOnly)
-                        .frame(width: 44, height: 44)
+                    Button { globeResetToken += 1 } label: {
+                        Image(systemName: "location")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                        .accessibilityLabel("Recenter")
                         .accessibilityHint("Return to \(country.name)")
                         .accessibilityIdentifier("recenterCountryGlobe")
                 }
