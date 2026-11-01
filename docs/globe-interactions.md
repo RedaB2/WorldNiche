@@ -42,6 +42,8 @@ The previous 204,802 assertions bounded individual angular steps, kept north upr
 
 The reproducible affected UI selection is below. Run it with XcodeBuildMCP's simulator test tool, specifying the phone or unfolded Duo and a separate derived-data path:
 
+On Xcode 27.2, open the Duo in Device Hub before starting the test runner. Its inner display uses screen ID `3` in the current simulator inventory. Pass `testRunnerEnv: {"WORLDNICHE_UI_TEST_DISPLAY_ID": "3"}` to XcodeBuildMCP for this layout so synthetic globe gestures reach the inner screen. The phone uses the default display ID `1`. Verify the display IDs after changing simulator runtimes. Opening the Duo after a run has started or leaving its gestures targeted at the outer display invalidates that run.
+
 ```text
 CODE_SIGNING_ALLOWED=NO
 -parallel-testing-enabled NO

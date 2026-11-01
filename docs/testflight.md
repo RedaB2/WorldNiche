@@ -1,5 +1,21 @@
 # TestFlight
 
+## Combined PR #8 and PR #9 candidate: November 1, 2026
+
+**1.0.1 (10) is uploaded, valid and available in internal TestFlight.** It combines the native friend invitation changes from [PR #8](https://github.com/RedaB2/WorldNiche/pull/8), head `e2350b777a1d3b9b1aad25f3a01e2b3d5698d4aa`, and the country-location globe from [PR #9](https://github.com/RedaB2/WorldNiche/pull/9), head `d3102eafc1f591bde812128afd6120e44aed0ded`. Both heads are ancestors of archive source `d90d229ab7c66562a40873d421f7df2b6694d7ab` on `beta/pr8-pr9-testflight`.
+
+App Store Connect build ID: `7b7b1f41-f84d-48fa-a323-cfbb0c07b952`. Readback confirms `VALID`, internal state `IN_BETA_TESTING`, automatic notification enabled, and exact assignment to **Release Checks**. The owner is the sole enrolled tester. The tester record is `INSTALLED`, indicating existing TestFlight participation; installation of build 10 itself has not been verified. Open TestFlight, select WorldNiche and update to **1.0.1 (10)**.
+
+The same combined selection passes **25/25 on iPhone 17 Pro (iOS 27.0)** and **25/25 on unfolded Duo (iOS 27.1)**, with zero failures or skips. It covers all three country-location tests, fourteen globe regressions, seven profile setup/invitation preview tests, and warm/cold invitation opening. The full Swift suite passes, including 32,676 globe assertions and 411 social assertions. Private-file checks, website tests and packaging, Vercel HTTP/metadata validation, and isolated backend tests pass. The database run uses `PGTZ=UTC` for the existing local daylight-saving boundary issue.
+
+Initial failures remain in the private evidence. The first Swift run and one focused rerun hit four temporary-file write failures; an instrumented run, an unchanged focused run, and the final unchanged full Swift run subsequently passed. The cause is unconfirmed. The initial Duo run began folded and continued with synthetic gestures targeting its outer display. Its replacement began unfolded and used `WORLDNICHE_UI_TEST_DISPLAY_ID=3`; all 25 scenarios passed. No app runtime changes were needed beyond the two PRs.
+
+The distribution archive and exported IPA pass strict signature, version, App Store profile, Apple sign-in, associated-domain and disabled-debugger validation. The bundled production configuration matches the ignored local input and uses only a public client key. Privacy manifest, app icons and source credits are present; simulator fixture markers and private-key patterns are absent. Static release readiness passes against the live production AASA. IPA SHA-256: `cf4be080fe30efc2e8110b2cfbbc90a863c5f630b2618f176949ef9ac4cc2bc3`.
+
+What to Test notes cover the country globe, Add a friend, approved-name privacy, main-globe regressions and both layouts. Personalized website previews from PR #8 still require its migration and Vercel deployment. This operation did not deploy the website or backend, merge either PR, change public access, or submit an App Store release. Build 10 is absent from **WorldNiche Public Beta**; the App Store readback remains **1.0 (8), READY_FOR_DISTRIBUTION** with build ID `47bfd9d3-1dd9-4322-8df7-4f7b3263d660`.
+
+Private packages, logs, test results, package provenance and distribution readbacks are in `outputs/testflight/1.0.1-10/`. The final packages are `WorldNiche-distribution.xcarchive` and `WorldNiche-distribution.ipa`; `test-evidence.json` and `validation-provenance.json` identify their checks and source.
+
 ## Owner globe candidate: November 1, 2026
 
 **1.0.1 (9) is uploaded, processed and in internal testing.** The archive source is `f912909c7dd302d349c8428782380ae2f4fff8f2` on `feat/globe-interactions` / [PR #4](https://github.com/RedaB2/WorldNiche/pull/4). It preserves the owner-approved globe runtime from `8352c453f18b94155786b1e7557bf5173a21d9e8`; only version/build configuration and documentation changed for preparation. Build 9 was the next available number across processed builds and in-flight uploads.
