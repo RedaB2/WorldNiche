@@ -1,9 +1,12 @@
 <h1 align="center"><img src="apps/web/landing-site/assets/app-icon.png" width="44" alt="" /> WorldNiche</h1>
 
 <p align="center">A little more world, every day.</p>
+<p align="center">Available now on the App Store.</p>
+<p align="center">
+  <a href="https://apps.apple.com/app/id6824807927"><img src="apps/web/landing-site/assets/download-on-the-app-store.svg" width="144" height="48" alt="Download on the App Store" /></a>
+</p>
 <p align="center">
   <a href="https://worldniche.app">Take a look</a> ·
-  <a href="https://testflight.apple.com/join/kqpQhYFw">Try the beta</a> ·
   <a href="https://github.com/RedaB2/WorldNiche/releases">Releases</a>
 </p>
 
@@ -32,6 +35,6 @@ Living in LA, it feels like everyone wants to be niche. Knowing about the world 
 
 One repo: [`apps/ios`](apps/ios) · [`apps/web`](apps/web) · [`backend`](backend) · [`screenshots & media`](marketing/app-store)
 
-Version **1.0 (8)** is submitted to App Review, with manual release after approval. [Submission details](docs/app-store-readiness.md).
+WorldNiche is available now on the [App Store](https://apps.apple.com/app/id6824807927).
 
 Working on it? Start with the [single workspace](docs/local-workspace.md), [handoff](docs/handoff.md), [deployment map](docs/deployment.md) and [architecture](docs/architecture.md).
