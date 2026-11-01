@@ -9,6 +9,7 @@ final class CountryLocationUITests: XCTestCase {
         let app = launch()
         let globe = open("Japan", in: app)
         let initial = try renderedLocation(globe)
+        capture("Japan initial location", app)
         XCTAssertEqual(initial.pin.x, globe.frame.width / 2, accuracy: 4)
         XCTAssertEqual(initial.pin.y, globe.frame.height / 2, accuracy: 22)
         let originalFrame = globe.frame
@@ -123,7 +124,11 @@ final class CountryLocationUITests: XCTestCase {
 
     @MainActor
     private func renderedLocation(_ globe: XCUIElement) throws -> (pin: CGPoint, diameter: CGFloat) {
-        let image = try XCTUnwrap(globe.screenshot().image.cgImage)
+        let screenshot = globe.screenshot().image
+        // The unfolded display returns rotated screenshot pixels. Honor UIImage's orientation.
+        let image = try XCTUnwrap(UIGraphicsImageRenderer(size: screenshot.size).image { _ in
+            screenshot.draw(at: .zero)
+        }.cgImage)
         let width = image.width, height = image.height
         var pixels = [UInt8](repeating: 0, count: width * height * 4)
         let context = try XCTUnwrap(CGContext(data: &pixels, width: width, height: height, bitsPerComponent: 8,
@@ -154,7 +159,9 @@ final class CountryLocationUITests: XCTestCase {
 
     @MainActor
     private func capture(_ name: String, _ app: XCUIApplication) {
-        let attachment = XCTAttachment(screenshot: app.screenshot())
+        // Capture the content's display; the Duo's default application screenshot uses its outer screen.
+        let content = app.scrollViews.containing(.staticText, identifier: "countryTitle").firstMatch
+        let attachment = XCTAttachment(screenshot: content.screenshot())
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
