@@ -101,6 +101,7 @@ jobs:
       - name: Verify pinned Xcode and simulator environment
         run: python3 scripts/ci_simulator.py --check-environment
       - name: Compile application and UI tests
+        shell: bash
         run: |
           xcodebuild build-for-testing \
             -project apps/ios/WorldNiche.xcodeproj -scheme WorldNiche \
