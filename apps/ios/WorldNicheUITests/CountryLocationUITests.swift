@@ -55,7 +55,7 @@ final class CountryLocationUITests: XCTestCase {
             XCTAssertEqual(rendered.pin.y, globe.frame.height / 2, accuracy: 22)
             globe.swipeLeft()
             app.buttons["toggleCountryGlobe"].tap()
-            XCTAssertFalse(globe.exists)
+            XCTAssertTrue(globe.waitForNonExistence(timeout: 3))
             XCTAssertFalse(app.buttons["recenterCountryGlobe"].exists)
             XCTAssertEqual(app.buttons["toggleCountryGlobe"].value as? String, "Collapsed")
             capture("\(name) with the globe hidden", app)
@@ -76,7 +76,7 @@ final class CountryLocationUITests: XCTestCase {
         let toggle = app.buttons["toggleCountryGlobe"]
         XCTAssertTrue(toggle.isHittable)
         toggle.tap()
-        XCTAssertFalse(globe.exists)
+        XCTAssertTrue(globe.waitForNonExistence(timeout: 3))
         toggle.tap()
         XCTAssertTrue(globe.waitForExistence(timeout: 3))
         let originalY = toggle.frame.minY
