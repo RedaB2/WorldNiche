@@ -6,11 +6,14 @@ import simd
 
 /// An offline, tactile world. The texture and hit tests use the same country polygons.
 struct WorldGlobeView: UIViewRepresentable {
+    enum Mode { case explore, location }
+
     let countries: [Country]
     let selectedCountry: Country?
     let spinToken: Int
     var resetToken = 0
     var allowsCountrySelection = true
+    var mode: Mode = .explore
     var onInteraction: () -> Void = {}
     var onSelect: (Country) -> Void
 
@@ -30,6 +33,7 @@ struct WorldGlobeView: UIViewRepresentable {
         updateAccessibility(view)
         view.accessibilityTraits = [.image]
         context.coordinator.allowsCountrySelection = allowsCountrySelection
+        context.coordinator.mode = mode
         context.coordinator.onInteraction = onInteraction
         context.coordinator.configure(view: view, countries: countries)
         return view
@@ -39,6 +43,7 @@ struct WorldGlobeView: UIViewRepresentable {
         context.coordinator.countries = countries
         context.coordinator.onSelect = onSelect
         context.coordinator.allowsCountrySelection = allowsCountrySelection
+        context.coordinator.mode = mode
         context.coordinator.onInteraction = onInteraction
         updateAccessibility(uiView)
         context.coordinator.updateSelection(selectedCountry, spinToken: spinToken)
@@ -46,6 +51,11 @@ struct WorldGlobeView: UIViewRepresentable {
     }
 
     private func updateAccessibility(_ view: SCNView) {
+        if mode == .location, let selectedCountry {
+            view.accessibilityLabel = "\(selectedCountry.name) on the globe"
+            view.accessibilityHint = "Drag to turn. The pin marks the approximate country center. Use Recenter to return to \(selectedCountry.name)."
+            return
+        }
         view.accessibilityHint = allowsCountrySelection
             ? "Drag with one finger to turn. Use two fingers to move and pinch to zoom. Tap a country to show its name, then tap the name to explore. All destinations are also available in Atlas."
             : "Drag with one finger to turn. Use two fingers to move and pinch to zoom. This practice globe does not open countries."
@@ -63,6 +73,7 @@ struct WorldGlobeView: UIViewRepresentable {
         var countries: [Country] = []
         var onSelect: (Country) -> Void
         var allowsCountrySelection = true
+        var mode: Mode = .explore
         var onInteraction: () -> Void = {}
         private var hasInteracted = false
         private weak var view: SCNView?
@@ -175,8 +186,8 @@ struct WorldGlobeView: UIViewRepresentable {
             markerNode.simdPosition = direction * 1.014
             markerNode.simdOrientation = simd_quatf(from: SIMD3<Float>(0, 1, 0), to: direction)
             markerNode.isHidden = false
-            // Browsing changes only the marker. Surprise navigation is explicitly requested.
-            guard isFirstUpdate || shouldSpin else { return }
+            // Discovery browsing changes only the marker. Location previews follow their country.
+            guard isFirstUpdate || shouldSpin || mode == .location else { return }
             navigate(to: country, spinning: shouldSpin, animated: !isFirstUpdate)
         }
 
@@ -247,6 +258,24 @@ struct WorldGlobeView: UIViewRepresentable {
             let centerNode = SCNNode(geometry: center)
             centerNode.position.y = 0.004
             markerNode.addChildNode(centerNode)
+            if mode == .location, let symbol = UIImage(systemName: "mappin", withConfiguration:
+                UIImage.SymbolConfiguration(pointSize: 64, weight: .semibold))?
+                .withTintColor(accent, renderingMode: .alwaysOriginal) {
+                let height: CGFloat = 0.24
+                let pin = SCNPlane(width: height * symbol.size.width / symbol.size.height, height: height)
+                let material = SCNMaterial()
+                material.diffuse.contents = UIGraphicsImageRenderer(size: symbol.size).image { _ in
+                    symbol.draw(at: .zero)
+                }
+                material.lightingModel = .constant
+                material.isDoubleSided = true
+                pin.materials = [material]
+                let pinNode = SCNNode(geometry: pin)
+                // Keep the native pin upright, with its tip attached to the country.
+                pinNode.pivot = SCNMatrix4MakeTranslation(0, -Float(height / 2), 0)
+                pinNode.constraints = [SCNBillboardConstraint()]
+                markerNode.addChildNode(pinNode)
+            }
             markerNode.isHidden = true
         }
 
@@ -268,7 +297,7 @@ struct WorldGlobeView: UIViewRepresentable {
                 gestureViewport = viewport
                 gesturePoint = recognizer.startCenter
             }
-            if fingerCount == 2 {
+            if fingerCount == 2 && mode == .explore {
                 viewport = gestureViewport
                 viewport.transform(from: recognizer.startCenter, to: recognizer.center,
                     magnification: recognizer.span / max(1, recognizer.startSpan), in: view.bounds.size)
@@ -304,7 +333,7 @@ struct WorldGlobeView: UIViewRepresentable {
         }
 
         @objc private func tap(_ recognizer: UITapGestureRecognizer) {
-            guard allowsCountrySelection, let view else { return }
+            guard mode == .explore, allowsCountrySelection, let view else { return }
             let location = recognizer.location(in: view)
             stopAnimation()
             let results = view.hitTest(location, options: [.searchMode: SCNHitTestSearchMode.all.rawValue])
