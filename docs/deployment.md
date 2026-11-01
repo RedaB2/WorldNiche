@@ -31,7 +31,18 @@ GitHub's [`Checks`](../.github/workflows/ci.yml) independently runs the website/
 
 After Vercel reports success for the current `main` commit, [`Check live website`](../.github/workflows/website-live.yml) verifies the public domain and its serving commit. Preview and superseded commits are skipped. This check can also be run manually from GitHub Actions. A failed live check reports a problem; it does not automatically roll back production.
 
-The generated `.vercel/output` uses Vercel's Build Output API. Pages, images and videos are CDN files. A small Node function handles invitations, unsupported methods and unknown URLs using the existing handler. It does not read profiles, redeem invites or need service keys. The build gets the public Apple team/bundle IDs from `ops/production.json`.
+The generated `.vercel/output` uses Vercel's Build Output API. Pages, images and videos are CDN files. A small Node function handles invitations, unsupported methods and unknown URLs using the existing handler. Its invitation metadata lookup reads only an approved display name and never redeems invites. The build gets the public Apple team/bundle IDs from `ops/production.json`.
+
+### Personalized friend previews
+
+The Add a friend change requires migration `202611010009_invitation_link_metadata.sql` and these Vercel runtime environment variables:
+
+- `WORLDNICHE_INVITE_SERVICE_URL`: the project's HTTPS Supabase URL.
+- `WORLDNICHE_INVITE_PUBLIC_KEY`: a publishable key or legacy anon key. Secret and service-role keys are rejected.
+
+Apply the migration through the explicit backend deployment process below, then configure the variables for the intended Vercel environment and deploy the website commit. This is a release prerequisite, not an automatic consequence of opening the PR. Until configured, the website still serves a usable generic friend invitation; the new app supplies its personalized share-sheet title locally. CI uses injected synthetic responses and no hosted account data.
+
+The RPC allows holders of a valid, unexpired invitation token to read only its owner's approved display name. It returns no name for revoked links, deleted or restricted accounts, or an unapproved first name. Pending edits, photos, account IDs, email, exploration and journals are not included. Responses are not cached by the website, and preview requests never consume the invitation or the owner's invitation quotas. Messaging apps may keep their own cached previews. The existing invitation URL and Apple association rules stay compatible with released app versions.
 
 ## Make a website change
 

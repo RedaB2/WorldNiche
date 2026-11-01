@@ -33,7 +33,11 @@ function decodeBytes(base64, start, end) {
   return bytes;
 }
 
-export function createHandler({ routes, blobs, association }) {
+function escapeHTML(text) {
+  return text.replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+}
+
+export function createHandler({ routes, blobs, association }, { invitationName = async () => null } = {}) {
   return {
     async fetch(request) {
       const url = new URL(request.url);
@@ -45,10 +49,12 @@ export function createHandler({ routes, blobs, association }) {
       }
 
       let route;
+      let invitationToken;
       if (url.pathname === "/.well-known/apple-app-site-association" || url.pathname === "/apple-app-site-association") {
         route = association;
       } else if (/^\/invite\/[0-9a-f]{64}$/.test(url.pathname) && !url.search) {
         route = routes["/invite-template"];
+        invitationToken = url.pathname.slice("/invite/".length);
       } else if (url.pathname === "/" || url.pathname === "/index.html") {
         route = routes["/"];
       } else if (url.pathname !== "/invite-template") {
@@ -63,6 +69,21 @@ export function createHandler({ routes, blobs, association }) {
       const blob = blobs[route.blob];
       headers.set("content-type", route.type);
       headers.set("cache-control", route.cache);
+      if (invitationToken) {
+        let name;
+        try { name = await invitationName(invitationToken); } catch { /* Keep invitations usable during a preview outage. */ }
+        name = typeof name === "string" ? name.trim() : "";
+        if (Array.from(name).length > 32 || /[\u0000-\u001f\u007f-\u009f]/u.test(name) || name.toLowerCase() === "explorer") name = "";
+        const title = name ? `Share cultures with ${name}` : "Share cultures with a friend";
+        const description = name ? `Add ${name} as a friend on WorldNiche and explore cultures together.`
+          : "Open this personal link to become friends on WorldNiche and explore cultures together.";
+        const template = new TextDecoder().decode(decodeBytes(blob.base64, 0, blob.size - 1));
+        const body = template.replace(/__INVITATION_(TITLE|DESCRIPTION)__/g,
+          (_, kind) => escapeHTML(kind === "TITLE" ? title : description));
+        headers.set("cache-control", "no-store");
+        headers.set("content-length", String(new TextEncoder().encode(body).length));
+        return new Response(request.method === "HEAD" ? null : body, { headers });
+      }
       headers.set("etag", blob.etag);
       headers.set("accept-ranges", "bytes");
       headers.set("content-length", String(blob.size));

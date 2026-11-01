@@ -31,6 +31,8 @@ def build(host, team, bundle, app_store_url, output):
     else:
         install_action = '<div class="install"><p>WorldNiche is in early access.</p><p class="install-note">Already have the app? Open your friend’s invitation on your iPhone. Otherwise, ask them for access to the test build, then return to this link.</p></div>'
     markup = (output / "index.html").read_text().replace("__INSTALL_ACTION__", install_action)
+    markup = markup.replace("__INVITATION_TITLE__", "Share cultures with a friend")
+    markup = markup.replace("__INVITATION_DESCRIPTION__", "Open this personal link to become friends on WorldNiche and explore cultures together.")
     (output / "index.html").write_text(markup)
     app_assets = Path(__file__).resolve().parents[2] / "apps/ios/WorldNiche/Assets.xcassets/AppLogo.imageset"
     shutil.copyfile(app_assets / "AppLogo.png", output / "logo.png")

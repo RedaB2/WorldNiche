@@ -141,6 +141,8 @@ private final class SocialUIResponses: @unchecked Sendable {
         let value: Any
         var delay: TimeInterval = 0
         switch request.url?.path {
+        case "/rest/v1/rpc/create_invite":
+            value = ["token": String(repeating: "a", count: 64), "expires_at": "2030-01-01T00:00:00Z"]
         case "/rest/v1/rpc/get_my_profile":
             if consent == true, Date() >= automaticApprovalAt {
                 if let pendingName { name = pendingName }
