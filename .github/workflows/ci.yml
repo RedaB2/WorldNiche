@@ -18,11 +18,19 @@ jobs:
     name: Secret scan
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    outputs:
+      native: ${{ steps.changes.outputs.native }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Determine whether native checks are needed
+        id: changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python3 scripts/ci_changes.py
       - name: Reject tracked private files and check ignore rules
         run: bash scripts/check.sh private
       - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
@@ -64,32 +72,51 @@ jobs:
           echo 'WORLDNICHE_PG_BIN=/usr/lib/postgresql/16/bin' >> "$GITHUB_ENV"
       - run: bash scripts/check.sh backend
 
-  native:
-    name: Swift and simulator
+  swift:
+    name: Swift logic tests
+    needs: secrets
+    if: needs.secrets.outputs.native == 'true'
     runs-on: xcode-27
-    timeout-minutes: 35
+    timeout-minutes: 10
     env:
-      DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_27.app/Contents/Developer
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
       - run: bash scripts/check.sh swift
-      - name: Build and test profile and journal flows with synthetic data
+
+  native:
+    name: iOS build and UI tests
+    needs: secrets
+    if: needs.secrets.outputs.native == 'true'
+    runs-on: xcode-27
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_27.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Verify pinned Xcode and simulator environment
+        run: python3 scripts/ci_simulator.py --check-environment
+      - name: Compile application and UI tests
+        shell: bash
         run: |
-          device_id=$(xcrun simctl create WorldNiche-CI com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max)
-          xcodebuild test \
+          xcodebuild build-for-testing \
             -project apps/ios/WorldNiche.xcodeproj -scheme WorldNiche \
-            -destination "platform=iOS Simulator,id=$device_id" \
-            -parallel-testing-enabled NO -resultBundlePath outputs/ci.xcresult \
-            -only-testing:WorldNicheUITests/ProfileSetupUITests \
-            -only-testing:WorldNicheUITests/JournalUITests \
-            CODE_SIGNING_ALLOWED=NO
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath outputs/ci/DerivedData \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee outputs/ci/build.log
+      - name: Run profile and journal tests on a ready simulator
+        run: python3 scripts/ci_simulator.py
       - name: Preserve simulator results
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: simulator-results
-          path: outputs/ci.xcresult
+          path: |
+            outputs/ci/build.log
+            outputs/ci/simulator/
           if-no-files-found: ignore
           retention-days: 7
