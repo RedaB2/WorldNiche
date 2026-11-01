@@ -123,7 +123,11 @@ final class GlobeInteractionUITests: XCTestCase {
 
     @MainActor
     private func silhouetteEdges(of globe: XCUIElement) throws -> [CGFloat] {
-        let image = try XCTUnwrap(globe.screenshot().image.cgImage)
+        let screenshot = globe.screenshot().image
+        // Match visual coordinates even when the simulator's display is rotated.
+        let image = try XCTUnwrap(UIGraphicsImageRenderer(size: screenshot.size).image { _ in
+            screenshot.draw(at: .zero)
+        }.cgImage)
         let width = image.width, height = image.height
         var pixels = [UInt8](repeating: 0, count: width * height * 4)
         let context = try XCTUnwrap(CGContext(data: &pixels, width: width, height: height, bitsPerComponent: 8,

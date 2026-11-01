@@ -5,6 +5,9 @@ struct CountryDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(DiscoveryJournal.self) private var journal
     @Environment(SocialStore.self) private var social
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var showsGlobe = true
+    @State private var globeResetToken = 0
     @State private var music: FeedSnapshot<MusicTrack>?
     @State private var news: FeedSnapshot<NewsStory>?
     @State private var musicLoading = true
@@ -168,6 +171,8 @@ struct CountryDetailView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 210)
                         .clipped()
+                        // Cropped image pixels must not intercept the country controls above.
+                        .contentShape(Rectangle())
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         .accessibilityLabel("Photo illustrating \(cultureReading?.title ?? country.name)")
                 }
@@ -225,7 +230,56 @@ struct CountryDetailView: View {
                 .accessibilityIdentifier("countryTitle")
             Label(country.capital, systemImage: "mappin")
                 .scaledFont(size: 13).foregroundStyle(Palette.muted)
+            countryLocation
             Rectangle().fill(Palette.line).frame(height: 1).padding(.top, 8)
+        }
+    }
+
+    private var countryLocation: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
+                        showsGlobe.toggle()
+                    }
+                } label: {
+                    Label(showsGlobe ? "Hide globe" : "Show on globe", systemImage: "globe.europe.africa")
+                        .scaledFont(size: 13, weight: .medium)
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityIdentifier("toggleCountryGlobe")
+                .accessibilityValue(showsGlobe ? "Expanded" : "Collapsed")
+                Spacer()
+                if showsGlobe {
+                    Button { globeResetToken += 1 } label: {
+                        Image(systemName: "location")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                        .accessibilityLabel("Recenter")
+                        .accessibilityHint("Return to \(country.name)")
+                        .accessibilityIdentifier("recenterCountryGlobe")
+                }
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(Palette.pine)
+
+            if showsGlobe {
+                WorldGlobeView(countries: [country], selectedCountry: country, spinToken: 0,
+                    resetToken: globeResetToken, allowsCountrySelection: false, mode: .location,
+                    onSelect: { _ in })
+                    .frame(height: 250)
+                    .frame(maxWidth: 420)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityIdentifier("countryLocationGlobe")
+                    .accessibilityAction(named: "Recenter") { globeResetToken += 1 }
+                Text("Drag to explore")
+                    .scaledFont(size: 11)
+                    .foregroundStyle(Palette.muted)
+                    .padding(.top, 4)
+                    .accessibilityHidden(true)
+            }
         }
     }
 
