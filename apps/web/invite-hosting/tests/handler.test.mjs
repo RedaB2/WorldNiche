@@ -25,6 +25,51 @@ const handler = createHandler({ routes, blobs, association });
 const request = (path, options) => handler.fetch(new Request(`https://worldniche.app${path}`, options));
 const token = "a".repeat(64);
 
+test("message crawlers and browsers receive personal, escaped invitation metadata", async () => {
+  const template = await readFile(new URL("../../invite-site/index.html", import.meta.url), "utf8");
+  const personalizedRoutes = { ...routes, "/invite-template": asset(template, "text/html; charset=utf-8", "no-store") };
+  const calls = [];
+  const personal = createHandler({ routes: personalizedRoutes, blobs, association }, { invitationName: async value => {
+    calls.push(value);
+    return 'Mira & <Jun> "Sun" $&';
+  } });
+  const url = `https://worldniche.app/invite/${token}`;
+  const response = await personal.fetch(new Request(url, { headers: { "user-agent": "facebookexternalhit/1.1", range: "bytes=0-1", "if-none-match": "*" } }));
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /<meta property="og:title" content="Share cultures with Mira &amp; &lt;Jun&gt; &quot;Sun&quot; \$&amp;">/);
+  assert.match(html, /<h1>Share cultures with Mira/);
+  assert.match(html, /Add Mira &amp; &lt;Jun&gt; &quot;Sun&quot; \$&amp; as a friend/);
+  assert.doesNotMatch(html, /__INVITATION_|<Jun>/);
+  assert.equal(response.headers.get("content-length"), String(Buffer.byteLength(html)));
+  assert.equal(response.headers.get("etag"), null);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  const head = await personal.fetch(new Request(url, { method: "HEAD" }));
+  assert.equal(await head.text(), "");
+  assert.equal(head.headers.get("content-length"), response.headers.get("content-length"));
+  await personal.fetch(new Request("https://worldniche.app/"));
+  await personal.fetch(new Request(`${url}?name=Spoofed`));
+  await personal.fetch(new Request(url, { method: "POST" }));
+  assert.deepEqual(calls, [token, token], "Only canonical GET/HEAD invitations request metadata");
+});
+
+test("unavailable or invalid names and lookup outages retain a usable friend invitation", async () => {
+  const template = await readFile(new URL("../../invite-site/index.html", import.meta.url), "utf8");
+  const fallbackRoutes = { ...routes, "/invite-template": asset(template, "text/html; charset=utf-8", "no-store") };
+  for (const name of [null, "", "Explorer", "x".repeat(33), "bad\nname", { display_name: "wrong shape" }, new Error("offline")]) {
+    const fallback = createHandler({ routes: fallbackRoutes, blobs, association }, { invitationName: async () => {
+      if (name instanceof Error) throw name;
+      return name;
+    } });
+    const response = await fallback.fetch(new Request(`https://worldniche.app/invite/${token}`));
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, /<meta property="og:title" content="Share cultures with a friend">/);
+    assert.match(html, /Open in WorldNiche/);
+    assert.doesNotMatch(html, /__INVITATION_/);
+  }
+});
+
 test("AASA is anonymous JSON without a redirect at both Apple paths", async () => {
   for (const path of ["/.well-known/apple-app-site-association", "/apple-app-site-association"]) {
     const response = await request(path);

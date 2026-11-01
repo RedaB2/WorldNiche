@@ -1,6 +1,6 @@
 # Website routing
 
-Shared routing serves the landing page, invitation fallback and Apple association document. Opening an invitation page never redeems its token or looks up profiles.
+Shared routing serves the landing page, invitation fallback and Apple association document. Opening an invitation page never redeems its token. The Vercel function uses a read-only metadata RPC to obtain only the inviter's approved display name for the link preview. Missing configuration, unavailable invitations and lookup failures use a generic friend invitation.
 
 Production uses Vercel with `apps/web` as the project root. `npm --prefix apps/web run build:vercel` creates `.vercel/output`, with pages, images and videos on the CDN and a small function for invitation/error routes. It reads public routing IDs from `ops/production.json` and checks exact asset bytes, headers and invitation behavior. Vercel runs the website tests before every build and publishes `main` automatically.
 

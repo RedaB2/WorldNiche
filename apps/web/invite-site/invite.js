@@ -5,7 +5,6 @@ if (match) {
   button.href = `worldniche://invite/${match[1]}`;
   button.hidden = false;
   document.getElementById('eyebrow').textContent = 'A FRIEND INVITED YOU';
-  document.getElementById('message').textContent = 'Your next discovery starts with a friend. Open your invitation in WorldNiche to connect.';
   document.getElementById('connection-note').hidden = false;
 } else if (window.location.pathname !== '/') {
   document.getElementById('eyebrow').textContent = 'LET’S FIND YOUR FRIEND';

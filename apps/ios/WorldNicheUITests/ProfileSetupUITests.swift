@@ -4,6 +4,45 @@ final class ProfileSetupUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     @MainActor
+    func testAddFriendShowsPersonalInvitationPreview() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro", "-worldniche-social-fixture", "existing-private"]
+        app.launch()
+        openProfileDestination(app)
+        let addFriend = app.buttons["inviteFriend"]
+        XCTAssertTrue(addFriend.waitForExistence(timeout: 10))
+        for _ in 0..<5 where !addFriend.isHittable { app.scrollViews.firstMatch.swipeUp() }
+        XCTAssertEqual(addFriend.label, "Add a friend")
+        XCTAssertTrue(addFriend.isHittable)
+        addFriend.tap()
+        XCTAssertTrue(app.otherElements.matching(identifier: "LP.CaptionBar.TopCaption").firstMatch.waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertEqual(app.otherElements["LP.CaptionBar.TopCaption"].label, "Share cultures with Mira")
+        capture("Add a friend with a personal link preview", app)
+    }
+
+    @MainActor
+    func testFriendPreviewKeepsApprovedNameDuringProfileReview() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro", "-worldniche-social-fixture", "existing-private"]
+        app.launch()
+        openProfileDestination(app)
+        XCTAssertTrue(app.buttons["editProfile"].waitForExistence(timeout: 10))
+        app.buttons["editProfile"].tap()
+        let name = app.textFields["profileNameField"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        name.tap()
+        name.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 4) + "Mira Updated")
+        app.buttons["saveProfile"].tap()
+        let addFriend = app.buttons["inviteFriend"]
+        XCTAssertTrue(addFriend.waitForExistence(timeout: 10))
+        for _ in 0..<5 where !addFriend.isHittable { app.scrollViews.firstMatch.swipeUp() }
+        addFriend.tap()
+        XCTAssertTrue(app.otherElements.matching(identifier: "LP.CaptionBar.TopCaption").firstMatch.waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertEqual(app.otherElements["LP.CaptionBar.TopCaption"].label, "Share cultures with Mira")
+        capture("Friend preview uses approved name", app)
+    }
+
+    @MainActor
     func testChosenNameOptionalPhotoAndRememberedConsent() {
         let app = openSetup()
         let name = app.textFields["profileNameField"]

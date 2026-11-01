@@ -26,6 +26,14 @@ struct ExplorerProfile: Codable, Sendable {
         return !name.isEmpty && name.caseInsensitiveCompare("Explorer") != .orderedSame
     }
     var editableDisplayName: String { pendingDisplayName ?? displayName }
+    var invitationTitle: String {
+        // Only the approved name belongs in a preview that other people can see.
+        let name = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty, name.caseInsensitiveCompare("Explorer") != .orderedSame else {
+            return "Share cultures with me"
+        }
+        return "Share cultures with \(name)"
+    }
     var editableAvatarPath: String? { pendingAvatarPath ?? avatarPath }
     var ownerDisplayName: String {
         if nameModerationStatus == .pending, let pendingDisplayName { return pendingDisplayName }

@@ -123,7 +123,7 @@ struct ProfileView: View {
             .sheet(isPresented: $showSettings) { ProfileSettingsView() }
             .sheet(isPresented: $showSignIn) { ProfileSignInView() }
             .sheet(item: $selectedFriend) { friend in ProfileFriendView(friend: friend) }
-            .sheet(item: $sharedItem) { item in ProfileShareSheet(url: item.url) }
+            .sheet(item: $sharedItem) { item in ProfileShareSheet(url: item.url, invitationTitle: item.invitationTitle) }
             .refreshable { await social.refresh() }
             .task { await social.refresh() }
             .refreshSocialProfiles(enabled: !showEditor && !showSettings && !showSignIn && selectedFriend == nil)
@@ -220,17 +220,17 @@ struct ProfileView: View {
                 Button {
                     Task {
                         if let url = await social.createInvitation() {
-                            sharedItem = ProfileSharedItem(url: url)
+                            sharedItem = ProfileSharedItem(url: url, invitationTitle: social.profile?.invitationTitle ?? "Share cultures with me")
                         }
                     }
                 } label: {
-                    Label("Invite a friend", systemImage: "person.badge.plus")
+                    Label("Add a friend", systemImage: "person.badge.plus")
                         .frame(maxWidth: .infinity, minHeight: 32)
                 }
                 .buttonStyle(.glassProminent).tint(Palette.forest).controlSize(.large)
                 .disabled(social.isBusy || social.deletionPending || social.profile?.communityRestricted == true)
                 .accessibilityIdentifier("inviteFriend")
-                Text("Send a private invitation link. Your friend opens it in WorldNiche to connect with you.")
+                Text("Share your personal link to add each other as friends and explore cultures together.")
                     .font(.footnote).foregroundStyle(Palette.muted)
                 if social.friends.isEmpty {
                     VStack(spacing: 10) {
@@ -1080,16 +1080,17 @@ private struct ProfileStatusMessage: View {
 private struct ProfileSharedItem: Identifiable {
     let id = UUID()
     let url: URL
+    var invitationTitle: String? = nil
 }
 
 private struct ProfileShareSheet: UIViewControllerRepresentable {
     let url: URL
+    var invitationTitle: String? = nil
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let item: Any
-        if url.scheme == "https",
-           InvitationLink.token(from: url, allowedHost: "worldniche.app") != nil {
-            item = ProfileInviteShareSource(url: url)
+        if let invitationTitle {
+            item = ProfileInviteShareSource(url: url, title: invitationTitle)
         } else {
             item = url
         }
@@ -1104,12 +1105,12 @@ private final class ProfileInviteShareSource: NSObject, @MainActor UIActivityIte
     private let url: URL
     private let metadata: LPLinkMetadata
 
-    init(url: URL) {
+    init(url: URL, title: String) {
         self.url = url
         let metadata = LPLinkMetadata()
         metadata.originalURL = url
         metadata.url = url
-        metadata.title = "WorldNiche · Explore together"
+        metadata.title = title
         if let logo = UIImage(named: "BrandIcon") {
             metadata.iconProvider = NSItemProvider(object: logo)
             metadata.imageProvider = NSItemProvider(object: logo)
@@ -1129,7 +1130,7 @@ private final class ProfileInviteShareSource: NSObject, @MainActor UIActivityIte
 
     func activityViewController(_ activityViewController: UIActivityViewController,
                                 subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
-        "Join me on WorldNiche"
+        metadata.title ?? "Share cultures with me"
     }
 
     func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController) -> LPLinkMetadata? {

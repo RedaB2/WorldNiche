@@ -53,7 +53,12 @@ const fallback = {
   blobs: Object.fromEntries([invitation.blob, payload.association.blob].map(key => [key, payload.blobs[key]])),
 };
 const handler = await readFile(new URL("../worker/handler.js", import.meta.url), "utf8");
-await writeFile(resolve(functionRoot, "handler.mjs"), `${handler}\nexport default createHandler(${JSON.stringify(fallback)});\n`);
+await writeFile(resolve(functionRoot, "handler.mjs"), `${handler}\nimport { createInvitationLookup } from './invitation-preview.mjs';
+export default createHandler(${JSON.stringify(fallback)}, { invitationName: createInvitationLookup({
+  serviceURL: process.env.WORLDNICHE_INVITE_SERVICE_URL,
+  publicAPIKey: process.env.WORLDNICHE_INVITE_PUBLIC_KEY,
+}) });\n`);
+await writeFile(resolve(functionRoot, "invitation-preview.mjs"), await readFile(new URL("../worker/invitation-preview.mjs", import.meta.url)));
 await writeFile(resolve(functionRoot, "index.cjs"), await readFile(new URL("../worker/vercel-adapter.cjs", import.meta.url)));
 await writeFile(resolve(functionRoot, ".vc-config.json"), JSON.stringify({
   runtime: "nodejs24.x", handler: "index.cjs", launcherType: "Nodejs", maxDuration: 10,
