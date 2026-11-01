@@ -2,7 +2,7 @@
 
 October 31, 2026. Branch: `feat/globe-interactions`, based on `24d1ac0`.
 
-The owner approved this behavior on their physical RBDUO. The October 31 development build was installed directly as 1.0 (8). On November 1, the owner authorized preparing 1.0.1 (9) for their TestFlight testing; see [TestFlight status](testflight.md). The published App Store 1.0 (8), immutable `v1.0.0` tag and listing remain unchanged. App Store submission and release are separate actions.
+The owner approved this behavior on their physical RBDUO. The October 31 development build was installed directly as 1.0 (8). On November 1, authorized TestFlight build 1.0.1 (9) was uploaded, processed and assigned to the owner-only internal Release Checks group; see [TestFlight status](testflight.md). The owner is invited but installation has not been observed. The published App Store 1.0 (8), immutable `v1.0.0` tag and listing remain unchanged. App Store submission and release are separate actions.
 
 ## Behavior
 

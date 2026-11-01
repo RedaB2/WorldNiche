@@ -1,12 +1,18 @@
-# Public beta
+# TestFlight
 
 ## Owner globe candidate: November 1, 2026
 
-The owner authorized TestFlight preparation of **1.0.1 (9)** from the approved globe implementation at `8352c453f18b94155786b1e7557bf5173a21d9e8` on `feat/globe-interactions` / [PR #4](https://github.com/RedaB2/WorldNiche/pull/4). App Store Connect confirms the production release is 1.0 (8), Ready for Distribution. Its latest processed and in-flight build number is 8, so 9 is the next unique build. Only the marketing version and build number change in app configuration; the owner-approved runtime is preserved.
+**1.0.1 (9) is uploaded, processed and in internal testing.** The archive source is `f912909c7dd302d349c8428782380ae2f4fff8f2` on `feat/globe-interactions` / [PR #4](https://github.com/RedaB2/WorldNiche/pull/4). It preserves the owner-approved globe runtime from `8352c453f18b94155786b1e7557bf5173a21d9e8`; only version/build configuration and documentation changed for preparation. Build 9 was the next available number across processed builds and in-flight uploads.
 
-This candidate is being prepared for owner testing through the existing internal Release Checks group. It must not be assigned to WorldNiche Public Beta or notify unrelated testers. No App Store version, submission, release, public access, main merge or production deployment is authorized by this beta upload.
+App Store Connect build ID: `81a13535-f895-4c8f-95a0-90dcf4ec474c`. Processing is `VALID`, internal state is `IN_BETA_TESTING`, and external state is `READY_FOR_BETA_SUBMISSION`. The existing internal **Release Checks** group contains this build and the owner as its sole tester. The owner's state is `INVITED`; accepting the TestFlight invitation and installing on a device remain owner actions. The saved What to Test notes cover rotation, flick/re-grab, pinch, repositioning, borders/fade, country previews, first-touch Reset and both device layouts.
 
-The approved source passed Swift checks including 32,676 globe assertions. Exact full and focused phone/Duo outcomes remain in [globe review notes](globe-interactions.md). Its GitHub secret, website, backend and Swift checks passed; the simulator job failed when the XCTest runner exited while bootstrapping, before completing its profile/journal selection. Archive validation and candidate checks are tracked separately. Private evidence belongs in `outputs/testflight/globe-preparation-2026-11-01/` and the versioned archive directory, not in git.
+The candidate is absent from **WorldNiche Public Beta**. A final App Store Connect readback still shows production 1.0 (8), `READY_FOR_DISTRIBUTION`, attached to build `47bfd9d3-1dd9-4322-8df7-4f7b3263d660`. No App Store version, submission, release, public access, main merge or production deployment was changed. The `v1.0.0` tag is intact.
+
+The approved source passed Swift checks including 32,676 globe assertions. Exact full and focused phone/Duo outcomes remain in [globe review notes](globe-interactions.md). The earlier GitHub simulator job failed while its runner bootstrapped. On candidate [run 41300420574](https://github.com/RedaB2/WorldNiche/actions/runs/41300420574), Swift, secret, website and backend checks passed; the native UI job was still running at the upload readback. These checks are separate from package validation and do not imply a clean full globe UI suite.
+
+The Release archive and exported IPA both passed strict signature, bundle/version, distribution profile, Sign in with Apple, associated-domain and disabled-debugger checks. The packaged production client configuration matches the ignored local input and uses only a public client key. Privacy manifest, icons and source credits are present; simulator fixture markers and private-key patterns are absent. Static release readiness passed using the live production AASA. Xcode 27.2 (27B52), iPhoneOS 27.2 SDK. IPA SHA-256: `e45d00ecdc61643bcd930baaf93d8d8ffb0786e6c6cce9bf31080dc77128a444`.
+
+Private archive/export, upload and readback evidence is in `outputs/testflight/1.0.1-9/`, including `validation-provenance.json`. Preparation evidence is in `outputs/testflight/globe-preparation-2026-11-01/`. Configured binaries, signing files and tester details remain ignored.
 
 ## Existing public beta
 
