@@ -40,7 +40,7 @@ The Add a friend change requires migration `202611010009_invitation_link_metadat
 - `WORLDNICHE_INVITE_SERVICE_URL`: the project's HTTPS Supabase URL.
 - `WORLDNICHE_INVITE_PUBLIC_KEY`: a publishable key or legacy anon key. Secret and service-role keys are rejected.
 
-Apply the migration through the explicit backend deployment process below, then configure the variables for the intended Vercel environment and deploy the website commit. This is a release prerequisite, not an automatic consequence of opening the PR. Until configured, the website still serves a usable generic friend invitation; the new app supplies its personalized share-sheet title locally. CI uses injected synthetic responses and no hosted account data.
+Apply the migration through the explicit backend deployment process below, then configure the variables for the intended Vercel environment and deploy the website commit. This is a prerequisite for personalized website previews, not an automatic consequence of opening the PR. Until configured, the website still serves a usable generic friend invitation; the new app supplies its personalized share-sheet title locally. CI uses injected synthetic responses and no hosted account data.
 
 The RPC allows holders of a valid, unexpired invitation token to read only its owner's approved display name. It returns no name for revoked links, deleted or restricted accounts, or an unapproved first name. Pending edits, photos, account IDs, email, exploration and journals are not included. Responses are not cached by the website, and preview requests never consume the invitation or the owner's invitation quotas. Messaging apps may keep their own cached previews. The existing invitation URL and Apple association rules stay compatible with released app versions.
 
@@ -108,11 +108,11 @@ Archive/export using the owner's Apple Distribution certificate and WorldNiche A
 
 Listing source lives in `metadata/app-info/` and `metadata/version/`. The frozen submitted listing beside the 1.0 media is a readback snapshot. Use the current App Store metadata sync tools to validate and review a future metadata diff before applying it.
 
-Do not change the submitted build while review is pending. Check its state with:
+Version **1.0.1 (13)** was submitted November 2, 2026 with owner-authorized automatic release after approval. Do not change the submitted build while review is pending. Check its state with:
 
 ```sh
-asc submit status --id 2128740a-4e7d-4e44-b4d9-7037e89013e7
-asc versions view --version-id 41861671-736b-4776-be96-f52aabd20343 --include-build
+asc submit status --id a945db30-b3a0-4199-abf4-8ad73f5c02df
+asc versions view --version-id c5197f2b-7821-4a8c-a76f-186617b2c1c1 --include-build
 ```
 
 The local `asc` keychain profile is named `Tech Bros Budget`; the verified app/team IDs above determine the target. On another Mac, authenticate with owner-authorized App Store Connect access. Never export a signing private key into Git.
@@ -135,3 +135,5 @@ On the existing Mac, an operator-only OpenAI copy is in `/Users/rb/dev/WorldNich
 ## Release tags
 
 `v1.0.0` identifies the first submitted app, **1.0 (8)**, plus its website/backend source, media and handoff docs. It is not an App Store approval announcement. Release notes must retain that distinction. Future tags are immutable; use a new version for a new release. Keep public release artifacts limited to source and public marketing media, never signed configured binaries or private review evidence.
+
+`v1.0.1` identifies the source for **1.0.1 (13)** and its submission documentation. The owner authorized automatic App Store release after approval. The tag does not mean Apple has approved the update. See [current submission status](app-store-readiness.md).
