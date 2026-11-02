@@ -143,7 +143,8 @@ final class CountryReadingUITests: XCTestCase {
     private func readToEnd(_ app: XCUIApplication, limit: Int = 32) {
         let finish = app.buttons["completeCountryExploration"]
         for _ in 0..<limit {
-            if finish.exists && finish.isHittable { return }
+            if finish.exists && finish.isHittable,
+               finish.frame.maxY + 40 < app.buttons["askNiche"].frame.minY { return }
             let more = app.buttons["continueCountryReading"]
             if more.exists && more.isHittable {
                 more.tap()

@@ -8,7 +8,7 @@ final class CountryLocationUITests: XCTestCase {
     func testAtlasGlobeRotatesWithAFixedPinAndRecenters() throws {
         let app = launch()
         let globe = open("Japan", in: app)
-        let initial = try renderedLocation(globe)
+        let initial = try renderedLocation(globe, in: app)
         capture("Japan initial location", app)
         XCTAssertEqual(initial.pin.x, globe.frame.width / 2, accuracy: 4)
         XCTAssertEqual(initial.pin.y, globe.frame.height / 2, accuracy: 22)
@@ -18,7 +18,7 @@ final class CountryLocationUITests: XCTestCase {
             NSValue(cgPoint: CGPoint(x: start.x + 55 * CGFloat(step) / 60, y: start.y))
         }
         XCTAssertNil(GlobeTestGestures.trace(points, duration: 1, hold: 0.5))
-        let turned = try renderedLocation(globe)
+        let turned = try renderedLocation(globe, in: app)
         XCTAssertGreaterThan(turned.pin.x, initial.pin.x + 25, "The pin must travel with its country")
         XCTAssertEqual(globe.frame, originalFrame, "Turning the globe must not scroll the page")
         XCTAssertEqual(turned.diameter, initial.diameter, accuracy: 3)
@@ -28,7 +28,7 @@ final class CountryLocationUITests: XCTestCase {
             second: CGPoint(x: start.x + 25, y: start.y),
             toFirst: CGPoint(x: start.x - 70, y: start.y + 20),
             toSecond: CGPoint(x: start.x + 110, y: start.y + 20), duration: 1))
-        let pinched = try renderedLocation(globe)
+        let pinched = try renderedLocation(globe, in: app)
         XCTAssertEqual(pinched.diameter, initial.diameter, accuracy: 3, "Country previews have a fixed scale")
         XCTAssertEqual(pinched.pin.x, turned.pin.x, accuracy: 3, "Two fingers must not pan the preview")
         XCTAssertEqual(pinched.pin.y, turned.pin.y, accuracy: 3)
@@ -38,7 +38,7 @@ final class CountryLocationUITests: XCTestCase {
         app.buttons["recenterCountryGlobe"].tap()
         // Wait for the existing short recenter animation before inspecting rendered pixels.
         Thread.sleep(forTimeInterval: 0.7)
-        let reset = try renderedLocation(globe)
+        let reset = try renderedLocation(globe, in: app)
         XCTAssertEqual(reset.pin.x, initial.pin.x, accuracy: 3)
         XCTAssertEqual(reset.pin.y, initial.pin.y, accuracy: 3)
         capture("Japan centered on its location", app)
@@ -50,7 +50,7 @@ final class CountryLocationUITests: XCTestCase {
         for name in ["Morocco", "New Zealand", "Singapore"] {
             let globe = open(name, in: app)
             XCTAssertEqual(globe.label, "\(name) on the globe")
-            let rendered = try renderedLocation(globe)
+            let rendered = try renderedLocation(globe, in: app)
             XCTAssertEqual(rendered.pin.x, globe.frame.width / 2, accuracy: 4)
             XCTAssertEqual(rendered.pin.y, globe.frame.height / 2, accuracy: 22)
             globe.swipeLeft()
@@ -61,7 +61,7 @@ final class CountryLocationUITests: XCTestCase {
             capture("\(name) with the globe hidden", app)
             app.buttons["toggleCountryGlobe"].tap()
             XCTAssertTrue(globe.waitForExistence(timeout: 3))
-            let reopened = try renderedLocation(globe)
+            let reopened = try renderedLocation(globe, in: app)
             XCTAssertEqual(reopened.pin.x, globe.frame.width / 2, accuracy: 4)
             XCTAssertEqual(reopened.pin.y, globe.frame.height / 2, accuracy: 22)
             capture("\(name) with its location restored", app)
@@ -123,8 +123,29 @@ final class CountryLocationUITests: XCTestCase {
     }
 
     @MainActor
-    private func renderedLocation(_ globe: XCUIElement) throws -> (pin: CGPoint, diameter: CGFloat) {
-        let screenshot = globe.screenshot().image
+    private func renderedLocation(_ globe: XCUIElement, in app: XCUIApplication) throws -> (pin: CGPoint, diameter: CGFloat) {
+        // Keep the sticky companion control out of the pixels used to locate the pine-colored pin.
+        for _ in 0..<3 {
+            let overlap = globe.frame.maxY - app.buttons["askNiche"].frame.minY + 24
+            if overlap <= 0 { break }
+            let scroll = app.scrollViews["countryReadingScroll"]
+            let sheet = app.navigationBars["A little more local"].frame
+            let startX = max(scroll.frame.minX, sheet.minX) + 12
+            let startY = min(globe.frame.midY, app.buttons["askNiche"].frame.minY - 40)
+            // Keep the gesture inside the visible sheet when content extends past its edges.
+            let points = (0...30).map { step in
+                NSValue(cgPoint: CGPoint(x: startX,
+                    y: startY - max(60, overlap) * CGFloat(step) / 30))
+            }
+            XCTAssertNil(GlobeTestGestures.trace(points, duration: 0.5, hold: 0.2))
+        }
+        XCTAssertLessThanOrEqual(globe.frame.maxY, app.buttons["askNiche"].frame.minY - 12)
+        let capture = globe.screenshot()
+        let attachment = XCTAttachment(screenshot: capture)
+        attachment.name = "Visible globe pixels"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        let screenshot = capture.image
         // The unfolded display returns rotated screenshot pixels. Honor UIImage's orientation.
         let image = try XCTUnwrap(UIGraphicsImageRenderer(size: screenshot.size).image { _ in
             screenshot.draw(at: .zero)

@@ -8,7 +8,7 @@ At the end, hold the leaf for 900 milliseconds, or pull up past the bottom and k
 
 Coverage is a reading cue, not proof of comprehension. A quick jump cannot credit skipped sections. Progress survives closing and relaunching on this device and stays within the existing guest/account workspaces. It is included in local data exports and erased with local data. Partial progress is not uploaded or shared with friends. Only confirmed completion uses the existing exploration sync and sharing preference. No backend change is required.
 
-Previously explored countries remain explored. Reopening or refreshing them does not change their exploration dates. Bookmarks, private notes, feed retries and source attribution retain their existing behavior.
+Previously explored countries remain explored. Reopening or refreshing them does not change their exploration dates. Bookmarks, private notes, feed retries and source attribution retain their existing behavior. Opening a country from Atlas dismisses search keyboard focus, so it does not obscure the journal controls when the sheet closes.
 
 ## Validation
 
