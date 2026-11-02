@@ -1,5 +1,17 @@
 # TestFlight
 
+## Combined PR #11 and PR #12 candidate: November 1, 2026
+
+**1.0.1 (11) is uploaded, valid and available in internal TestFlight.** [PR #11](https://github.com/RedaB2/WorldNiche/pull/11) and [PR #12](https://github.com/RedaB2/WorldNiche/pull/12) are merged into `main`, at `6a860db90ee0c6e03e33ef4c298887f0dfbe436a` and `5e78c9a307cc244e5d156fbc20dcb6a395e33f71`. Archive source `fc8bae83ebc9a694c83c2380aed47c20ddcb00b0` on `beta/pr11-pr12-testflight` contains both merges plus the build-number increment. Reset now hides after use and returns on the next globe touch. Discover ends at its country-count tagline without the old country preview card.
+
+App Store Connect build ID: `20e9d3f4-354b-4def-8df7-3fea1ca574e6`. Readback confirms `VALID`, internal state `IN_BETA_TESTING`, saved What to Test notes, automatic notification enabled, and exact assignment to **Release Checks**. The owner remains its sole enrolled tester. Open TestFlight, select WorldNiche, and update to **1.0.1 (11)**. Installation of this build has not been verified.
+
+All nine selected UI tests pass on iPhone 17 Pro Max (iOS 27.0) and unfolded Duo (iOS 27.1), with zero failures or skips. They cover repeated resets, reset interruption, the exploration walkthrough, transparent-corner scrolling, standard and large-text Discover guidance, and all three country-location scenarios. All seven Swift suites, private-file checks, 24 repository regression tests and staged Gitleaks pass. Both PRs had passing GitHub checks before merging. The live website passes its full check against merged commit `5e78c9a307cc244e5d156fbc20dcb6a395e33f71`.
+
+Archive and IPA pass strict signature, version, distribution-profile, Apple sign-in, associated-domain, disabled-debugger, production client configuration, privacy manifest, source-credit, icon and fixture-exclusion validation. Static readiness passes against the live AASA. IPA SHA-256: `03de6023f92541de3ad1d20f5655f8d2b095b251f096d037086308afcfc84f48`. Private packages, test results, validation and distribution readbacks are in `outputs/testflight/1.0.1-11/`.
+
+Build 11 is absent from **WorldNiche Public Beta**. The App Store readback remains **1.0 (8), READY_FOR_DISTRIBUTION**, attached to build `47bfd9d3-1dd9-4322-8df7-4f7b3263d660`. No App Store submission, public-beta distribution or backend deployment was performed.
+
 ## Combined PR #8 and PR #9 candidate: November 1, 2026
 
 **1.0.1 (10) is uploaded, valid and available in internal TestFlight.** It combines the native friend invitation changes from [PR #8](https://github.com/RedaB2/WorldNiche/pull/8), head `e2350b777a1d3b9b1aad25f3a01e2b3d5698d4aa`, and the country-location globe from [PR #9](https://github.com/RedaB2/WorldNiche/pull/9), head `d3102eafc1f591bde812128afd6120e44aed0ded`. Both heads are ancestors of archive source `d90d229ab7c66562a40873d421f7df2b6694d7ab` on `beta/pr8-pr9-testflight`.
