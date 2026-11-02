@@ -4,25 +4,33 @@ final class CountryReadingUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     @MainActor
-    func testOpeningAndFastScrollingDoNotExploreAndPartialProgressSurvivesRelaunch() {
+    func testScrollProgressOnlyIncreasesAndSurvivesRelaunch() {
         let app = launch()
         openMorocco(app)
         XCTAssertTrue(progress(app).contains("0 percent"))
         XCTAssertFalse(app.descendants(matching: .any)["countryExplored"].exists)
         app.buttons["toggleCountryGlobe"].tap()
         readStep(app)
+        let first = percentage(app)
+        XCTAssertGreaterThan(first, 0)
+        readStep(app)
+        XCTAssertGreaterThan(percentage(app), first, "Each further scroll advances the page percentage")
         let partial = progress(app)
-        XCTAssertFalse(partial.hasPrefix("0 percent"), partial)
         XCTAssertFalse(partial.contains("Explored"))
+        app.scrollViews["countryReadingScroll"].swipeDown()
+        XCTAssertEqual(progress(app), partial, "Scrolling back must keep the furthest percentage")
+        capture("Scrolling back keeps the earned progress", app)
         app.terminate()
         app.launchArguments = arguments(reset: false)
         app.launch()
         openMorocco(app)
         XCTAssertEqual(progress(app), partial)
+        app.buttons["toggleCountryGlobe"].tap()
         let scroll = app.scrollViews["countryReadingScroll"]
         for _ in 0..<5 { scroll.swipeUp(velocity: .fast) }
         XCTAssertFalse(app.descendants(matching: .any)["countryExplored"].exists)
-        XCTAssertFalse(app.buttons["completeCountryExploration"].exists, "A fling cannot credit skipped content")
+        XCTAssertEqual(percentage(app), 100, "Progress follows the page distance even during a fast scroll")
+        XCTAssertTrue(app.buttons["completeCountryExploration"].exists, "Reaching the end unlocks confirmation")
         capture("Partial reading stays separate from explored", app)
     }
 
@@ -131,12 +139,16 @@ final class CountryReadingUITests: XCTestCase {
     }
 
     @MainActor
+    private func percentage(_ app: XCUIApplication) -> Int {
+        Int(progress(app).split(separator: " ").first ?? "") ?? -1
+    }
+
+    @MainActor
     private func readStep(_ app: XCUIApplication) {
         let scroll = app.scrollViews["countryReadingScroll"]
         let start = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: 0.70))
         let end = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: 0.42))
         start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.1)
-        Thread.sleep(forTimeInterval: 0.85)
     }
 
     @MainActor
@@ -145,11 +157,7 @@ final class CountryReadingUITests: XCTestCase {
         for _ in 0..<limit {
             if finish.exists && finish.isHittable,
                finish.frame.maxY + 40 < app.buttons["askNiche"].frame.minY { return }
-            let more = app.buttons["continueCountryReading"]
-            if more.exists && more.isHittable {
-                more.tap()
-                Thread.sleep(forTimeInterval: 1.1)
-            } else { readStep(app) }
+            readStep(app)
         }
         XCTFail("Could not finish reading: \(progress(app))\n\(app.debugDescription)")
     }

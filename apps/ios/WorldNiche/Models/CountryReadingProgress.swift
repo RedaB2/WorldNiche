@@ -1,44 +1,32 @@
 import Foundation
 import CoreGraphics
 
-enum CountryReadingSection: String, CaseIterable, Codable, Sendable {
-    case culture, music, news
-
-    var title: String {
-        switch self {
-        case .culture: "Culture"
-        case .music: "Music"
-        case .news: "Stories"
-        }
-    }
-}
-
-/// Small, device-local coverage records. Seeing content is a reading cue, not proof of comprehension.
+/// The furthest scroll percentage reached on this device, independent of content sections.
 struct CountryReadingProgress: Codable, Equatable, Sendable {
-    private var coverage: [String: Set<Int>] = [:]
-    static let bandCount = 20
-    static let requiredBands = 18
+    private(set) var fraction = 0.0
+    var isReady: Bool { fraction == 1 }
 
-    func fraction(for section: CountryReadingSection) -> Double {
-        min(1, Double(coverage[section.rawValue, default: []].count) / Double(Self.requiredBands))
+    init() {}
+
+    private enum CodingKeys: String, CodingKey { case fraction }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        record(try values.decodeIfPresent(Double.self, forKey: .fraction) ?? 0)
     }
 
-    var fraction: Double {
-        CountryReadingSection.allCases.reduce(0) { $0 + fraction(for: $1) } / 3
+    mutating func record(_ fraction: Double) {
+        guard fraction.isFinite else { return }
+        self.fraction = max(self.fraction, min(1, max(0, fraction)))
     }
 
-    var isReady: Bool { CountryReadingSection.allCases.allSatisfy { fraction(for: $0) == 1 } }
-    var nextSection: CountryReadingSection? { CountryReadingSection.allCases.first { fraction(for: $0) < 1 } }
-
-    /// Only called after the viewport has rested. A fling cannot credit skipped content.
-    mutating func record(_ section: CountryReadingSection, frame: CGRect, viewport: CGRect) {
-        guard frame.height > 0, viewport.height > 0, frame.intersects(viewport) else { return }
-        let visible = frame.intersection(viewport)
-        for band in 0..<Self.bandCount {
-            let midpoint = frame.minY + frame.height * (Double(band) + 0.5) / Double(Self.bandCount)
-            if midpoint >= visible.minY && midpoint <= visible.maxY {
-                coverage[section.rawValue, default: []].insert(band)
-            }
-        }
+    static func scrollFraction(offset: CGFloat, contentHeight: CGFloat,
+                               viewportHeight: CGFloat, topInset: CGFloat) -> Double {
+        let distance = contentHeight - viewportHeight
+        let position = offset + topInset
+        guard distance.isFinite, position.isFinite, distance > 0 else { return 0 }
+        // Allow one point for fractional layout rounding at the bottom.
+        if position >= distance - 1 { return 1 }
+        return Double(min(1, max(0, position / distance)))
     }
 }

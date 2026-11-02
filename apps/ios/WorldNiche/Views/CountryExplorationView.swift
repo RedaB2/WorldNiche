@@ -1,15 +1,9 @@
 import SwiftUI
 
-struct CountryReadingViewport: Equatable {
-    var sections: [CountryReadingSection: CGRect] = [:]
-    var viewport = CGRect.zero
-    var readySections: Set<CountryReadingSection> = []
-    var canRead = false
-}
-
 struct CountryReadingHeader: View {
     let progress: CountryReadingProgress
     let explored: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 8) {
@@ -25,17 +19,14 @@ struct CountryReadingHeader: View {
             }
             .scaledFont(size: 11, weight: .medium)
             .foregroundStyle(Palette.muted)
-            HStack(spacing: 4) {
-                ForEach(CountryReadingSection.allCases, id: \.self) { section in
-                    GeometryReader { geometry in
-                        Capsule().fill(Palette.line)
-                            .overlay(alignment: .leading) {
-                                Capsule().fill(explored ? Palette.pine : Palette.clay)
-                                    .frame(width: geometry.size.width * (explored ? 1 : progress.fraction(for: section)))
-                            }
-                    }.frame(height: 3)
-                }
-            }
+            GeometryReader { geometry in
+                Capsule().fill(Palette.line)
+                    .overlay(alignment: .leading) {
+                        Capsule().fill(explored ? Palette.pine : Palette.clay)
+                            .frame(width: geometry.size.width * (explored ? 1 : progress.fraction))
+                    }
+                    .animation(reduceMotion ? nil : .linear(duration: 0.12), value: progress.fraction)
+            }.frame(height: 3)
         }
         .padding(.horizontal, 24).padding(.top, 8).padding(.bottom, 12)
         .frame(maxWidth: 720)
@@ -43,9 +34,7 @@ struct CountryReadingHeader: View {
         .background(Palette.paper)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Discovery progress")
-        .accessibilityValue(explored ? "Explored" : "\(Int(progress.fraction * 100)) percent. " + CountryReadingSection.allCases.map {
-            "\($0.title) \(Int(progress.fraction(for: $0) * 100)) percent"
-        }.joined(separator: ". "))
+        .accessibilityValue(explored ? "Explored" : "\(Int(progress.fraction * 100)) percent")
         .accessibilityIdentifier("countryReadingProgress")
     }
 }
@@ -55,7 +44,6 @@ struct CountryExplorationFinish: View {
     let ready: Bool
     let explored: Bool
     let pulling: Bool
-    let onContinue: () -> Void
     let onComplete: () -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
@@ -104,15 +92,12 @@ struct CountryExplorationFinish: View {
                     .scaledFont(size: 12).foregroundStyle(Palette.muted)
                     .multilineTextAlignment(.center)
             } else {
-                Text("There’s a little more to discover.")
+                Text("Keep scrolling.")
                     .scaledFont(size: 23, design: .serif).foregroundStyle(Palette.pine)
                     .multilineTextAlignment(.center)
-                Text("Take a moment with the culture, music and local perspectives. Your progress is saved as you go.")
+                Text("Your progress is saved as you go.")
                     .scaledFont(size: 13).foregroundStyle(Palette.muted)
                     .multilineTextAlignment(.center).lineSpacing(3)
-                Button("Continue exploring", action: onContinue)
-                    .scaledFont(size: 13, weight: .medium).buttonStyle(.glass)
-                    .accessibilityIdentifier("continueCountryReading")
             }
         }
         .padding(.bottom, 12)

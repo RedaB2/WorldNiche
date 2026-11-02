@@ -380,8 +380,7 @@ private final class CheckSuite {
         journal.visit(CountryRepository.country(id: "FR")!)
         journal.toggleSaved(CountryRepository.country(id: "JP")!)
         var partialReading = CountryReadingProgress()
-        partialReading.record(.culture, frame: CGRect(x: 0, y: 0, width: 320, height: 1000),
-                              viewport: CGRect(x: 0, y: 0, width: 320, height: 500))
+        partialReading.record(0.25)
         journal.saveReadingProgress(partialReading, for: CountryRepository.country(id: "MA")!)
         guard let exported = await store.exportData(), let data = try? Data(contentsOf: exported),
               let document = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
@@ -808,8 +807,7 @@ private final class CheckSuite {
                                 api: api(vault: MemoryVault()))
         journal.visit(CountryRepository.country(id: "FR")!)
         var guestReading = CountryReadingProgress()
-        guestReading.record(.music, frame: CGRect(x: 0, y: 0, width: 320, height: 500),
-                            viewport: CGRect(x: 0, y: 0, width: 320, height: 500))
+        guestReading.record(0.4)
         journal.saveReadingProgress(guestReading, for: CountryRepository.country(id: "MA")!)
         await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Mira Apple")
         check(store.isSignedIn && store.profile == nil && store.needsProfileSetup && store.suggestedProfileName == "Mira Apple",

@@ -7,14 +7,9 @@ struct CountryDetailView: View {
     @Environment(SocialStore.self) private var social
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
-    @State private var readingFrames: [CountryReadingSection: CGRect] = [:]
-    @State private var readingBounds = CGRect.zero
-    @State private var readingTop: CGFloat = 0
-    @State private var readingBottom: CGFloat = 0
+    @State private var currentProgress = CountryReadingProgress()
     @State private var scrollPhase = ScrollPhase.idle
-    @State private var hasScrolled = false
     @State private var bottomPull = false
-    @State private var readingPosition = ScrollPosition()
     @State private var showsGlobe = true
     @State private var globeResetToken = 0
     @State private var music: FeedSnapshot<MusicTrack>?
@@ -42,29 +37,44 @@ struct CountryDetailView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 26) {
                     countryHeader
-                    liveCultureSection.readingFrame(.culture, frames: $readingFrames)
-                    musicSection.readingFrame(.music, frames: $readingFrames)
-                    newsSection.readingFrame(.news, frames: $readingFrames)
+                    liveCultureSection
+                    musicSection
+                    newsSection
                     Text("A country contains many cultures. Use these discoveries as invitations to ask, never assumptions about a person.")
                         .scaledFont(size: 12).lineSpacing(4).foregroundStyle(Palette.muted)
                         .padding(.horizontal, 4)
                     CountryFriendsView(country: country)
                     CountryExplorationFinish(country: country, ready: readingProgress.isReady,
                         explored: isExplored, pulling: bottomPull && scrollPhase == .interacting,
-                        onContinue: continueReading,
-                        onComplete: { journal.completeExploration(country) })
+                        onComplete: {
+                            saveReadingProgress()
+                            journal.completeExploration(country)
+                        })
                 }
                 .padding(24)
                 .padding(.bottom, 80)
                 .frame(maxWidth: 720)
                 .frame(maxWidth: .infinity)
             }
-            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { readingBounds = $0 }
             .accessibilityIdentifier("countryReadingScroll")
-            .scrollPosition($readingPosition)
             .onScrollPhaseChange { _, phase in
                 scrollPhase = phase
-                if phase == .interacting || phase == .animating { hasScrolled = true }
+                if phase == .idle { saveReadingProgress() }
+            }
+            .onScrollGeometryChange(for: Double.self) { geometry in
+                CountryReadingProgress.scrollFraction(offset: geometry.contentOffset.y,
+                    contentHeight: geometry.contentSize.height, viewportHeight: geometry.containerSize.height,
+                    topInset: geometry.contentInsets.top)
+            } action: { _, fraction in
+                guard scenePhase == .active, !showCompanion, !isExplored,
+                      scrollPhase == .interacting || scrollPhase == .decelerating else { return }
+                var progress = readingProgress
+                progress.record(fraction)
+                currentProgress = progress
+                // Keep the bar continuous while coalescing persistent writes to whole percentages.
+                if Int(progress.fraction * 100) > Int(journal.readingProgress(for: country.id).fraction * 100) {
+                    saveReadingProgress()
+                }
             }
             .onScrollGeometryChange(for: Bool.self) { geometry in
                 // SwiftUI's container size already excludes its content insets.
@@ -72,10 +82,10 @@ struct CountryDetailView: View {
                     geometry.contentSize.height - geometry.containerSize.height - geometry.contentInsets.top)
                 return geometry.contentOffset.y - end > 44
             } action: { _, pulling in bottomPull = pulling }
-            .task(id: readingObservation) { await saveVisibleReading() }
+            .onDisappear { saveReadingProgress() }
+            .onChange(of: scenePhase) { _, phase in if phase != .active { saveReadingProgress() } }
             .safeAreaInset(edge: .top, spacing: 0) {
                 CountryReadingHeader(progress: readingProgress, explored: isExplored)
-                    .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).maxY } action: { readingTop = $0 }
             }
             .background(Palette.paper)
             .navigationTitle("A little more local")
@@ -110,7 +120,6 @@ struct CountryDetailView: View {
                 .accessibilityIdentifier("askNiche")
                 .disabled(!cultureLoaded || cultureLoading)
                 .padding(.horizontal, 24).padding(.bottom, 8)
-                .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minY } action: { readingBottom = $0 }
             }
             .sheet(isPresented: $showCompanion) { CompanionView(country: country, feed: feed, reading: cultureReading) }
             .task(id: "\(country.id)-music-\(musicRefreshID)-\(refreshID)") {
@@ -132,43 +141,14 @@ struct CountryDetailView: View {
     }
 
     private var isExplored: Bool { journal.visitedIDs.contains(country.id) }
-    private var readingProgress: CountryReadingProgress { journal.readingProgress(for: country.id) }
-
-    private var readingViewport: CGRect {
-        CGRect(x: readingBounds.minX, y: max(readingBounds.minY, readingTop), width: readingBounds.width,
-            height: max(0, min(readingBounds.maxY, readingBottom) - max(readingBounds.minY, readingTop)))
+    private var readingProgress: CountryReadingProgress {
+        var progress = currentProgress
+        progress.record(journal.readingProgress(for: country.id).fraction)
+        return progress
     }
 
-    private var readingObservation: CountryReadingViewport {
-        var ready: Set<CountryReadingSection> = []
-        if cultureLoaded && !cultureLoading { ready.insert(.culture) }
-        if !musicLoading { ready.insert(.music) }
-        if !newsLoading { ready.insert(.news) }
-        return CountryReadingViewport(sections: readingFrames, viewport: readingViewport,
-            readySections: ready, canRead: hasScrolled && scrollPhase == .idle && !showCompanion
-                && scenePhase == .active && !isExplored)
-    }
-
-    private func saveVisibleReading() async {
-        let observation = readingObservation
-        guard observation.canRead else { return }
-        // Briefly resting on content prevents a fast fling from counting unseen sections.
-        do { try await Task.sleep(for: .milliseconds(650)) } catch { return }
-        guard !Task.isCancelled, readingObservation == observation else { return }
-        var progress = readingProgress
-        for section in observation.readySections {
-            if let frame = observation.sections[section] {
-                progress.record(section, frame: frame, viewport: observation.viewport)
-            }
-        }
-        journal.saveReadingProgress(progress, for: country)
-    }
-
-    private func continueReading() {
-        guard let section = readingProgress.nextSection else { return }
-        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
-            readingPosition.scrollTo(id: section, anchor: .top)
-        }
+    private func saveReadingProgress() {
+        journal.saveReadingProgress(readingProgress, for: country)
     }
 
     private func loadCulture(forceRefresh: Bool) async {
@@ -478,14 +458,5 @@ struct CountryDetailView: View {
     private func updatedLabel(_ date: Date) -> some View {
         Text("Checked \(date.formatted(date: .abbreviated, time: .shortened))")
             .scaledFont(size: 11, design: .monospaced).foregroundStyle(Palette.muted)
-    }
-}
-
-private extension View {
-    func readingFrame(_ section: CountryReadingSection, frames: Binding<[CountryReadingSection: CGRect]>) -> some View {
-        id(section)
-            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: {
-                frames.wrappedValue[section] = $0
-            }
     }
 }

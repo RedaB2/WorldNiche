@@ -68,7 +68,7 @@ final class DiscoveryJournal {
     }
 
     func saveReadingProgress(_ progress: CountryReadingProgress, for country: Country) {
-        guard !visitedIDs.contains(country.id), progress != readingProgress(for: country.id) else { return }
+        guard !visitedIDs.contains(country.id), progress.fraction > readingProgress(for: country.id).fraction else { return }
         if snapshot.readingProgress == nil { snapshot.readingProgress = [:] }
         snapshot.readingProgress?[country.id] = progress
         // Partial reading stays in this account's local workspace, outside the social sync queue.
