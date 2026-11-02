@@ -379,6 +379,10 @@ private final class CheckSuite {
         check(restored.profile?.displayName == "Mira", "Local profile must survive store reconstruction")
         journal.visit(CountryRepository.country(id: "FR")!)
         journal.toggleSaved(CountryRepository.country(id: "JP")!)
+        var partialReading = CountryReadingProgress()
+        partialReading.record(.culture, frame: CGRect(x: 0, y: 0, width: 320, height: 1000),
+                              viewport: CGRect(x: 0, y: 0, width: 320, height: 500))
+        journal.saveReadingProgress(partialReading, for: CountryRepository.country(id: "MA")!)
         guard let exported = await store.exportData(), let data = try? Data(contentsOf: exported),
               let document = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
               let local = document["local"] as? [String: Any] else {
@@ -386,6 +390,7 @@ private final class CheckSuite {
         }
         check(document["account"] == nil && (local["exploredCountryIDs"] as? [String]) == ["FR"], "Local export must accurately contain journal without fake account data")
         check((local["savedCountryIDs"] as? [String]) == ["JP"], "Local export must contain private saved countries")
+        check((local["readingProgress"] as? [String: Any])?["MA"] != nil, "Local export includes private partial reading")
         await store.clearLocalData()
         check(defaults.object(forKey: "worldniche.culture.history.GH") == nil, "Local wipe must erase persisted cultural reading history")
         check(store.profile == nil && journal.visitedIDs.isEmpty && journal.savedIDs.isEmpty, "Local wipe must clear profile, journal and saved countries")
@@ -802,6 +807,10 @@ private final class CheckSuite {
         let store = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory, configuration: configuration,
                                 api: api(vault: MemoryVault()))
         journal.visit(CountryRepository.country(id: "FR")!)
+        var guestReading = CountryReadingProgress()
+        guestReading.record(.music, frame: CGRect(x: 0, y: 0, width: 320, height: 500),
+                            viewport: CGRect(x: 0, y: 0, width: 320, height: 500))
+        journal.saveReadingProgress(guestReading, for: CountryRepository.country(id: "MA")!)
         await store.signInWithApple(identityToken: appleIdentityToken, nonce: appleNonce, name: "Mira Apple")
         check(store.isSignedIn && store.profile == nil && store.needsProfileSetup && store.suggestedProfileName == "Mira Apple",
               "Apple's name prefills setup without publishing an unchosen profile")
@@ -811,8 +820,10 @@ private final class CheckSuite {
         check(store.profile?.shareExploration == true && !fixture.observed("/rest/v1/rpc/sync_journal").isEmpty,
               "New Apple accounts use the disclosed sharing-on default")
         check(!journal.visitedIDs.contains("FR"), "Apple sign-in must not merge a guest journal into the online account")
+        check(journal.readingProgress(for: "MA").fraction == 0, "Signing in does not import guest reading progress")
         await store.signOut()
         check(journal.visitedIDs == ["FR"], "Signing out of Apple account must restore the private guest journal")
+        check(journal.readingProgress(for: "MA") == guestReading, "Signing out restores private guest reading progress")
 
         fixture.reset(profile: true, sharing: true)
         let existingDefaults = isolatedDefaults()

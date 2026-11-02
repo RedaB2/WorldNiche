@@ -857,8 +857,9 @@ final class SocialStore {
                 let exploredCountryIDs: [String]
                 let savedCountryIDs: [String]
                 let journalEntries: [JournalEntry]
+                let readingProgress: [String: CountryReadingProgress]?
             }
-            let local = LocalExport(profile: profile, exploredCountryIDs: journal.visitedIDs, savedCountryIDs: journal.savedIDs.sorted(), journalEntries: journal.snapshot.entries.values.sorted { $0.countryId < $1.countryId })
+            let local = LocalExport(profile: profile, exploredCountryIDs: journal.visitedIDs, savedCountryIDs: journal.savedIDs.sorted(), journalEntries: journal.snapshot.entries.values.sorted { $0.countryId < $1.countryId }, readingProgress: journal.snapshot.readingProgress)
             var document: [String: Any] = ["local": try JSONSerialization.jsonObject(with: JSONEncoder().encode(local))]
             if let localID = profile?.localAvatarID, let data = AvatarPhotoFiles.load(localID, directory: photoDirectory) {
                 document["profile_photo_jpeg_base64"] = data.base64EncodedString()

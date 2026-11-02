@@ -29,6 +29,8 @@ struct JournalSnapshot: Codable, Sendable {
     var sequence: Int64 = 0
     var entries: [String: JournalEntry] = [:]
     var pending: [String: JournalChange] = [:]
+    // Optional so journals from before reading progress still decode without a migration.
+    var readingProgress: [String: CountryReadingProgress]?
 }
 
 struct JournalSyncResult: Decodable, Sendable { let entries: [JournalEntry] }
@@ -60,6 +62,25 @@ final class DiscoveryJournal {
 
     func entry(for id: String) -> JournalEntry? { snapshot.entries[id] }
     func note(for id: String) -> String { snapshot.entries[id]?.note ?? "" }
+
+    func readingProgress(for id: String) -> CountryReadingProgress {
+        snapshot.readingProgress?[id] ?? CountryReadingProgress()
+    }
+
+    func saveReadingProgress(_ progress: CountryReadingProgress, for country: Country) {
+        guard !visitedIDs.contains(country.id), progress != readingProgress(for: country.id) else { return }
+        if snapshot.readingProgress == nil { snapshot.readingProgress = [:] }
+        snapshot.readingProgress?[country.id] = progress
+        // Partial reading stays in this account's local workspace, outside the social sync queue.
+        persist()
+    }
+
+    @discardableResult
+    func completeExploration(_ country: Country) -> Bool {
+        guard !visitedIDs.contains(country.id), readingProgress(for: country.id).isReady else { return false }
+        visit(country)
+        return true
+    }
 
     func toggleSaved(_ country: Country) {
         var entry = snapshot.entries[country.id] ?? JournalEntry(countryId: country.id)
