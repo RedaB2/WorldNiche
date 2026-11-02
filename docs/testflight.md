@@ -1,5 +1,31 @@
 # TestFlight
 
+## Discover exploration fix: November 2, 2026
+
+**1.0.1 (13) is uploaded, valid and available in internal TestFlight.** It fixes the owner's report that Take me somewhere immediately added a country to explored history. Both random selection and direct globe taps now leave completion to the card's existing scroll-and-hold flow. The design and animation are unchanged. Archive source: `2b04f3f49978c4386e25584d55a2d5979bbb1ab0`, on `feat/country-reading-progress` / [PR #13](https://github.com/RedaB2/WorldNiche/pull/13).
+
+App Store Connect build ID: `aa77e426-2b58-43f4-9287-68ff5d08fce3`. Readback confirms `VALID`, `IN_BETA_TESTING`, automatic notification enabled, exact membership in **Release Checks**, and the owner as its sole tester. The What to Test notes match the uploaded instructions. Open TestFlight, select WorldNiche and update to **1.0.1 (13)**. Test with a previously unexplored country; existing exploration records are preserved. Installation of build 13 itself has not been verified.
+
+The final selection passes **7/7 on iPhone 17 Pro and 7/7 on unfolded Duo**, with no failures or skips. The new regressions reproduce both premature-completion paths before the fix, then verify zero initial progress, unchanged journal counts, shared Discover/Atlas progress and completion only after the hold. Existing gradual progress, relaunch persistence, cancellation, pull-and-hold, unavailable-feed and large-text checks also pass. Runtime and UI-test sources match tested commit `d236057800345ecc42c6aa11d32458d26c179ccf`; the archive changes only the build number.
+
+Initial results remain in the private evidence: the phone test needed to reveal Atlas search after returning to its tab, and one Duo completion run stalled at 99 percent. The Duo focused diagnostic and final full selection passed without changing reading behavior. Local globe, intro and journal logic pass 32,676, 12 and 42 assertions; the local avatar suite hits the existing protected-file failure. The full Swift suite passes in [Checks for the archive source](https://github.com/RedaB2/WorldNiche/actions/runs/41426997138); its separate native CI job was still running at distribution readback.
+
+The signed archive and exported IPA pass version, signature, App Store profile, entitlements, production client configuration, privacy, source-credit and fixture-exclusion checks. IPA SHA-256: `f9b053789a03fe286c06385aedda12b1c3cef2769f6d476eaa5287ff79f1a7a6`. Private packages, test results, provenance and independent distribution readbacks are under `outputs/testflight/1.0.1-13/` and `outputs/country-reading-progress/discover-fix/`.
+
+Build 13 is absent from **WorldNiche Public Beta**. App Store readback remains **1.0 (8), READY_FOR_DISTRIBUTION**. PR #13 remains open and unmerged.
+
+## Continuous country progress candidate: November 2, 2026
+
+**1.0.1 (12) is uploaded, valid and available in internal TestFlight.** It includes build 11's changes plus the continuous country scroll progress and hold-to-complete feature from [PR #13](https://github.com/RedaB2/WorldNiche/pull/13). Archive source: `91f73b83b6f2a29c41c9d89604f660578c06459a`, on `feat/country-reading-progress`.
+
+App Store Connect build ID: `c05b18a7-f004-4d9e-8d7d-79b15811c483`. Readback confirms `VALID`, `IN_BETA_TESTING`, automatic notification enabled, and exact membership in **Release Checks**. The owner is the group's sole tester. Installation of build 12 itself has not been verified. Open TestFlight, select WorldNiche and update to **1.0.1 (12)**. Choose a country that has not already been explored to try the new progress flow.
+
+All five feature UI tests pass on iPhone 17 Pro and unfolded Duo, including gradual progress, scrolling backward without regression, relaunch persistence, cancelled holds, completion, unavailable feeds and large text. The archive's runtime and UI-test sources match tested feature commit `20a4bb1`; only the build number changed. Journal checks pass 42 assertions. The full Swift suite passes in [GitHub Checks](https://github.com/RedaB2/WorldNiche/actions/runs/41422034809); its separate iOS CI job was still running at distribution readback. Local photo/export checks encounter macOS protected-file permissions, as recorded in the private evidence.
+
+The distribution archive and exported IPA pass strict signature, version, App Store profile, Apple sign-in, associated-domain, disabled-debugger, production client configuration, privacy-manifest, source-credit and fixture-exclusion checks. IPA SHA-256: `cc1aeee000e4995262e1add7e7d62c8ff6bd2a1d7024610f38809ba6561efd63`. Private packages and readbacks are under `outputs/testflight/1.0.1-12/`, including `validation-provenance.json` and `test-evidence.json`.
+
+The What to Test notes are verified. Build 12 is absent from **WorldNiche Public Beta**. App Store readback remains **1.0 (8), READY_FOR_DISTRIBUTION**. This operation did not merge PR #13, deploy the backend or website, change public access, or submit an App Store release.
+
 ## Combined PR #8 and PR #9 candidate: November 1, 2026
 
 **1.0.1 (10) is uploaded, valid and available in internal TestFlight.** It combines the native friend invitation changes from [PR #8](https://github.com/RedaB2/WorldNiche/pull/8), head `e2350b777a1d3b9b1aad25f3a01e2b3d5698d4aa`, and the country-location globe from [PR #9](https://github.com/RedaB2/WorldNiche/pull/9), head `d3102eafc1f591bde812128afd6120e44aed0ded`. Both heads are ancestors of archive source `d90d229ab7c66562a40873d421f7df2b6694d7ab` on `beta/pr8-pr9-testflight`.

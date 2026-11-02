@@ -59,7 +59,6 @@ struct RootView: View {
 }
 
 struct ExploreView: View {
-    @Environment(DiscoveryJournal.self) private var journal
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selected = CountryRepository.country(id: "MA") ?? CountryRepository.countries[0]
     @State private var spinToken = 0
@@ -105,7 +104,6 @@ struct ExploreView: View {
                             isSpinning = true
                             selected = CountryRepository.random(excluding: selected.id)
                             spinToken += 1
-                            journal.visit(selected)
                         } label: {
                             HStack(spacing: 10) {
                                 Image(systemName: "shuffle")
@@ -173,7 +171,6 @@ struct ExploreView: View {
                            spinToken: spinToken, resetToken: globeResetToken,
                            onInteraction: { hasTouchedGlobe = true }) { country in
                 selected = country
-                journal.visit(country)
             }
             .accessibilityLabel("Interactive world globe")
             .accessibilityIdentifier("interactiveGlobe")

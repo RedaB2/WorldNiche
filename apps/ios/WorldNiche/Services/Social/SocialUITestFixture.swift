@@ -10,7 +10,7 @@ enum SocialUITestFixture {
         let arguments = ProcessInfo.processInfo.arguments
         if let index = arguments.firstIndex(of: "-worldniche-journal-fixture"), arguments.indices.contains(index + 1),
            let defaults = UserDefaults(suiteName: "io.worldniche.app.journal-ui-fixture") {
-            if ["reset", "marketing"].contains(arguments[index + 1]) {
+            if ["reset", "marketing", "reading-reset"].contains(arguments[index + 1]) {
                 defaults.removePersistentDomain(forName: "io.worldniche.app.journal-ui-fixture")
             }
             let journal = DiscoveryJournal(defaults: defaults)

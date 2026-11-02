@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AtlasView: View {
     @State private var search = ""
+    @FocusState private var searchFocused: Bool
     @State private var region = "All"
     @State private var detail: Country?
     private let regions = ["All", "Africa", "Asia", "Europe", "Americas", "Oceania"]
@@ -48,7 +49,10 @@ struct AtlasView: View {
                     } else {
                         LazyVStack(spacing: 0) {
                             ForEach(countries) { country in
-                                Button { detail = country } label: { CountryRow(country: country) }.buttonStyle(.plain)
+                                Button {
+                                    searchFocused = false
+                                    detail = country
+                                } label: { CountryRow(country: country) }.buttonStyle(.plain)
                                 Divider().overlay(Palette.line)
                             }
                         }
@@ -59,6 +63,7 @@ struct AtlasView: View {
             .navigationTitle("Atlas")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $search, prompt: "A country or a capital")
+            .searchFocused($searchFocused)
             .sheet(item: $detail) { CountryDetailView(country: $0) }
         }
     }

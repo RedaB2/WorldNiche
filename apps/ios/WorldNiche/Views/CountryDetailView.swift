@@ -6,6 +6,10 @@ struct CountryDetailView: View {
     @Environment(DiscoveryJournal.self) private var journal
     @Environment(SocialStore.self) private var social
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var currentProgress = CountryReadingProgress()
+    @State private var scrollPhase = ScrollPhase.idle
+    @State private var bottomPull = false
     @State private var showsGlobe = true
     @State private var globeResetToken = 0
     @State private var music: FeedSnapshot<MusicTrack>?
@@ -40,11 +44,48 @@ struct CountryDetailView: View {
                         .scaledFont(size: 12).lineSpacing(4).foregroundStyle(Palette.muted)
                         .padding(.horizontal, 4)
                     CountryFriendsView(country: country)
+                    CountryExplorationFinish(country: country, ready: readingProgress.isReady,
+                        explored: isExplored, pulling: bottomPull && scrollPhase == .interacting,
+                        onComplete: {
+                            saveReadingProgress()
+                            journal.completeExploration(country)
+                        })
                 }
                 .padding(24)
                 .padding(.bottom, 80)
                 .frame(maxWidth: 720)
                 .frame(maxWidth: .infinity)
+            }
+            .accessibilityIdentifier("countryReadingScroll")
+            .onScrollPhaseChange { _, phase in
+                scrollPhase = phase
+                if phase == .idle { saveReadingProgress() }
+            }
+            .onScrollGeometryChange(for: Double.self) { geometry in
+                CountryReadingProgress.scrollFraction(offset: geometry.contentOffset.y,
+                    contentHeight: geometry.contentSize.height, viewportHeight: geometry.containerSize.height,
+                    topInset: geometry.contentInsets.top)
+            } action: { _, fraction in
+                guard scenePhase == .active, !showCompanion, !isExplored,
+                      scrollPhase == .interacting || scrollPhase == .decelerating else { return }
+                var progress = readingProgress
+                progress.record(fraction)
+                currentProgress = progress
+                // Keep the bar continuous while coalescing persistent writes to whole percentages.
+                if Int(progress.fraction * 100) > Int(journal.readingProgress(for: country.id).fraction * 100) {
+                    saveReadingProgress()
+                }
+            }
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                // SwiftUI's container size already excludes its content insets.
+                let end = max(-geometry.contentInsets.top,
+                    geometry.contentSize.height - geometry.containerSize.height - geometry.contentInsets.top)
+                return geometry.contentOffset.y - end > 44
+            } action: { _, pulling in bottomPull = pulling }
+            .onDisappear { saveReadingProgress() }
+            .onChange(of: scenePhase) { _, phase in if phase != .active { saveReadingProgress() } }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                CountryReadingHeader(progress: readingProgress, explored: isExplored)
             }
             .background(Palette.paper)
             .navigationTitle("A little more local")
@@ -82,7 +123,6 @@ struct CountryDetailView: View {
             }
             .sheet(isPresented: $showCompanion) { CompanionView(country: country, feed: feed, reading: cultureReading) }
             .task(id: "\(country.id)-music-\(musicRefreshID)-\(refreshID)") {
-                journal.visit(country)
                 await loadMusic(forceRefresh: musicRefreshID > 0 || refreshID > 0)
             }
             .task(id: "\(country.id)-news-\(newsRefreshID)-\(refreshID)") {
@@ -100,7 +140,25 @@ struct CountryDetailView: View {
         }
     }
 
+    private var isExplored: Bool { journal.visitedIDs.contains(country.id) }
+    private var readingProgress: CountryReadingProgress {
+        var progress = currentProgress
+        progress.record(journal.readingProgress(for: country.id).fraction)
+        return progress
+    }
+
+    private func saveReadingProgress() {
+        journal.saveReadingProgress(readingProgress, for: country)
+    }
+
     private func loadCulture(forceRefresh: Bool) async {
+        #if DEBUG && targetEnvironment(simulator)
+        if CountryReadingFixture.mode != nil {
+            cultureLoaded = true
+            cultureLoading = false
+            return
+        }
+        #endif
         let requestID = UUID()
         cultureRequestID = requestID
         cultureLoading = true
@@ -196,6 +254,13 @@ struct CountryDetailView: View {
     }
 
     private func loadMusic(forceRefresh: Bool) async {
+        #if DEBUG && targetEnvironment(simulator)
+        if CountryReadingFixture.mode != nil {
+            music = CountryReadingFixture.music()
+            musicLoading = false
+            return
+        }
+        #endif
         let requestID = UUID()
         musicRequestID = requestID
         musicLoading = true
@@ -207,6 +272,13 @@ struct CountryDetailView: View {
     }
 
     private func loadNews(forceRefresh: Bool) async {
+        #if DEBUG && targetEnvironment(simulator)
+        if CountryReadingFixture.mode != nil {
+            news = CountryReadingFixture.news()
+            newsLoading = false
+            return
+        }
+        #endif
         let requestID = UUID()
         newsRequestID = requestID
         newsLoading = true
