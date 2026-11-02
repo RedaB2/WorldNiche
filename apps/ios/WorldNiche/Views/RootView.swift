@@ -227,7 +227,10 @@ struct ExploreView: View {
         }
         .overlay(alignment: .topTrailing) {
             if hasTouchedGlobe {
-                Button { globeResetToken += 1 } label: {
+                Button {
+                    hasTouchedGlobe = false
+                    globeResetToken += 1
+                } label: {
                     Image(systemName: "arrow.counterclockwise")
                         .font(.system(size: 14, weight: .medium))
                         .frame(width: 44, height: 44)

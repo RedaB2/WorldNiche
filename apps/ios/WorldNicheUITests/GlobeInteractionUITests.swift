@@ -25,11 +25,18 @@ final class GlobeInteractionUITests: XCTestCase {
         let globe = globe(in: app)
         XCTAssertFalse(app.buttons["resetGlobe"].exists, "Startup must not offer a reset action")
         let originalFrame = globe.frame
-        tap(latitude: 25, longitude: -35, on: globe, centeredAt: (32, -5), zoom: 1)
-        XCTAssertTrue(app.buttons["resetGlobe"].waitForExistence(timeout: 2), "An ocean tap still counts as touching the globe")
-        XCTAssertEqual(globe.frame, originalFrame, "Revealing Reset must not move the layout")
-        app.buttons["resetGlobe"].tap()
-        XCTAssertTrue(app.buttons["resetGlobe"].exists)
+        for _ in 0..<2 {
+            tap(latitude: 25, longitude: -35, on: globe, centeredAt: (32, -5), zoom: 1)
+            XCTAssertTrue(app.buttons["resetGlobe"].waitForExistence(timeout: 2), "An ocean tap must reveal Reset after each reset")
+            XCTAssertEqual(globe.frame, originalFrame, "Revealing Reset must not move the layout")
+            app.buttons["resetGlobe"].tap()
+            XCTAssertTrue(app.buttons["resetGlobe"].waitForNonExistence(timeout: 2), "Reset must disappear after use")
+            XCTAssertEqual(globe.frame, originalFrame, "Hiding Reset must not move the layout")
+        }
+        globe.coordinate(withNormalizedOffset: CGVector(dx: 0.02, dy: 0.02)).tap()
+        XCTAssertFalse(app.buttons["resetGlobe"].exists, "A transparent corner must not reveal Reset again")
+        app.buttons["spinButton"].tap()
+        XCTAssertFalse(app.buttons["resetGlobe"].exists, "Programmatic navigation must not reveal Reset again")
         app.terminate()
         app.launch()
         XCTAssertFalse(app.buttons["resetGlobe"].exists, "Touch history must not persist across launches")
@@ -316,6 +323,8 @@ final class GlobeInteractionUITests: XCTestCase {
         tap(latitude: 46, longitude: 2, on: globe, centeredAt: (32, -5), zoom: 1)
         expectCountry("France", app: app)
         app.buttons["resetGlobe"].tap()
+        // Raw touch paths can interrupt navigation before XCTest considers the app idle.
+        Thread.sleep(forTimeInterval: 0.6)
         let anchor = screenPoint(latitude: 46.8, longitude: 8.2, on: globe, centeredAt: (46, 2), zoom: 1)
         let destination = CGPoint(x: anchor.x + 35, y: anchor.y + 18)
         XCTAssertNil(GlobeTestGestures.moveFirst(CGPoint(x: anchor.x - 25, y: anchor.y),
@@ -380,6 +389,7 @@ final class GlobeInteractionUITests: XCTestCase {
         let percent = Int(interrupted.replacingOccurrences(of: "% zoom", with: "")) ?? 0
         XCTAssertGreaterThan(percent, 100, "Touch must stop the reset at its visible intermediate zoom")
         XCTAssertLessThan(percent, 400)
+        XCTAssertTrue(app.buttons["resetGlobe"].exists, "Interrupting Reset with a globe touch must reveal it again")
         trace(from: origin, to: CGPoint(x: origin.x - 60, y: origin.y + 20), duration: 0.5)
         XCTAssertEqual(globe.value as? String, interrupted, "Subsequent one-finger turning keeps the interrupted framing")
         capture("Reset interruption holds the current frame", app: app)
@@ -417,6 +427,9 @@ final class GlobeInteractionUITests: XCTestCase {
         tap(latitude: 46, longitude: 2, on: globe, centeredAt: (32, -5), zoom: 1)
         expectCountry("France", app: app)
         app.buttons["resetGlobe"].tap()
+        XCTAssertTrue(app.buttons["resetGlobe"].waitForNonExistence(timeout: 2))
+        // Coordinate-based gestures below require the reset animation to finish first.
+        Thread.sleep(forTimeInterval: 0.6)
         return globe
     }
 

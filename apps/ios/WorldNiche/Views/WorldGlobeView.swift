@@ -194,6 +194,7 @@ struct WorldGlobeView: UIViewRepresentable {
         func resetIfNeeded(token: Int, country: Country?) {
             defer { lastResetToken = token }
             guard let previous = lastResetToken, previous != token else { return }
+            hasInteracted = false
             navigate(to: country, spinning: false, animated: true)
         }
 
