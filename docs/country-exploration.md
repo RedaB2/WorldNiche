@@ -14,4 +14,4 @@ Previously explored countries remain explored. Reopening or refreshing them does
 
 `CountryReadingUITests` exercises gradual scroll progress, backward scrolling without regression, partial progress across relaunch, cancelling a short hold, completing and reopening, bottom pull and hold, unavailable feeds and accessibility text sizes. Its simulator-only content fixtures make no provider or paid AI calls. Journal checks cover scroll geometry, continuous fractions, monotonic persistence, legacy decoding, sync isolation, confirmation, duplicate completion and workspace reset/restore.
 
-Builds, simulator results and the review video are kept under ignored `outputs/country-reading-progress/`. No App Store, TestFlight or backend release is part of this change.
+Simulator results and the review video are kept under ignored `outputs/country-reading-progress/`. The owner's authorized TestFlight candidate is **1.0.1 (12)**; package and availability evidence are recorded in [TestFlight status](testflight.md) and ignored `outputs/testflight/1.0.1-12/`. App Store and backend releases remain separate.

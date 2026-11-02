@@ -1,5 +1,17 @@
 # TestFlight
 
+## Continuous country progress candidate: November 2, 2026
+
+**1.0.1 (12) is uploaded, valid and available in internal TestFlight.** It includes build 11's changes plus the continuous country scroll progress and hold-to-complete feature from [PR #13](https://github.com/RedaB2/WorldNiche/pull/13). Archive source: `91f73b83b6f2a29c41c9d89604f660578c06459a`, on `feat/country-reading-progress`.
+
+App Store Connect build ID: `c05b18a7-f004-4d9e-8d7d-79b15811c483`. Readback confirms `VALID`, `IN_BETA_TESTING`, automatic notification enabled, and exact membership in **Release Checks**. The owner is the group's sole tester. Installation of build 12 itself has not been verified. Open TestFlight, select WorldNiche and update to **1.0.1 (12)**. Choose a country that has not already been explored to try the new progress flow.
+
+All five feature UI tests pass on iPhone 17 Pro and unfolded Duo, including gradual progress, scrolling backward without regression, relaunch persistence, cancelled holds, completion, unavailable feeds and large text. The archive's runtime and UI-test sources match tested feature commit `20a4bb1`; only the build number changed. Journal checks pass 42 assertions. The full Swift suite passes in [GitHub Checks](https://github.com/RedaB2/WorldNiche/actions/runs/41422034809); its separate iOS CI job was still running at distribution readback. Local photo/export checks encounter macOS protected-file permissions, as recorded in the private evidence.
+
+The distribution archive and exported IPA pass strict signature, version, App Store profile, Apple sign-in, associated-domain, disabled-debugger, production client configuration, privacy-manifest, source-credit and fixture-exclusion checks. IPA SHA-256: `cc1aeee000e4995262e1add7e7d62c8ff6bd2a1d7024610f38809ba6561efd63`. Private packages and readbacks are under `outputs/testflight/1.0.1-12/`, including `validation-provenance.json` and `test-evidence.json`.
+
+The What to Test notes are verified. Build 12 is absent from **WorldNiche Public Beta**. App Store readback remains **1.0 (8), READY_FOR_DISTRIBUTION**. This operation did not merge PR #13, deploy the backend or website, change public access, or submit an App Store release.
+
 ## Combined PR #8 and PR #9 candidate: November 1, 2026
 
 **1.0.1 (10) is uploaded, valid and available in internal TestFlight.** It combines the native friend invitation changes from [PR #8](https://github.com/RedaB2/WorldNiche/pull/8), head `e2350b777a1d3b9b1aad25f3a01e2b3d5698d4aa`, and the country-location globe from [PR #9](https://github.com/RedaB2/WorldNiche/pull/9), head `d3102eafc1f591bde812128afd6120e44aed0ded`. Both heads are ancestors of archive source `d90d229ab7c66562a40873d421f7df2b6694d7ab` on `beta/pr8-pr9-testflight`.
