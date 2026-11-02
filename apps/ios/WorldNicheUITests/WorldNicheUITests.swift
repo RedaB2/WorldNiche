@@ -34,8 +34,9 @@ final class WorldNicheUITests: XCTestCase {
         app.buttons["Discover"].firstMatch.tap()
         assertDiscoverGuidanceOrdering(app)
         let guidance = app.staticTexts["discoverGuidance"]
-        XCTAssertGreaterThanOrEqual(guidance.frame.minX, app.frame.minX)
-        XCTAssertLessThanOrEqual(guidance.frame.maxX, app.frame.maxX)
+        let contentBounds = app.scrollViews.firstMatch.frame
+        XCTAssertGreaterThanOrEqual(guidance.frame.minX, contentBounds.minX)
+        XCTAssertLessThanOrEqual(guidance.frame.maxX, contentBounds.maxX)
         capture("Discover guidance with large text", app: app)
         let spin = app.buttons["spinButton"]
         if !spin.isHittable {

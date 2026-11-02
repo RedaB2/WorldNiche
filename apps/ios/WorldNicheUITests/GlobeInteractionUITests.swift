@@ -281,7 +281,8 @@ final class GlobeInteractionUITests: XCTestCase {
 
     @MainActor
     func testTransparentCornerLeavesPageScrollingAvailable() {
-        let app = launch()
+        // Large text keeps the shortened landing page tall enough to scroll.
+        let app = launch(largeText: true)
         let globe = globe(in: app)
         let originalY = globe.frame.minY
         XCTAssertFalse(app.buttons["resetGlobe"].exists)
@@ -395,10 +396,13 @@ final class GlobeInteractionUITests: XCTestCase {
     }
 
     @MainActor
-    private func launch() -> XCUIApplication {
+    private func launch(largeText: Bool = false) -> XCUIApplication {
         XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()
         app.launchArguments = ["-worldniche-skip-intro", "-worldniche-journal-fixture", "reset"]
+        if largeText {
+            app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
+        }
         app.launch()
         XCTAssertTrue(app.buttons["landingCountry"].waitForExistence(timeout: 10))
         return app
