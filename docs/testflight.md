@@ -1,5 +1,9 @@
 # TestFlight
 
+## Owner acceptance and App Store submission: November 2, 2026
+
+The owner confirmed testing the latest build and authorized App Store submission. **1.0.1 (13)** is now **WAITING_FOR_REVIEW**, with **automatic release after approval**. PR #13 is merged, and build 13's iOS source matches the merged feature commit `c8842bb153575d58ecbceddf28d78a2c461ffe22`, whose five CI jobs all passed. [Submission details](app-store-readiness.md) contain the live record IDs. The distribution evidence below remains the historical upload record. Release Checks still contains build 13; the public beta remains on build 8.
+
 ## Discover exploration fix: November 2, 2026
 
 **1.0.1 (13) is uploaded, valid and available in internal TestFlight.** It fixes the owner's report that Take me somewhere immediately added a country to explored history. Both random selection and direct globe taps now leave completion to the card's existing scroll-and-hold flow. The design and animation are unchanged. Archive source: `2b04f3f49978c4386e25584d55a2d5979bbb1ab0`, on `feat/country-reading-progress` / [PR #13](https://github.com/RedaB2/WorldNiche/pull/13).

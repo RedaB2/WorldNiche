@@ -1,8 +1,26 @@
 # App Store readiness
 
-Rechecked against Apple's documentation and the live App Store Connect record on October 29, 2026. This is a release checklist, not an approval claim.
+The latest submission was verified against live App Store Connect records on November 2, 2026. Earlier checks below retain their original dates. Submission acceptance is not App Store approval.
 
-## Current submission status: October 29, 2026
+## Current submission status: November 2, 2026
+
+The owner confirmed TestFlight testing and authorized **1.0.1 (13)** for App Store review and automatic distribution after approval. Apple accepted the submission on November 2 at **23:16:26 UTC / 3:16 p.m. Pacific**. Independent submission and version readbacks show **WAITING_FOR_REVIEW**; release type is **AFTER_APPROVAL**. Version 1.0 (8) remains the live App Store version while review is pending.
+
+| Record | Identifier |
+| --- | --- |
+| Version 1.0.1 | `c5197f2b-7821-4a8c-a76f-186617b2c1c1` |
+| Build 13 | `aa77e426-2b58-43f4-9287-68ff5d08fce3` |
+| Review submission | `a945db30-b3a0-4199-abf4-8ad73f5c02df` |
+| Archive source | `2b04f3f49978c4386e25584d55a2d5979bbb1ab0` |
+| Merged feature source | `c8842bb153575d58ecbceddf28d78a2c461ffe22` |
+
+The archive and merged source have identical `apps/ios` trees. All five CI jobs passed for the merged source; existing final UI evidence passes 7/7 reading scenarios on phone and 7/7 on unfolded Duo. Package provenance and earlier globe/friend tests are recorded in [TestFlight status](testflight.md). No replacement binary was built for submission.
+
+Canonical [English metadata](../metadata/version/1.0.1/en-US.json) matches Apple's readback. Release notes describe the new features for an App Store audience. Ten inherited screenshots and the app preview are processed. Validation reports zero errors, the existing CLI warning for `APP_IPHONE_DUO`, and the API's App Privacy publication advisory. Published privacy disclosures were verified on the public App Store listing. Reviewer instructions were updated for the reading flow; the existing private invitation and contact details remain only in App Store Connect and ignored evidence. Its November 29 expiry is unchanged.
+
+The existing free pricing, territory availability and privacy settings are retained. This submission does not deploy personalized website invitation previews: the metadata RPC is still absent, and the website retains its generic invitation fallback. The app supplies its personalized share-sheet title locally. Private submission results and readbacks are under `outputs/app-store-1.0.1/`.
+
+## First submission: October 29, 2026
 
 Version 1.0 with **build 8** was submitted with the owner’s approval on October 29, 2026 at 6:28 p.m. Pacific. Apple confirms `WAITING_FOR_REVIEW`. Release remains manual after approval. The listing now has its description, keywords, subtitle, support and privacy links, Education and Travel categories, copyright, and App Review contact and notes. Pricing is free in 174 selected territories, with future territories enabled. Mainland China is excluded at the owner's request because the app includes news and has no configured news permit. Readback confirms that China is the only excluded territory.
 
