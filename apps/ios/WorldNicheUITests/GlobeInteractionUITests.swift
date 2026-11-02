@@ -161,7 +161,7 @@ final class GlobeInteractionUITests: XCTestCase {
 
     @MainActor
     func testCountryTapsPreviewWithoutMovingTheGlobeOrOpeningDetails() {
-        let app = launch()
+        let app = launch(offlineReading: true)
         let globe = globe(in: app)
         tap(latitude: 46, longitude: 2, on: globe, centeredAt: (32, -5), zoom: 1)
         expectCountry("France", app: app)
@@ -174,9 +174,14 @@ final class GlobeInteractionUITests: XCTestCase {
         app.buttons["landingCountry"].tap()
         XCTAssertTrue(app.staticTexts["countryTitle"].waitForExistence(timeout: 8))
         XCTAssertEqual(app.staticTexts["countryTitle"].label, "Spain")
+        XCTAssertEqual(app.descendants(matching: .any)["countryReadingProgress"].firstMatch.value as? String,
+                       "0 percent", "Globe selection must not complete a discovery")
         app.buttons["Close"].firstMatch.tap()
         XCTAssertEqual(globe.value as? String, "100% zoom")
         expectCountry("Spain", app: app)
+        let journal = app.tabBars.buttons["Journal"]
+        (journal.exists ? journal : app.buttons["Journal"].firstMatch).tap()
+        XCTAssertTrue(app.staticTexts["1"].waitForExistence(timeout: 4), "Only the pre-existing fixture country should be explored")
     }
 
     @MainActor
@@ -406,10 +411,11 @@ final class GlobeInteractionUITests: XCTestCase {
     }
 
     @MainActor
-    private func launch(largeText: Bool = false) -> XCUIApplication {
+    private func launch(largeText: Bool = false, offlineReading: Bool = false) -> XCUIApplication {
         XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()
         app.launchArguments = ["-worldniche-skip-intro", "-worldniche-journal-fixture", "reset"]
+        if offlineReading { app.launchArguments += ["-worldniche-reading-fixture", "ready"] }
         if largeText {
             app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
         }

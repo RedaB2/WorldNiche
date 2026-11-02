@@ -4,6 +4,51 @@ final class CountryReadingUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     @MainActor
+    func testTakeMeSomewhereRequiresCompletionAndSharesProgressWithAtlas() {
+        let app = launch()
+        let landing = app.buttons["landingCountry"]
+        XCTAssertTrue(landing.waitForExistence(timeout: 8))
+        let original = landing.label
+        app.buttons["spinButton"].tap()
+        expectation(for: NSPredicate(format: "label != %@", original), evaluatedWith: landing)
+        waitForExpectations(timeout: 8)
+        landing.tap()
+        XCTAssertTrue(app.staticTexts["countryTitle"].waitForExistence(timeout: 5))
+        let country = app.staticTexts["countryTitle"].label
+        capture("Random country starts unexplored", app)
+        XCTAssertEqual(progress(app), "0 percent", "Choosing a destination must not mark it explored")
+        app.navigationBars["A little more local"].buttons["Close"].tap()
+        let journal = app.tabBars.buttons["Journal"]
+        (journal.exists ? journal : app.buttons["Journal"].firstMatch).tap()
+        XCTAssertTrue(app.staticTexts["0"].waitForExistence(timeout: 4), "Choosing a destination must not add journal history")
+
+        openCountry(country, in: app)
+        XCTAssertEqual(progress(app), "0 percent")
+        app.buttons["toggleCountryGlobe"].tap()
+        readStep(app)
+        let partial = progress(app)
+        XCTAssertGreaterThan(percentage(app), 0)
+        app.navigationBars["A little more local"].buttons["Close"].tap()
+        let searchClose = app.navigationBars["Atlas"].buttons["Close"]
+        if searchClose.exists { searchClose.tap() }
+        let discover = app.tabBars.buttons["Discover"]
+        (discover.exists ? discover : app.buttons["Discover"].firstMatch).tap()
+        landing.tap()
+        XCTAssertTrue(app.staticTexts["countryTitle"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["countryTitle"].label, country)
+        XCTAssertEqual(progress(app), partial, "Discover and Atlas must share the same saved progress")
+        app.buttons["toggleCountryGlobe"].tap()
+        readToEnd(app)
+        app.buttons["completeCountryExploration"].press(forDuration: 1.2)
+        XCTAssertTrue(app.descendants(matching: .any)["countryExplored"].firstMatch.waitForExistence(timeout: 4))
+        app.navigationBars["A little more local"].buttons["Close"].tap()
+        (journal.exists ? journal : app.buttons["Journal"].firstMatch).tap()
+        XCTAssertTrue(app.staticTexts["1"].waitForExistence(timeout: 4))
+        openCountry(country, in: app)
+        XCTAssertEqual(progress(app), "Explored")
+    }
+
+    @MainActor
     func testScrollProgressOnlyIncreasesAndSurvivesRelaunch() {
         let app = launch()
         openMorocco(app)
@@ -119,17 +164,23 @@ final class CountryReadingUITests: XCTestCase {
 
     @MainActor
     private func openMorocco(_ app: XCUIApplication, selectAtlas: Bool = true) {
+        openCountry("Morocco", in: app, selectAtlas: selectAtlas)
+    }
+
+    @MainActor
+    private func openCountry(_ country: String, in app: XCUIApplication, selectAtlas: Bool = true) {
         if selectAtlas {
             let atlas = app.tabBars.buttons["Atlas"]
             (atlas.exists ? atlas : app.buttons["Atlas"].firstMatch).tap()
         }
         let search = app.searchFields.firstMatch
-        XCTAssertTrue(search.waitForExistence(timeout: 5))
-        if search.value as? String != "Morocco" {
+        if !search.exists { app.scrollViews.firstMatch.swipeDown() }
+        XCTAssertTrue(search.waitForExistence(timeout: 5), app.debugDescription)
+        if search.value as? String != country {
             search.tap()
-            search.typeText("Morocco")
+            search.typeText(country)
         }
-        app.buttons.containing(.staticText, identifier: "Morocco").firstMatch.tap()
+        app.buttons.containing(.staticText, identifier: country).firstMatch.tap()
         XCTAssertTrue(app.staticTexts["countryTitle"].waitForExistence(timeout: 5))
     }
 

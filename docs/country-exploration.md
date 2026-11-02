@@ -1,6 +1,6 @@
 # Country exploration
 
-Opening a country no longer marks it explored. One continuous clay progress line stays below the country toolbar and fills smoothly with the percentage of the card scrolled. The existing paper, pine, serif type and glass controls remain the visual language.
+Selecting a destination with Take me somewhere, tapping a country on the globe, or opening a country from Atlas does not mark it explored. One continuous clay progress line stays below the country toolbar and fills smoothly with the percentage of the card scrolled. The existing paper, pine, serif type and glass controls remain the visual language.
 
 Progress is the furthest scroll offset divided by the available scroll distance, from zero at the top to 100 percent at the bottom. It updates during every scroll without section milestones or a reading pause. Scrolling back, reopening the card or loading more content never reduces saved progress. The bar follows fractional progress continuously; persistent writes are coalesced at each whole percentage and when scrolling stops or the card closes. Music links remain optional and do not require a subscription or external playback.
 
@@ -12,6 +12,6 @@ Previously explored countries remain explored. Reopening or refreshing them does
 
 ## Validation
 
-`CountryReadingUITests` exercises gradual scroll progress, backward scrolling without regression, partial progress across relaunch, cancelling a short hold, completing and reopening, bottom pull and hold, unavailable feeds and accessibility text sizes. Its simulator-only content fixtures make no provider or paid AI calls. Journal checks cover scroll geometry, continuous fractions, monotonic persistence, legacy decoding, sync isolation, confirmation, duplicate completion and workspace reset/restore.
+`CountryReadingUITests` exercises Take me somewhere without premature exploration, shared progress between Discover and Atlas, gradual scroll progress, backward scrolling without regression, partial progress across relaunch, cancelling a short hold, completing and reopening, bottom pull and hold, unavailable feeds and accessibility text sizes. The globe selection test separately checks that previewing countries leaves their discovery incomplete and does not increase explored history. These tests use simulator-only content fixtures without provider or paid AI calls. Journal checks cover scroll geometry, continuous fractions, monotonic persistence, legacy decoding, sync isolation, confirmation, duplicate completion and workspace reset/restore.
 
 Simulator results and the review video are kept under ignored `outputs/country-reading-progress/`. The owner's authorized TestFlight candidate is **1.0.1 (12)**; package and availability evidence are recorded in [TestFlight status](testflight.md) and ignored `outputs/testflight/1.0.1-12/`. App Store and backend releases remain separate.
