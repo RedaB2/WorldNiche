@@ -68,10 +68,6 @@ struct ExploreView: View {
     @State private var isSpinning = false
     @State private var detail: Country?
     @State private var showAbout = false
-    @State private var dailyReading: CultureReading?
-    @State private var readingLoaded = false
-    @State private var readingMessage: String?
-    @State private var refreshID = 0
 
     var body: some View {
         NavigationStack {
@@ -135,8 +131,7 @@ struct ExploreView: View {
                             .scaledFont(size: 11)
                             .foregroundStyle(Palette.muted)
                             .padding(.top, 13)
-
-                        localPreview.padding(.top, 32).padding(.bottom, 28)
+                            .padding(.bottom, 28)
                     }
                     .padding(.horizontal, 26)
                     .frame(maxWidth: 620)
@@ -148,18 +143,6 @@ struct ExploreView: View {
             .toolbar(.hidden, for: .navigationBar)
             .sheet(item: $detail) { CountryDetailView(country: $0) }
             .sheet(isPresented: $showAbout) { AboutView() }
-            .refreshLiveContent { refreshID += 1 }
-            .task(id: "\(selected.id)-\(refreshID)") {
-                dailyReading = nil
-                readingMessage = nil
-                readingLoaded = false
-                for await result in LiveCultureService.shared.updates(for: selected, forceRefresh: refreshID > 0) {
-                    guard !Task.isCancelled else { break }
-                    dailyReading = result.reading
-                    readingMessage = result.message
-                    readingLoaded = true
-                }
-            }
         }
     }
 
@@ -244,30 +227,5 @@ struct ExploreView: View {
                 .padding(.trailing, 24).padding(.top, 18)
             }
         }
-    }
-
-    private var localPreview: some View {
-        Button { detail = selected } label: {
-            VStack(alignment: .leading, spacing: 12) {
-                Eyebrow(text: "Your window into \(selected.name)")
-                Text(dailyReading?.displayTitle ?? (readingLoaded ? (selected.insights.first?.title ?? "A window into \(selected.name)") : "Finding a local discovery…"))
-                    .scaledFont(size: 23, weight: .regular, design: .serif)
-                    .foregroundStyle(Palette.pine)
-                    .multilineTextAlignment(.leading)
-                Text(dailyReading?.displayBody ?? (readingLoaded ? (selected.insights.first?.body ?? "Open this country for current music and headlines.") : "Following today’s cultural threads in \(selected.name)."))
-                    .scaledFont(size: 13).lineSpacing(4)
-                    .foregroundStyle(Palette.muted)
-                    .lineLimit(3).multilineTextAlignment(.leading)
-                HStack(spacing: 7) {
-                    Circle().fill(Palette.clay).frame(width: 5, height: 5)
-                    Text(dailyReading.map { "Wikipedia · retrieved \($0.fetchedAt.formatted(date: .omitted, time: .shortened))" } ?? (readingLoaded ? "Saved source note · reviewed Oct 17, 2026" : "Fetching live sources"))
-                        .scaledFont(size: 11, weight: .medium)
-                }.foregroundStyle(Palette.muted)
-                if readingMessage != nil {
-                    Text("Live refresh unavailable · showing the last source")
-                        .scaledFont(size: 11).foregroundStyle(Palette.muted)
-                }
-            }.frame(maxWidth: .infinity, alignment: .leading).editorialCard()
-        }.buttonStyle(.plain)
     }
 }
