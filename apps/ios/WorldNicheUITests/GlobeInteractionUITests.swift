@@ -323,6 +323,8 @@ final class GlobeInteractionUITests: XCTestCase {
         tap(latitude: 46, longitude: 2, on: globe, centeredAt: (32, -5), zoom: 1)
         expectCountry("France", app: app)
         app.buttons["resetGlobe"].tap()
+        // Raw touch paths can interrupt navigation before XCTest considers the app idle.
+        Thread.sleep(forTimeInterval: 0.6)
         let anchor = screenPoint(latitude: 46.8, longitude: 8.2, on: globe, centeredAt: (46, 2), zoom: 1)
         let destination = CGPoint(x: anchor.x + 35, y: anchor.y + 18)
         XCTAssertNil(GlobeTestGestures.moveFirst(CGPoint(x: anchor.x - 25, y: anchor.y),
@@ -426,6 +428,8 @@ final class GlobeInteractionUITests: XCTestCase {
         expectCountry("France", app: app)
         app.buttons["resetGlobe"].tap()
         XCTAssertTrue(app.buttons["resetGlobe"].waitForNonExistence(timeout: 2))
+        // Coordinate-based gestures below require the reset animation to finish first.
+        Thread.sleep(forTimeInterval: 0.6)
         return globe
     }
 
