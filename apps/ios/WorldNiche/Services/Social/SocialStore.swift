@@ -28,7 +28,6 @@ final class SocialStore {
     private let defaults: UserDefaults
     private let photoDirectory: URL?
     private let journal: DiscoveryJournal
-    private let culture: LiveCultureService
     private let appleCredentialIsAuthorized: @Sendable (String) async -> Bool?
     private var pendingToken: String?
     private var generation = UUID()
@@ -99,10 +98,8 @@ final class SocialStore {
 
     init(journal: DiscoveryJournal, defaults: UserDefaults = .standard, photoDirectory: URL? = nil,
          configuration: SocialConfiguration? = .load(), api: SocialAPI? = nil,
-         culture: LiveCultureService = .shared,
          appleCredentialIsAuthorized: @escaping @Sendable (String) async -> Bool? = { _ in nil }) {
         self.journal = journal
-        self.culture = culture
         self.defaults = defaults
         self.photoDirectory = photoDirectory
         self.configuration = configuration
@@ -788,7 +785,7 @@ final class SocialStore {
         isBusy = true
         generation = UUID()
         defer { isBusy = false }
-        do { try await api?.forgetSession(); await clearLocalState() }
+        do { try await api?.forgetSession(); clearLocalState() }
         catch { record(error) }
     }
 
@@ -825,7 +822,7 @@ final class SocialStore {
         do {
             let result = try await api.deleteAccount(appleAuthorizationCode: appleAuthorizationCode, appleNonce: appleNonce, appleManualRevocation: appleManualRevocation)
             let manualRevocation = result.appleRevocation == "manual_required" || defaults.bool(forKey: "niche.deletionManualAppleRevocation")
-            await clearLocalState()
+            clearLocalState()
             if manualRevocation {
                 appleRevocationNeedsManualAction = true
                 defaults.set(true, forKey: "niche.appleRevocationNeedsManualAction")
@@ -947,14 +944,13 @@ final class SocialStore {
         try? FileManager.default.removeItem(at: exportDirectory)
     }
 
-    private func clearLocalState() async {
+    private func clearLocalState() {
         cancelJournalSync()
         cancelProfileCheck()
         profileCheckFailed = false
         profileSaveMessage = nil
         lastVisibleProfileRefresh = nil
         generation = UUID()
-        await culture.clearHistory()
         profile = nil
         friends = []
         isSignedIn = false
@@ -972,7 +968,9 @@ final class SocialStore {
         defaults.removeObject(forKey: "niche.deletionTargetID")
         defaults.removeObject(forKey: "niche.deletionManualAppleRevocation")
         defaults.removeObject(forKey: "niche.localOwnerID")
+        // Older releases stored the country articles and their reading histories on this device.
         for key in defaults.dictionaryRepresentation().keys where key.hasPrefix("niche.workspace.")
+            || key.hasPrefix("worldniche.culture.history.") || key.hasPrefix("worldniche.culture.reading.")
             || key.hasPrefix("niche.pendingAppleName.") || key.hasPrefix("niche.pendingAppleAuthorizationName.")
             || key.hasPrefix("niche.pendingProfileSharing.") || key.hasPrefix("niche.profileSetupPending.") {
             defaults.removeObject(forKey: key)

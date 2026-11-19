@@ -1,6 +1,6 @@
 # A quick look around
 
-- `apps/ios`: the SwiftUI app and Xcode project. The globe uses native rendering; music, news, and cultural discoveries have separate loading and retry states.
+- `apps/ios`: the SwiftUI app and Xcode project. The globe uses native rendering. Country overviews and historical facts are bundled, and music charts load independently.
 - `apps/web/landing-site`: the landing page, hand animation, and real app recording.
 - `apps/web/invite-site`: the invitation fallback page. Opening a page never redeems an invitation.
 - `apps/web/invite-hosting`: shared routing and packaging. Vercel serves static pages/media from its CDN and uses a small function for invitations and errors; the original Worker remains an archival build target.
@@ -8,7 +8,7 @@
 
 The app stores its session in Keychain. Invitation links carry an opaque token; the signed-in app redeems it through an idempotent database function. Row-level policies keep profiles, friendships, shared exploration, and private profile photos scoped to their owners and friends. Account deletion removes stored photos and revokes Apple credentials when applicable.
 
-Cultural discoveries come from linked sources, with country checks and persistent seen-history. The first verified reading appears before optional enrichment finishes. Licensed images and Apple's on-device observations arrive independently. Saved readings survive relaunch, renew daily, and resume interrupted enrichment without repeating the search. Source links and image credits remain visible.
+Country readings pair a short geographic introduction with a historical fact and a link to the institution that supports it. Ask Niche gets the same material the reader sees. Apple Music supplies the default top five. A country without an Apple chart can show up to five tracks from Tuneping’s seven-day local radio chart. A provider error leaves the reading available offline.
 
 New profiles offer exploration sharing on the sign-in screen, enabled initially. Existing accounts keep their saved choice. Only post-sign-in exploration is synchronized, and turning sharing off removes shared records. Guest discovery and journals remain local.
 

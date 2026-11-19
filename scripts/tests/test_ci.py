@@ -84,8 +84,8 @@ class SimulatorVerdictTests(unittest.TestCase):
                                "WorldNiche-Runner at -[XCTWaiter(StallHandling) handleStalledWait:])",
             }],
         }
-        self.passed = {"result": "Passed", "passedTests": 9, "failedTests": 0,
-                       "skippedTests": 0, "totalTestCount": 9, "testFailures": []}
+        self.passed = {"result": "Passed", "passedTests": 11, "failedTests": 0,
+                       "skippedTests": 0, "totalTestCount": 11, "testFailures": []}
 
     def test_recorded_pre_test_runner_crash_is_retryable(self):
         self.assertEqual(SIMULATOR.classify(65, self.startup, "Testing started\n"), "runner-startup")
@@ -108,7 +108,7 @@ class SimulatorVerdictTests(unittest.TestCase):
     def test_success_requires_exit_code_and_complete_results(self):
         self.assertEqual(SIMULATOR.classify(0, self.passed, ""), "passed")
         self.assertNotEqual(SIMULATOR.classify(65, self.passed, ""), "passed")
-        for summary in [{}, {**self.passed, "passedTests": 0}, {**self.passed, "skippedTests": 1},
+        for summary in [{}, {**self.passed, "passedTests": 0}, {**self.passed, "passedTests": 10}, {**self.passed, "skippedTests": 1},
                         {**self.passed, "failedTests": 1}, {**self.passed, "result": "Failed"}]:
             self.assertNotEqual(SIMULATOR.classify(0, summary, ""), "passed")
 

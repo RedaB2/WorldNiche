@@ -150,12 +150,12 @@ struct IntroView: View {
         ScrollView {
             VStack(spacing: 28) {
                 VStack(spacing: 12) {
+                    discoverySection(.overview, title: "Meet a country", symbol: "globe")
+                    discoverySection(.history, title: "A detail from its past", symbol: "book.pages")
                     discoverySection(.music, title: "A song to bring home", symbol: "music.note")
-                    discoverySection(.news, title: "A new point of view", symbol: "newspaper")
-                    discoverySection(.culture, title: "Something only locals know", symbol: "sparkle.magnifyingglass")
                 }
                 introduction(title: "Get to know\nthe little things.",
-                             detail: "Hear what’s playing, catch up on local news, and discover the details that make a place its own.", index: 1)
+                             detail: "Start with a quick introduction, discover a piece of history, then hear what’s playing.", index: 1)
             }
             .padding(.top, 24)
             .padding(.horizontal, 28)
@@ -258,8 +258,8 @@ struct IntroView: View {
                     Divider().overlay(Palette.line)
                     switch category {
                     case .music: musicPreview
-                    case .news: newsPreview
-                    case .culture: culturePreview
+                    case .overview: overviewPreview
+                    case .history: historyPreview
                     }
                 }
                 .padding(.horizontal, 16)
@@ -276,7 +276,8 @@ struct IntroView: View {
 
     @ViewBuilder
     private var musicPreview: some View {
-        previewHeading("Top five in the United States", source: "Apple Music chart")
+        let provider = previews.tracks.first?.provider
+        previewHeading("On repeat in the United States", source: provider?.rawValue ?? "Music chart")
         if previews.musicLoading {
             ProgressView("Finding what’s playing…").font(.subheadline)
         } else if previews.musicUnavailable {
@@ -300,12 +301,20 @@ struct IntroView: View {
                     VStack(alignment: .leading, spacing: 3) {
                         Text(track.title).font(.subheadline.weight(.medium))
                         Text(track.artist).font(.caption).foregroundStyle(Palette.muted)
+                        if let sample = track.radioSample {
+                            Text(sample).font(.caption2).foregroundStyle(Palette.muted)
+                        }
                     }
                     .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 0)
                 }
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("introTrack\(index)")
+            }
+            if provider == .tuneping {
+                Text(MusicChartProvider.tuneping.chartDescription).font(.caption).foregroundStyle(Palette.muted)
+                Link("Data by Tuneping", destination: URL(string: "https://tuneping.com")!)
+                    .font(.caption.weight(.medium))
             }
             if let fetchedAt = previews.musicFetchedAt, !previews.tracks.isEmpty {
                 Text("Updated \(fetchedAt.formatted(date: .abbreviated, time: .shortened))")
@@ -315,53 +324,25 @@ struct IntroView: View {
     }
 
     @ViewBuilder
-    private var newsPreview: some View {
-        previewHeading("A view of the United States", source: "Local perspectives · Global Voices")
-        if previews.newsLoading {
-            ProgressView("Finding the latest stories…").font(.subheadline)
-        } else if previews.newsUnavailable {
-            previewRetry("The headlines couldn’t load. You can try again in a moment.", id: "introNewsRetry", action: previews.retryNews)
-        } else {
-            ForEach(Array(previews.stories.enumerated()), id: \.element.id) { index, story in
-                Link(destination: story.url) {
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(story.title).font(.subheadline.weight(.medium))
-                            .fixedSize(horizontal: false, vertical: true)
-                        Text(story.source).font(.caption).foregroundStyle(Palette.muted)
-                        if let author = story.author {
-                            Text("By \(author)").font(.caption).foregroundStyle(Palette.muted)
-                        }
-                        if let date = story.publishedAt {
-                            Text(date.formatted(date: .abbreviated, time: .omitted)).font(.caption2).foregroundStyle(Palette.muted)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 5)
-                }
-                .accessibilityIdentifier("introStory\(index)")
-            }
-            if let fetchedAt = previews.newsFetchedAt, !previews.stories.isEmpty {
-                Link("Headlines: CC BY 3.0", destination: URL(string: "https://creativecommons.org/licenses/by/3.0/")!)
-                    .font(.caption2)
-                Text("Updated \(fetchedAt.formatted(date: .abbreviated, time: .shortened))")
-                    .font(.caption2).foregroundStyle(Palette.muted)
-            }
+    private var overviewPreview: some View {
+        if let country = CountryRepository.country(id: "US") {
+            previewHeading(country.name, source: "At a glance")
+            Text(country.overview).font(.subheadline)
+                .foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true)
+            Link(country.overviewSourceName, destination: country.overviewSourceURL)
+                .font(.caption.weight(.medium))
         }
     }
 
     @ViewBuilder
-    private var culturePreview: some View {
-        if let insight = CountryRepository.insightsByCountry["US"]?.first {
-            previewHeading("A little more local", source: "United States")
-            Text(insight.title).font(.headline)
-            Text(insight.body).font(.subheadline)
-                .foregroundStyle(Palette.muted)
-                .fixedSize(horizontal: false, vertical: true)
-            Link(insight.sourceName, destination: insight.sourceURL)
-                .font(.caption.weight(.medium))
+    private var historyPreview: some View {
+        if let fact = CountryRepository.country(id: "US")?.historicalFact {
+            previewHeading(fact.title, source: "United States")
+            Text(fact.body).font(.subheadline)
+                .foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true)
+            Link(fact.sourceName, destination: fact.sourceURL).font(.caption.weight(.medium))
         } else {
-            Text("Every place has its own everyday rituals. Discover one when you start exploring.")
-                .font(.subheadline).foregroundStyle(Palette.muted)
+            Text("A historical fact is unavailable for this country.").font(.subheadline)
         }
     }
 
@@ -385,16 +366,16 @@ struct IntroView: View {
     private func buttonID(_ category: IntroPreviewCategory) -> String {
         switch category {
         case .music: "introMusicPreview"
-        case .news: "introNewsPreview"
-        case .culture: "introCulturePreview"
+        case .overview: "introOverviewPreview"
+        case .history: "introHistoryPreview"
         }
     }
 
     private func contentID(_ category: IntroPreviewCategory) -> String {
         switch category {
         case .music: "introMusicContent"
-        case .news: "introNewsContent"
-        case .culture: "introCultureContent"
+        case .overview: "introOverviewContent"
+        case .history: "introHistoryContent"
         }
     }
 

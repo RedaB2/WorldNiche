@@ -2,8 +2,7 @@ import SwiftUI
 
 struct CompanionView: View {
     let country: Country
-    let feed: CountryFeed?
-    var reading: CultureReading? = nil
+    let music: FeedSnapshot<MusicTrack>?
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -85,7 +84,7 @@ struct CompanionView: View {
         .tint(pine)
         .foregroundStyle(pine)
         .presentationDragIndicator(.visible)
-        .task(id: contextID) {
+        .task(id: country.id) {
             question = ""
             companion.reset()
         }
@@ -119,8 +118,8 @@ struct CompanionView: View {
     }
 
     private var introductionDetail: String {
-        if companion.availability.isAvailable, let reading {
-            return "Ask about “\(reading.title)” and the music or headlines loaded here."
+        if companion.availability.isAvailable, let fact = country.historicalFact {
+            return "Ask about “\(fact.title)” or the music chart for \(country.name)."
         }
         return companion.availability.detail
     }
@@ -154,14 +153,11 @@ struct CompanionView: View {
 
     private var suggestedQuestions: [String] {
         var result: [String] = []
-        if let reading {
-            result.append("What does “\(reading.title)” mean in this excerpt?")
-            result.append("How could I bring this up in a conversation?")
-        } else if let insight = country.insights.first {
-            result.append("Tell me more about “\(insight.title)”.")
+        if let fact = country.historicalFact {
+            result.append("What can we learn from “\(fact.title)”?")
             result.append("How could I bring this up in a conversation?")
         }
-        if feed?.tracks.isEmpty == false {
+        if music?.items.isEmpty == false {
             result.append("What does this chart tell us about \(country.name)’s music?")
         } else if result.isEmpty {
             result.append("What can we learn from the sources here?")
@@ -272,51 +268,35 @@ struct CompanionView: View {
         .background(.ultraThinMaterial)
     }
 
-    @ViewBuilder
     private var sources: some View {
-        if !sourceLinks.isEmpty {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("GO TO THE SOURCE")
-                    .font(.caption2.weight(.semibold))
-                    .tracking(1.5)
-                    .foregroundStyle(pine.opacity(0.55))
-                ForEach(sourceLinks) { source in
-                    Link(destination: source.url) {
-                        HStack(alignment: .center, spacing: 12) {
-                            Image(systemName: source.symbol)
+        VStack(alignment: .leading, spacing: 14) {
+            Text("GO TO THE SOURCE")
+                .font(.caption2.weight(.semibold))
+                .tracking(1.5)
+                .foregroundStyle(pine.opacity(0.55))
+            ForEach(sourceLinks) { source in
+                Link(destination: source.url) {
+                    HStack(alignment: .center, spacing: 12) {
+                        Image(systemName: source.symbol)
+                            .font(.subheadline)
+                            .frame(width: 20)
+                            .foregroundStyle(clay)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(source.title)
                                 .font(.subheadline)
-                                .frame(width: 20)
-                                .foregroundStyle(clay)
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(source.title)
-                                    .font(.subheadline)
-                                    .lineLimit(2)
-                                Text(source.subtitle)
-                                    .font(.caption)
-                                    .foregroundStyle(pine.opacity(0.55))
-                            }
-                            Spacer(minLength: 2)
+                                .lineLimit(2)
+                            Text(source.subtitle)
+                                .font(.caption)
+                                .foregroundStyle(pine.opacity(0.55))
                         }
-                        .frame(minHeight: 44)
-                        .contentShape(Rectangle())
+                        Spacer(minLength: 2)
                     }
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
                 }
             }
-            .padding(.top, 2)
-        } else {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(feed == nil ? "Waiting for the source material" : "No source material loaded yet")
-                    .font(.system(.headline, design: .serif))
-                Text(feed == nil
-                     ? "Music and headlines are still loading. You can return to the country to check their progress."
-                     : "Return to the country and try loading its cultural reading, music, and headlines again.")
-                    .font(.footnote)
-                    .foregroundStyle(Palette.muted)
-            }
-            .padding(16)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Palette.card, in: RoundedRectangle(cornerRadius: 18))
         }
+        .padding(.top, 2)
     }
 
     private struct SourceLink: Identifiable {
@@ -328,31 +308,27 @@ struct CompanionView: View {
     }
 
     private var sourceLinks: [SourceLink] {
-        var links: [SourceLink] = []
-        if let reading {
-            let fetched = reading.fetchedAt.formatted(date: .abbreviated, time: .shortened)
-            links.append(SourceLink(title: reading.title, subtitle: "Wikipedia · Retrieved \(fetched)", symbol: "book.pages", url: reading.sourceURL))
-        } else if let insight = country.insights.first {
-            links.append(SourceLink(title: insight.title, subtitle: "Saved note · \(insight.sourceName)", symbol: "book.closed", url: insight.sourceURL))
+        var links = [SourceLink(title: "Country overview", subtitle: country.overviewSourceName,
+                                symbol: "globe", url: country.overviewSourceURL)]
+        if let fact = country.historicalFact {
+            links.append(SourceLink(title: fact.title, subtitle: fact.sourceName,
+                                    symbol: "book", url: fact.sourceURL))
         }
-        links += feed?.tracks.prefix(3).map {
-            SourceLink(title: $0.title, subtitle: $0.artist, symbol: "music.note", url: $0.url)
+        links += music?.items.prefix(5).map { track in
+            let destination = track.provider == .tuneping ? "MusicBrainz recording" : track.provider.rawValue
+            return SourceLink(title: track.title, subtitle: "\(track.artist) · \(destination)",
+                              symbol: "music.note", url: track.url)
         } ?? []
-        links += feed?.stories.prefix(3).map {
-            SourceLink(title: $0.title, subtitle: $0.source, symbol: "newspaper", url: $0.url)
-        } ?? []
+        if music?.items.first?.provider == .tuneping {
+            links.append(SourceLink(title: "Data by Tuneping", subtitle: "Radio chart",
+                                    symbol: "radio", url: URL(string: "https://tuneping.com")!))
+        }
         var seen = Set<String>()
         return links.filter { seen.insert($0.id).inserted }
     }
 
-    // A new displayed article starts a new conversation; answers about the
-    // previous topic must not silently become evidence for this one.
-    private var contextID: String {
-        "\(country.id)|\(reading?.sourceURL.absoluteString ?? "saved-note")"
-    }
-
     private func send(_ text: String) {
-        if companion.send(text, country: country, feed: feed, reading: reading) {
+        if companion.send(text, country: country, music: music) {
             question = ""
             composerFocused = false
         }

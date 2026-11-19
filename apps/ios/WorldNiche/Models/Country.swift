@@ -1,10 +1,15 @@
 import Foundation
 
-struct CultureInsight: Codable, Identifiable, Hashable, Sendable {
+struct HistoricalFact: Codable, Identifiable, Hashable, Sendable {
     let id: String
     let title: String
     let body: String
-    let conversationStarter: String
+    let sourceName: String
+    let sourceURL: URL
+}
+
+struct CountryOverview: Codable, Hashable, Sendable {
+    let text: String
     let sourceName: String
     let sourceURL: URL
 }
@@ -17,15 +22,18 @@ struct Country: Codable, Identifiable, Hashable, Sendable {
     let region: String
     let latitude: Double
     let longitude: Double
+    let introduction: CountryOverview?
+
+    var overview: String { introduction?.text ?? "\(name) is in \(region)." }
+    var overviewSourceName: String { introduction?.sourceName ?? "Country geography" }
+    var overviewSourceURL: URL { introduction?.sourceURL ?? URL(string: "https://github.com/mledoze/countries")! }
+    var historicalFact: HistoricalFact? { CountryRepository.historicalFacts[id] }
 
     var flag: String {
         String(String.UnicodeScalarView(id.uppercased().unicodeScalars.compactMap {
             UnicodeScalar(127397 + $0.value)
         }))
     }
-
-    /// Editorial coverage is deliberately separate from geographic coverage.
-    var insights: [CultureInsight] { CountryRepository.insightsByCountry[id, default: []] }
 }
 
 /// Geographic data is adapted from mledoze/countries, licensed ODbL 1.0.
@@ -38,7 +46,16 @@ enum CountryRepository {
         return result.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }()
 
-    static let insightsByCountry: [String: [CultureInsight]] = readResource("insights")
+    static let historicalFacts: [String: HistoricalFact] = {
+        guard let url = Bundle.main.url(forResource: "historical-facts", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let facts = try? JSONDecoder().decode([String: HistoricalFact].self, from: data) else { return [:] }
+        return facts.filter { code, fact in
+            fact.id.hasPrefix(code.lowercased() + "-") && !fact.title.isEmpty &&
+            !fact.body.isEmpty && !fact.sourceName.isEmpty &&
+            fact.sourceURL.scheme == "https" && fact.sourceURL.host != nil
+        }
+    }()
 
     static func country(id: String) -> Country? {
         countries.first { $0.id == id.uppercased() }

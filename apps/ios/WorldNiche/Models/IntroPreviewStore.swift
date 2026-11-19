@@ -2,7 +2,7 @@ import Foundation
 import Observation
 
 enum IntroPreviewCategory: String, CaseIterable, Sendable {
-    case music, news, culture
+    case overview, history, music
 }
 
 struct IntroAccordionState: Equatable, Sendable {
@@ -18,19 +18,13 @@ struct IntroAccordionState: Equatable, Sendable {
 final class IntroPreviewStore {
     private(set) var accordion = IntroAccordionState()
     private(set) var tracks: [MusicTrack] = []
-    private(set) var stories: [NewsStory] = []
     private(set) var musicLoading = false
-    private(set) var newsLoading = false
     private(set) var musicUnavailable = false
-    private(set) var newsUnavailable = false
     private(set) var musicFetchedAt: Date?
-    private(set) var newsFetchedAt: Date?
 
     private let feedService: DiscoveryFeedService
     private var musicTask: Task<Void, Never>?
-    private var newsTask: Task<Void, Never>?
     private var musicRequest = UUID()
-    private var newsRequest = UUID()
     private var fixtureMode: String?
     private var musicAttempts = 0
 
@@ -49,26 +43,16 @@ final class IntroPreviewStore {
 
     func toggle(_ category: IntroPreviewCategory) {
         accordion.toggle(category)
-        guard accordion.expanded == category else { return }
-        switch category {
-        case .music: loadMusic()
-        case .news: loadNews()
-        case .culture: break
-        }
+        if accordion.expanded == .music { loadMusic() }
     }
 
     func retryMusic() { loadMusic(forceRefresh: true) }
-    func retryNews() { loadNews(forceRefresh: true) }
 
     func cancelLoading() {
         musicRequest = UUID()
-        newsRequest = UUID()
         musicTask?.cancel()
-        newsTask?.cancel()
         musicTask = nil
-        newsTask = nil
         musicLoading = false
-        newsLoading = false
     }
 
     private func loadMusic(forceRefresh: Bool = false) {
@@ -91,25 +75,6 @@ final class IntroPreviewStore {
         }
     }
 
-    private func loadNews(forceRefresh: Bool = false) {
-        guard !newsLoading else { return }
-        guard forceRefresh || newsFetchedAt == nil || isExpired(newsFetchedAt) else { return }
-        newsLoading = true
-        newsUnavailable = false
-        let request = UUID()
-        newsRequest = request
-        newsTask = Task { [weak self] in
-            guard let self else { return }
-            let result = await newsSnapshot(forceRefresh: forceRefresh)
-            guard !Task.isCancelled, newsRequest == request else { return }
-            stories = Array(result.items.prefix(2))
-            newsFetchedAt = result.fetchedAt
-            newsUnavailable = stories.isEmpty
-            newsLoading = false
-            newsTask = nil
-        }
-    }
-
     private func isExpired(_ date: Date?) -> Bool {
         guard let date else { return true }
         return Date().timeIntervalSince(date) >= 15 * 60
@@ -127,16 +92,6 @@ final class IntroPreviewStore {
         return await feedService.fetchMusic(for: country, forceRefresh: forceRefresh)
     }
 
-    private func newsSnapshot(forceRefresh: Bool) async -> FeedSnapshot<NewsStory> {
-        #if DEBUG && targetEnvironment(simulator)
-        if fixtureMode != nil { return Self.newsFixture() }
-        #endif
-        guard let country = CountryRepository.country(id: "US") else {
-            return FeedSnapshot(items: [], fetchedAt: Date(), unavailable: "Unavailable")
-        }
-        return await feedService.fetchNews(for: country, forceRefresh: forceRefresh)
-    }
-
     #if DEBUG && targetEnvironment(simulator)
     private static func musicFixture(fails: Bool) -> FeedSnapshot<MusicTrack> {
         let titles = ["A Little Sunshine", "The Long Way Home", "Night Windows", "Good Company", "Open Roads"]
@@ -145,16 +100,6 @@ final class IntroPreviewStore {
                        artworkURL: nil, url: URL(string: "https://music.apple.com/us/browse")!)
         }
         return FeedSnapshot(items: items, fetchedAt: Date(), unavailable: fails ? "Unavailable" : nil)
-    }
-
-    private static func newsFixture() -> FeedSnapshot<NewsStory> {
-        let items = [
-            NewsStory(id: "intro-news-0", title: "A neighborhood festival brings a city together", source: "Preview News",
-                      url: URL(string: "https://globalvoices.org")!, publishedAt: Date()),
-            NewsStory(id: "intro-news-1", title: "Inside a community's favorite gathering place", source: "Preview News",
-                      url: URL(string: "https://globalvoices.org")!, publishedAt: Date())
-        ]
-        return FeedSnapshot(items: items, fetchedAt: Date(), unavailable: nil)
     }
     #endif
 }

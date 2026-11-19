@@ -28,7 +28,7 @@ Living in LA, it feels like everyone wants to be niche. Knowing about the world 
 | --- | --- |
 | iOS app | Swift 6, SwiftUI, SceneKit globe, native Sign in with Apple |
 | Accounts, friends & journals | Supabase Auth, PostgreSQL with row-level security, private Storage |
-| Music & culture | Apple Music charts, Global Voices news, Wikipedia and Wikimedia sources |
+| Music & culture | Sourced country overviews and historical facts, Apple Music charts and Tuneping radio charts |
 | AI | Apple Foundation Models on-device; OpenAI for backend profile moderation |
 | Website | HTML, CSS and JavaScript, hosted on Vercel with automatic deployments from `main` |
 | Checks | GitHub Actions, Swift/XCTest, Node tests and isolated PostgreSQL tests |

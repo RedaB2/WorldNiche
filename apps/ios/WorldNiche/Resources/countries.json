@@ -5,7 +5,12 @@
     "capital": "Kabul",
     "region": "Southern Asia",
     "latitude": 33,
-    "longitude": 65
+    "longitude": 65,
+    "introduction": {
+      "text": "Afghanistan is a landlocked country in Asia between Iran and Pakistan. Mountain ranges cover much of it, giving way to plains in the north and southwest.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/af.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "AL",
@@ -13,7 +18,12 @@
     "capital": "Tirana",
     "region": "Southeast Europe",
     "latitude": 41,
-    "longitude": 20
+    "longitude": 20,
+    "introduction": {
+      "text": "Albania lies on the coast of southeastern Europe, just north of Greece. The Adriatic and Ionian seas meet its western shore, with mountains inland.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/al.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "DZ",
@@ -21,7 +31,12 @@
     "capital": "Algiers",
     "region": "Northern Africa",
     "latitude": 28,
-    "longitude": 3
+    "longitude": 3,
+    "introduction": {
+      "text": "Algeria stretches from the Mediterranean coast of North Africa deep into the Sahara. The Atlas Mountains rise in the north, and another range, the Hoggar, rises from the southern desert.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ag.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "AD",
@@ -29,7 +44,12 @@
     "capital": "Andorra la Vella",
     "region": "Southern Europe",
     "latitude": 42.5,
-    "longitude": 1.5
+    "longitude": 1.5,
+    "introduction": {
+      "text": "Andorra is a small country high in the Pyrenees between France and Spain. Its towns sit in narrow valleys between mountain ridges.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/an.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "AO",
@@ -37,7 +57,12 @@
     "capital": "Luanda",
     "region": "Middle Africa",
     "latitude": -12.5,
-    "longitude": 18.5
+    "longitude": 18.5,
+    "introduction": {
+      "text": "Angola faces the Atlantic on the southwest coast of Africa. From the shore, the land rises steeply to a broad inland plateau.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ao.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "AG",
@@ -45,7 +70,12 @@
     "capital": "Saint John's",
     "region": "Caribbean",
     "latitude": 17.05,
-    "longitude": -61.8
+    "longitude": -61.8,
+    "introduction": {
+      "text": "Antigua and Barbuda is a Caribbean country built around two islands of the same names. The Atlantic lies to their east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ac.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "AR",
@@ -53,7 +83,12 @@
     "capital": "Buenos Aires",
     "region": "South America",
     "latitude": -34,
-    "longitude": -64
+    "longitude": -64,
+    "introduction": {
+      "text": "Argentina runs down the eastern side of the Andes in South America. Its landscapes include the grassy Pampas and the great plateau of Patagonia.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ar.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "AM",
@@ -61,7 +96,12 @@
     "capital": "Yerevan",
     "region": "Western Asia",
     "latitude": 40,
-    "longitude": 45
+    "longitude": 45,
+    "introduction": {
+      "text": "Armenia is a landlocked country in the Caucasus, where Europe and Asia meet. Mountain rivers flow down to the fertile valley of the Aras.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/am.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "AU",
@@ -69,7 +109,12 @@
     "capital": "Canberra",
     "region": "Australia and New Zealand",
     "latitude": -27,
-    "longitude": 133
+    "longitude": 133,
+    "introduction": {
+      "text": "Australia occupies a continent between the Indian and Pacific oceans. Much of its interior is dry, while fertile plains stretch across parts of the southeast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/as.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "AT",
@@ -77,7 +122,12 @@
     "capital": "Vienna",
     "region": "Central Europe",
     "latitude": 47.33333333,
-    "longitude": 13.33333333
+    "longitude": 13.33333333,
+    "introduction": {
+      "text": "Austria is a landlocked country in central Europe, north of Italy. The Alps fill much of its west and south before giving way to gentler country in the east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/au.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "AZ",
@@ -85,7 +135,12 @@
     "capital": "Baku",
     "region": "Western Asia",
     "latitude": 40.5,
-    "longitude": 47.5
+    "longitude": 47.5,
+    "introduction": {
+      "text": "Azerbaijan sits on the western shore of the Caspian Sea, between Russia and Iran. Its capital, Baku, is on a peninsula that juts out into the water.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/aj.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BS",
@@ -93,7 +148,12 @@
     "capital": "Nassau",
     "region": "Caribbean",
     "latitude": 24.25,
-    "longitude": -76
+    "longitude": -76,
+    "introduction": {
+      "text": "The Bahamas are a chain of low islands in the Atlantic, southeast of Florida and northeast of Cuba. Many of the islands are formed from coral limestone.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bf.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BH",
@@ -101,7 +161,12 @@
     "capital": "Manama",
     "region": "Western Asia",
     "latitude": 26,
-    "longitude": 50.55
+    "longitude": 50.55,
+    "introduction": {
+      "text": "Bahrain is a group of low islands in the Persian Gulf, just east of Saudi Arabia. Much of the main island is a desert plain.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ba.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BD",
@@ -109,7 +174,12 @@
     "capital": "Dhaka",
     "region": "Southern Asia",
     "latitude": 24,
-    "longitude": 90
+    "longitude": 90,
+    "introduction": {
+      "text": "Bangladesh sits at the top of the Bay of Bengal in South Asia. Rivers have laid down much of its flat land, while hills rise in the southeast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bg.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BB",
@@ -117,7 +187,12 @@
     "capital": "Bridgetown",
     "region": "Caribbean",
     "latitude": 13.16666666,
-    "longitude": -59.53333333
+    "longitude": -59.53333333,
+    "introduction": {
+      "text": "Barbados is a Caribbean island that sits out in the Atlantic, northeast of Venezuela. Its low coastal land rises gently toward hills in the centre.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bb.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BY",
@@ -125,7 +200,12 @@
     "capital": "Minsk",
     "region": "Eastern Europe",
     "latitude": 53,
-    "longitude": 28
+    "longitude": 28,
+    "introduction": {
+      "text": "Belarus is a landlocked country in eastern Europe, east of Poland. Much of the landscape is flat, with extensive marshland.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bo.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BE",
@@ -133,7 +213,12 @@
     "capital": "Brussels",
     "region": "Western Europe",
     "latitude": 50.83333333,
-    "longitude": 4
+    "longitude": 4,
+    "introduction": {
+      "text": "Belgium sits on the North Sea between France and the Netherlands. Flat land near the coast gives way to rolling hills and the wooded Ardennes in the southeast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/be.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BZ",
@@ -141,7 +226,12 @@
     "capital": "Belmopan",
     "region": "Central America",
     "latitude": 17.25,
-    "longitude": -88.75
+    "longitude": -88.75,
+    "introduction": {
+      "text": "Belize is on the Caribbean side of Central America, south of Mexico and next to Guatemala. A low coastal plain rises into mountains in the south.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bh.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BJ",
@@ -149,7 +239,12 @@
     "capital": "Porto-Novo",
     "region": "Western Africa",
     "latitude": 9.5,
-    "longitude": 2.25
+    "longitude": 2.25,
+    "introduction": {
+      "text": "Benin reaches from a narrow stretch of Atlantic coast into the interior of West Africa. Togo is on one side and Nigeria on the other.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bn.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BT",
@@ -157,7 +252,12 @@
     "capital": "Thimphu",
     "region": "Southern Asia",
     "latitude": 27.5,
-    "longitude": 90.5
+    "longitude": 90.5,
+    "introduction": {
+      "text": "Bhutan sits high in the Himalayas between India and China. Fertile valleys break up the mountain ranges.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bt.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BO",
@@ -165,7 +265,12 @@
     "capital": "Sucre",
     "region": "South America",
     "latitude": -17,
-    "longitude": -65
+    "longitude": -65,
+    "introduction": {
+      "text": "Bolivia is landlocked near the centre of South America. The Andes rise around a high plateau, while lower plains extend toward the Amazon basin.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bl.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BA",
@@ -173,7 +278,12 @@
     "capital": "Sarajevo",
     "region": "Southeast Europe",
     "latitude": 44,
-    "longitude": 18
+    "longitude": 18,
+    "introduction": {
+      "text": "Bosnia and Herzegovina is a mountainous country in southeastern Europe. It has a short stretch of coast on the Adriatic Sea.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bk.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BW",
@@ -181,7 +291,12 @@
     "capital": "Gaborone",
     "region": "Southern Africa",
     "latitude": -22,
-    "longitude": 24
+    "longitude": 24,
+    "introduction": {
+      "text": "Botswana is a landlocked country in southern Africa. Much of it is open, gently rolling land, with the Kalahari Desert stretching across the southwest.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bc.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BR",
@@ -189,7 +304,12 @@
     "capital": "Brasília",
     "region": "South America",
     "latitude": -10,
-    "longitude": -55
+    "longitude": -55,
+    "introduction": {
+      "text": "Brazil stretches from the Amazon basin in northern South America to a long Atlantic coast. Its capital is Brasília, inland from the coast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/br.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BN",
@@ -197,7 +317,12 @@
     "capital": "Bandar Seri Begawan",
     "region": "South-Eastern Asia",
     "latitude": 4.5,
-    "longitude": 114.66666666
+    "longitude": 114.66666666,
+    "introduction": {
+      "text": "Brunei sits on the north coast of Borneo in Southeast Asia. It shares the island with Malaysia and Indonesia and faces the South China Sea.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bx.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BG",
@@ -205,7 +330,12 @@
     "capital": "Sofia",
     "region": "Southeast Europe",
     "latitude": 43,
-    "longitude": 25
+    "longitude": 25,
+    "introduction": {
+      "text": "Bulgaria is in southeastern Europe, with Romania to its north and the Black Sea to its east. Mountain ranges rise between stretches of lowland.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bu.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BF",
@@ -213,7 +343,12 @@
     "capital": "Ouagadougou",
     "region": "Western Africa",
     "latitude": 13,
-    "longitude": -2
+    "longitude": -2,
+    "introduction": {
+      "text": "Burkina Faso is a landlocked country in West Africa, just north of Ghana. Its south has grassy savanna and a short rainy season.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/uv.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "BI",
@@ -221,7 +356,12 @@
     "capital": "Gitega",
     "region": "Eastern Africa",
     "latitude": -3.5,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "Burundi is a small country in the hills of east-central Africa, between Tanzania and the Democratic Republic of the Congo. Lake Tanganyika runs along its southwest.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/by.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "KH",
@@ -229,7 +369,12 @@
     "capital": "Phnom Penh",
     "region": "South-Eastern Asia",
     "latitude": 13,
-    "longitude": 105
+    "longitude": 105,
+    "introduction": {
+      "text": "Cambodia lies in Southeast Asia between Thailand, Laos and Vietnam. Wide lowland plains open toward the Gulf of Thailand.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cb.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CM",
@@ -237,7 +382,12 @@
     "capital": "Yaoundé",
     "region": "Middle Africa",
     "latitude": 6,
-    "longitude": 12
+    "longitude": 12,
+    "introduction": {
+      "text": "Cameroon sits on the Atlantic coast of central Africa, beside Nigeria. The land changes from low coastal plains to mountains in the west and open plains in the north.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cm.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CA",
@@ -245,7 +395,12 @@
     "capital": "Ottawa",
     "region": "North America",
     "latitude": 60,
-    "longitude": -95
+    "longitude": -95,
+    "introduction": {
+      "text": "Canada stretches across northern North America from the Pacific to the Atlantic. The Arctic Ocean borders it to the north, and mountains rise in the west.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ca.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CV",
@@ -253,7 +408,12 @@
     "capital": "Praia",
     "region": "Western Africa",
     "latitude": 16,
-    "longitude": -24
+    "longitude": -24,
+    "introduction": {
+      "text": "Cape Verde is an island country in the Atlantic off the coast of West Africa. Volcanoes gave its islands their steep, rocky slopes.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cv.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CF",
@@ -261,7 +421,12 @@
     "capital": "Bangui",
     "region": "Middle Africa",
     "latitude": 7,
-    "longitude": 21
+    "longitude": 21,
+    "introduction": {
+      "text": "The Central African Republic is a landlocked country near the middle of Africa. Most of it lies on a broad plateau north of the Democratic Republic of the Congo.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ct.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TD",
@@ -269,7 +434,12 @@
     "capital": "N'Djamena",
     "region": "Middle Africa",
     "latitude": 15,
-    "longitude": 19
+    "longitude": 19,
+    "introduction": {
+      "text": "Chad is a landlocked country south of Libya. Northern Chad reaches into the Sahara, while open plains and lowlands stretch across the centre and south.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cd.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CL",
@@ -277,7 +447,12 @@
     "capital": "Santiago",
     "region": "South America",
     "latitude": -30,
-    "longitude": -71
+    "longitude": -71,
+    "introduction": {
+      "text": "Chile is a long, narrow country on the Pacific coast of South America. The Andes rise along its eastern side, beside Argentina.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ci.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CN",
@@ -285,7 +460,12 @@
     "capital": "Beijing",
     "region": "Eastern Asia",
     "latitude": 35,
-    "longitude": 105
+    "longitude": 105,
+    "introduction": {
+      "text": "China stretches from high mountains and inland deserts across East Asia to the Pacific coast. Its eastern plains include broad river deltas.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ch.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CO",
@@ -293,7 +473,12 @@
     "capital": "Bogotá",
     "region": "South America",
     "latitude": 4,
-    "longitude": -72
+    "longitude": -72,
+    "introduction": {
+      "text": "Colombia sits at the northern end of South America, where the continent meets Panama. It has coastlines on both the Caribbean Sea and the Pacific Ocean.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/co.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "KM",
@@ -301,7 +486,12 @@
     "capital": "Moroni",
     "region": "Eastern Africa",
     "latitude": -12.16666666,
-    "longitude": 44.25
+    "longitude": 44.25,
+    "introduction": {
+      "text": "Comoros is a group of volcanic islands between Madagascar and the African mainland. The islands sit at the northern entrance to the Mozambique Channel.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cn.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CG",
@@ -309,7 +499,12 @@
     "capital": "Brazzaville",
     "region": "Middle Africa",
     "latitude": -1,
-    "longitude": 15
+    "longitude": 15,
+    "introduction": {
+      "text": "The Republic of the Congo is a central African country with a short Atlantic coast. Its capital, Brazzaville, sits on the Congo River across from Kinshasa in the neighbouring Democratic Republic of the Congo.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cf.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CR",
@@ -317,7 +512,12 @@
     "capital": "San José",
     "region": "Central America",
     "latitude": 10,
-    "longitude": -84
+    "longitude": -84,
+    "introduction": {
+      "text": "Costa Rica sits between Nicaragua and Panama in Central America. Volcanic mountains rise between its Caribbean and Pacific coasts.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cs.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "HR",
@@ -325,7 +525,12 @@
     "capital": "Zagreb",
     "region": "Southeast Europe",
     "latitude": 45.16666666,
-    "longitude": 15.5
+    "longitude": 15.5,
+    "introduction": {
+      "text": "Croatia curves along the Adriatic coast of southeastern Europe. Islands line its shore, while flatter plains stretch inland toward Hungary.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/hr.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CU",
@@ -333,7 +538,12 @@
     "capital": "Havana",
     "region": "Caribbean",
     "latitude": 21.5,
-    "longitude": -80
+    "longitude": -80,
+    "introduction": {
+      "text": "Cuba lies south of Florida, between the Atlantic Ocean and the Caribbean Sea. Much of the island is open plain, with mountains rising in the southeast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cu.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CY",
@@ -341,7 +551,12 @@
     "capital": "Nicosia",
     "region": "Southern Europe",
     "latitude": 35,
-    "longitude": 33
+    "longitude": 33,
+    "introduction": {
+      "text": "Cyprus is an island in the eastern Mediterranean, south of Türkiye. Mountain ranges rise on either side of its central plain.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cy.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CZ",
@@ -349,7 +564,12 @@
     "capital": "Prague",
     "region": "Central Europe",
     "latitude": 49.75,
-    "longitude": 15.5
+    "longitude": 15.5,
+    "introduction": {
+      "text": "Czechia is a landlocked country in central Europe between Germany, Poland, Slovakia and Austria. Bohemia lies in its west and Moravia in its east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ez.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CD",
@@ -357,7 +577,12 @@
     "capital": "Kinshasa",
     "region": "Middle Africa",
     "latitude": 0,
-    "longitude": 25
+    "longitude": 25,
+    "introduction": {
+      "text": "The Democratic Republic of the Congo is a large country in central Africa. A low basin fills much of its centre, and mountains rise along its eastern edge.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cg.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "DK",
@@ -365,7 +590,12 @@
     "capital": "Copenhagen",
     "region": "Northern Europe",
     "latitude": 56,
-    "longitude": 10
+    "longitude": 10,
+    "introduction": {
+      "text": "Denmark’s European mainland extends north from Germany, between the North Sea and the Baltic. Many of its towns also lie on islands, including Copenhagen on Zealand.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/da.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "DJ",
@@ -373,7 +603,12 @@
     "capital": "Djibouti",
     "region": "Eastern Africa",
     "latitude": 11.5,
-    "longitude": 43
+    "longitude": 43,
+    "introduction": {
+      "text": "Djibouti is on the northeastern coast of Africa where the Red Sea meets the Gulf of Aden. Mountains separate its coastal plain from the inland plateau.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/dj.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "DM",
@@ -381,7 +616,12 @@
     "capital": "Roseau",
     "region": "Caribbean",
     "latitude": 15.41666666,
-    "longitude": -61.33333333
+    "longitude": -61.33333333,
+    "introduction": {
+      "text": "Dominica is a mountainous island in the eastern Caribbean. Its rugged interior was shaped by volcanoes.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/do.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "DO",
@@ -389,7 +629,12 @@
     "capital": "Santo Domingo",
     "region": "Caribbean",
     "latitude": 19,
-    "longitude": -70.66666666
+    "longitude": -70.66666666,
+    "introduction": {
+      "text": "The Dominican Republic occupies the eastern part of Hispaniola, a Caribbean island it shares with Haiti. Fertile valleys lie between its high mountain ranges.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/dr.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "EC",
@@ -397,7 +642,12 @@
     "capital": "Quito",
     "region": "South America",
     "latitude": -2,
-    "longitude": -77.5
+    "longitude": -77.5,
+    "introduction": {
+      "text": "Ecuador sits on the equator along South America’s Pacific coast. From west to east, the land changes from coastal plains to Andean highlands and then rainforest.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ec.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "EG",
@@ -405,7 +655,12 @@
     "capital": "Cairo",
     "region": "Northern Africa",
     "latitude": 27,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "Egypt sits in northeastern Africa, with the Sinai Peninsula extending into Asia. The Nile runs through the desert and fans out into a delta before reaching the Mediterranean.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/eg.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SV",
@@ -413,15 +668,25 @@
     "capital": "San Salvador",
     "region": "Central America",
     "latitude": 13.83333333,
-    "longitude": -88.91666666
+    "longitude": -88.91666666,
+    "introduction": {
+      "text": "El Salvador faces the Pacific in Central America, between Guatemala and Honduras. A narrow strip of coastal land rises toward mountains in the interior.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/es.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GQ",
     "name": "Equatorial Guinea",
-    "capital": "Malabo",
+    "capital": "Ciudad de la Paz",
     "region": "Middle Africa",
     "latitude": 2,
-    "longitude": 10
+    "longitude": 10,
+    "introduction": {
+      "text": "Equatorial Guinea has a mainland region between Cameroon and Gabon on Africa’s west coast. Its territory also includes volcanic islands in the Atlantic.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ek.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "ER",
@@ -429,7 +694,12 @@
     "capital": "Asmara",
     "region": "Eastern Africa",
     "latitude": 15,
-    "longitude": 39
+    "longitude": 39,
+    "introduction": {
+      "text": "Eritrea stretches along the Red Sea in eastern Africa, between Sudan and Djibouti. Its highlands descend eastward to a hot coastal plain.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/er.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "EE",
@@ -437,7 +707,12 @@
     "capital": "Tallinn",
     "region": "Northern Europe",
     "latitude": 59,
-    "longitude": 26
+    "longitude": 26,
+    "introduction": {
+      "text": "Estonia sits on the Baltic Sea in northern Europe, north of Latvia. The Gulf of Finland separates its northern coast from Finland.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/en.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SZ",
@@ -445,7 +720,12 @@
     "capital": "Lobamba",
     "region": "Southern Africa",
     "latitude": -26.5,
-    "longitude": 31.5
+    "longitude": 31.5,
+    "introduction": {
+      "text": "Eswatini is a small country in southern Africa between South Africa and Mozambique. Hills and mountains cover much of the country.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/wz.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "ET",
@@ -453,7 +733,12 @@
     "capital": "Addis Ababa",
     "region": "Eastern Africa",
     "latitude": 8,
-    "longitude": 38
+    "longitude": 38,
+    "introduction": {
+      "text": "Ethiopia is a landlocked country in eastern Africa, west of Somalia. The Great Rift Valley cuts through its high mountain plateau.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/et.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "FJ",
@@ -461,7 +746,12 @@
     "capital": "Suva",
     "region": "Melanesia",
     "latitude": -18,
-    "longitude": 175
+    "longitude": 175,
+    "introduction": {
+      "text": "Fiji is an island country in the South Pacific, north of New Zealand. Volcanoes formed many of its mountainous islands.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/fj.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "FI",
@@ -469,7 +759,12 @@
     "capital": "Helsinki",
     "region": "Northern Europe",
     "latitude": 64,
-    "longitude": 26
+    "longitude": 26,
+    "introduction": {
+      "text": "Finland is in northern Europe between Sweden and Russia. Its low hills are dotted with lakes, and its coast meets the Baltic Sea.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/fi.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "FR",
@@ -477,7 +772,12 @@
     "capital": "Paris",
     "region": "Western Europe",
     "latitude": 46,
-    "longitude": 2
+    "longitude": 2,
+    "introduction": {
+      "text": "Mainland France stretches from the English Channel to the Mediterranean in western Europe. France also includes places overseas, such as French Guiana in South America.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/fr.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GA",
@@ -485,7 +785,12 @@
     "capital": "Libreville",
     "region": "Middle Africa",
     "latitude": -1,
-    "longitude": 11.75
+    "longitude": 11.75,
+    "introduction": {
+      "text": "Gabon sits on Africa’s Atlantic coast where the equator crosses the continent. Behind its narrow coastal plain are hills and stretches of savanna.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gb.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GM",
@@ -493,7 +798,12 @@
     "capital": "Banjul",
     "region": "Western Africa",
     "latitude": 13.46666666,
-    "longitude": -16.56666666
+    "longitude": -16.56666666,
+    "introduction": {
+      "text": "The Gambia follows the Gambia River through West Africa to the Atlantic Ocean. Senegal borders the country on its landward sides.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ga.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GE",
@@ -501,7 +811,12 @@
     "capital": "Tbilisi",
     "region": "Western Asia",
     "latitude": 42,
-    "longitude": 43.5
+    "longitude": 43.5,
+    "introduction": {
+      "text": "Georgia lies in the Caucasus between Europe and Asia. High mountains rise to the north and south, while its western lowlands open onto the Black Sea.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gg.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "DE",
@@ -509,7 +824,12 @@
     "capital": "Berlin",
     "region": "Western Europe",
     "latitude": 51,
-    "longitude": 9
+    "longitude": 9,
+    "introduction": {
+      "text": "Germany is in central Europe. From north to south, its landscape runs from the Baltic and North Sea coasts to the Bavarian Alps.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gm.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GH",
@@ -517,7 +837,12 @@
     "capital": "Accra",
     "region": "Western Africa",
     "latitude": 8,
-    "longitude": -2
+    "longitude": -2,
+    "introduction": {
+      "text": "Ghana is a West African country on the Gulf of Guinea, an arm of the Atlantic. Côte d’Ivoire lies to its west and Togo to its east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gh.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GR",
@@ -525,7 +850,12 @@
     "capital": "Athens",
     "region": "Southern Europe",
     "latitude": 39,
-    "longitude": 22
+    "longitude": 22,
+    "introduction": {
+      "text": "Greece lies in southeastern Europe, where mountain ranges extend into the Mediterranean as peninsulas and chains of islands. Athens is its capital.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gr.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GD",
@@ -533,7 +863,12 @@
     "capital": "St. George's",
     "region": "Caribbean",
     "latitude": 12.11666666,
-    "longitude": -61.66666666
+    "longitude": -61.66666666,
+    "introduction": {
+      "text": "Grenada is an island country in the Caribbean north of Trinidad and Tobago. The main island has a mountainous centre formed by volcanoes.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gj.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GT",
@@ -541,7 +876,12 @@
     "capital": "Guatemala City",
     "region": "Central America",
     "latitude": 15.5,
-    "longitude": -90.25
+    "longitude": -90.25,
+    "introduction": {
+      "text": "Guatemala lies just south of Mexico in Central America. Mountain ranges separate its Pacific coast from the wide northern lowlands of Petén.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gt.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GN",
@@ -549,7 +889,12 @@
     "capital": "Conakry",
     "region": "Western Africa",
     "latitude": 11,
-    "longitude": -10
+    "longitude": -10,
+    "introduction": {
+      "text": "Guinea is on the Atlantic coast of West Africa, between Guinea-Bissau and Sierra Leone along the shore. The flat coastal land gives way to hills and mountains inland.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gv.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GW",
@@ -557,7 +902,12 @@
     "capital": "Bissau",
     "region": "Western Africa",
     "latitude": 12,
-    "longitude": -15
+    "longitude": -15,
+    "introduction": {
+      "text": "Guinea-Bissau is a West African country between Senegal and Guinea. Rivers cut deep into its Atlantic coastline, and the Bijagós Islands lie offshore.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pu.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GY",
@@ -565,7 +915,12 @@
     "capital": "Georgetown",
     "region": "South America",
     "latitude": 5,
-    "longitude": -59
+    "longitude": -59,
+    "introduction": {
+      "text": "Guyana faces the Atlantic on South America’s northern coast, between Venezuela and Suriname. Low coastal plains rise into rolling highlands inland.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gy.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "HT",
@@ -573,7 +928,12 @@
     "capital": "Port-au-Prince",
     "region": "Caribbean",
     "latitude": 19,
-    "longitude": -72.41666666
+    "longitude": -72.41666666,
+    "introduction": {
+      "text": "Haiti occupies the western part of Hispaniola, a mountainous Caribbean island. The Dominican Republic shares the island to its east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ha.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "HN",
@@ -581,7 +941,12 @@
     "capital": "Tegucigalpa",
     "region": "Central America",
     "latitude": 15,
-    "longitude": -86.5
+    "longitude": -86.5,
+    "introduction": {
+      "text": "Honduras is a Central American country between Guatemala and Nicaragua. It has a long Caribbean coastline and a smaller opening to the Pacific at the Gulf of Fonseca.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ho.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "HU",
@@ -589,7 +954,12 @@
     "capital": "Budapest",
     "region": "Central Europe",
     "latitude": 47,
-    "longitude": 20
+    "longitude": 20,
+    "introduction": {
+      "text": "Hungary is a landlocked country in central Europe. Broad plains cover much of the land, with hills and low mountains near the Slovak border.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/hu.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "IS",
@@ -597,7 +967,12 @@
     "capital": "Reykjavik",
     "region": "Northern Europe",
     "latitude": 65,
-    "longitude": -18
+    "longitude": -18,
+    "introduction": {
+      "text": "Iceland is an island in the North Atlantic, northwest of the United Kingdom. Its interior has mountains and ice fields, and deep bays cut into its coast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ic.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "IN",
@@ -605,7 +980,12 @@
     "capital": "New Delhi",
     "region": "Southern Asia",
     "latitude": 20,
-    "longitude": 77
+    "longitude": 77,
+    "introduction": {
+      "text": "India extends from the Himalayas in the north to the Indian Ocean in the south. The Arabian Sea lies to its west and the Bay of Bengal to its east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/in.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "ID",
@@ -613,7 +993,12 @@
     "capital": "Jakarta",
     "region": "South-Eastern Asia",
     "latitude": -5,
-    "longitude": 120
+    "longitude": 120,
+    "introduction": {
+      "text": "Indonesia is a chain of islands in Southeast Asia between the Indian and Pacific oceans. On many of the larger islands, mountains rise above the coastal lowlands.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/id.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "IR",
@@ -621,7 +1006,12 @@
     "capital": "Tehran",
     "region": "Southern Asia",
     "latitude": 32,
-    "longitude": 53
+    "longitude": 53,
+    "introduction": {
+      "text": "Iran lies between the Caspian Sea to the north and the Persian Gulf and Gulf of Oman to the south. Mountains surround much of its dry interior.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ir.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "IQ",
@@ -629,7 +1019,12 @@
     "capital": "Baghdad",
     "region": "Western Asia",
     "latitude": 33,
-    "longitude": 44
+    "longitude": 44,
+    "introduction": {
+      "text": "Iraq is in the Middle East, west of Iran. Much of it is broad plain, with reed marshes in the south and mountains near the borders with Iran and Türkiye.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/iz.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "IE",
@@ -637,7 +1032,12 @@
     "capital": "Dublin",
     "region": "Northern Europe",
     "latitude": 53,
-    "longitude": -8
+    "longitude": -8,
+    "introduction": {
+      "text": "Ireland occupies most of an island west of Great Britain in the North Atlantic. Low plains fill the interior, while sea cliffs rise along the western shore.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ei.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "IL",
@@ -645,7 +1045,12 @@
     "capital": "Jerusalem",
     "region": "Western Asia",
     "latitude": 31.47,
-    "longitude": 35.13
+    "longitude": 35.13,
+    "introduction": {
+      "text": "Israel lies on the eastern Mediterranean coast, south of Lebanon. Its landscape includes coastal plains, central hills and the Negev Desert in the south.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/is.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "IT",
@@ -653,7 +1058,12 @@
     "capital": "Rome",
     "region": "Southern Europe",
     "latitude": 42.83333333,
-    "longitude": 12.83333333
+    "longitude": 12.83333333,
+    "introduction": {
+      "text": "Italy’s boot-shaped peninsula extends from southern Europe into the Mediterranean. Mountain ranges run through much of the mainland.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/it.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CI",
@@ -661,7 +1071,12 @@
     "capital": "Yamoussoukro",
     "region": "Western Africa",
     "latitude": 8,
-    "longitude": -5
+    "longitude": -5,
+    "introduction": {
+      "text": "Côte d’Ivoire, also known as Ivory Coast, lies on West Africa’s Atlantic shore, west of Ghana. Most of its land is gently rolling plain, with mountains in the northwest.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/iv.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "JM",
@@ -669,7 +1084,12 @@
     "capital": "Kingston",
     "region": "Caribbean",
     "latitude": 18.25,
-    "longitude": -77.5
+    "longitude": -77.5,
+    "introduction": {
+      "text": "Jamaica is an island in the Caribbean Sea, south of Cuba. Mountains cover most of the interior and give way to narrow coastal plains.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/jm.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "JP",
@@ -677,7 +1097,12 @@
     "capital": "Tokyo",
     "region": "Eastern Asia",
     "latitude": 36,
-    "longitude": 138
+    "longitude": 138,
+    "introduction": {
+      "text": "Japan is a chain of mountainous islands off the east coast of Asia. Tokyo, the capital, is on Honshu, the largest island.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ja.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "JO",
@@ -685,7 +1110,12 @@
     "capital": "Amman",
     "region": "Western Asia",
     "latitude": 31,
-    "longitude": 36
+    "longitude": 36,
+    "introduction": {
+      "text": "Jordan is a Middle Eastern country northwest of Saudi Arabia. Along its western side, a deep valley holds the Jordan River and the Dead Sea.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/jo.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "KZ",
@@ -693,7 +1123,12 @@
     "capital": "Astana",
     "region": "Central Asia",
     "latitude": 48,
-    "longitude": 68
+    "longitude": 68,
+    "introduction": {
+      "text": "Kazakhstan stretches across a broad sweep of Central Asia. Open grasslands called steppe give way to the Altai Mountains in the east and desert in the south.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/kz.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "KE",
@@ -701,7 +1136,12 @@
     "capital": "Nairobi",
     "region": "Eastern Africa",
     "latitude": 1,
-    "longitude": 38
+    "longitude": 38,
+    "introduction": {
+      "text": "Kenya sits on the Indian Ocean in East Africa, between Somalia and Tanzania. Moving inland, the lowlands rise to high country cut by the Great Rift Valley.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ke.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "KI",
@@ -709,7 +1149,12 @@
     "capital": "South Tarawa",
     "region": "Micronesia",
     "latitude": 1.41666666,
-    "longitude": 173
+    "longitude": 173,
+    "introduction": {
+      "text": "Kiribati is a Pacific island country spread across the equator. Most of its islands are low rings of coral called atolls.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/kr.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "KW",
@@ -717,7 +1162,12 @@
     "capital": "Kuwait City",
     "region": "Western Asia",
     "latitude": 29.5,
-    "longitude": 45.75
+    "longitude": 45.75,
+    "introduction": {
+      "text": "Kuwait sits between Iraq and Saudi Arabia at the northern end of the Persian Gulf. The land inland from the coast is mostly flat desert.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ku.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "KG",
@@ -725,7 +1175,12 @@
     "capital": "Bishkek",
     "region": "Central Asia",
     "latitude": 41,
-    "longitude": 75
+    "longitude": 75,
+    "introduction": {
+      "text": "Kyrgyzstan is a landlocked country in Central Asia, west of China. The high peaks of the Tian Shan surround a network of valleys and basins.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/kg.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LA",
@@ -733,7 +1188,12 @@
     "capital": "Vientiane",
     "region": "South-Eastern Asia",
     "latitude": 18,
-    "longitude": 105
+    "longitude": 105,
+    "introduction": {
+      "text": "Laos is a landlocked country in Southeast Asia between Thailand and Vietnam. Most of its terrain is mountainous, broken up by plains and plateaus.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/la.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LV",
@@ -741,7 +1201,12 @@
     "capital": "Riga",
     "region": "Northern Europe",
     "latitude": 57,
-    "longitude": 25
+    "longitude": 25,
+    "introduction": {
+      "text": "Latvia lies between Estonia and Lithuania on the Baltic Sea. Much of this northern European country is low, level land.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/lg.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LB",
@@ -749,7 +1214,12 @@
     "capital": "Beirut",
     "region": "Western Asia",
     "latitude": 33.83333333,
-    "longitude": 35.83333333
+    "longitude": 35.83333333,
+    "introduction": {
+      "text": "Lebanon sits on the eastern shore of the Mediterranean. The Bekaa Valley runs between two mountain ranges inland from its narrow coast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/le.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LS",
@@ -757,7 +1227,12 @@
     "capital": "Maseru",
     "region": "Southern Africa",
     "latitude": -29.5,
-    "longitude": 28.5
+    "longitude": 28.5,
+    "introduction": {
+      "text": "Lesotho is a mountain country completely surrounded by South Africa. High plateaus and hills cover much of its land.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/lt.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LR",
@@ -765,7 +1240,12 @@
     "capital": "Monrovia",
     "region": "Western Africa",
     "latitude": 6.5,
-    "longitude": -9.5
+    "longitude": -9.5,
+    "introduction": {
+      "text": "Liberia is on West Africa’s Atlantic coast between Sierra Leone and Côte d’Ivoire. Lowlands by the shore rise toward a plateau and mountains in the northeast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/li.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LY",
@@ -773,7 +1253,12 @@
     "capital": "Tripoli",
     "region": "Northern Africa",
     "latitude": 25,
-    "longitude": 17
+    "longitude": 17,
+    "introduction": {
+      "text": "Libya lies on North Africa’s Mediterranean coast, west of Egypt. Much of its land extends south into the Sahara.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ly.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LI",
@@ -781,7 +1266,12 @@
     "capital": "Vaduz",
     "region": "Western Europe",
     "latitude": 47.26666666,
-    "longitude": 9.53333333
+    "longitude": 9.53333333,
+    "introduction": {
+      "text": "Liechtenstein is a small country between Switzerland and Austria. The Rhine Valley runs along its western side, and the Alps rise in the east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ls.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LT",
@@ -789,7 +1279,12 @@
     "capital": "Vilnius",
     "region": "Northern Europe",
     "latitude": 56,
-    "longitude": 24
+    "longitude": 24,
+    "introduction": {
+      "text": "Lithuania is on the Baltic Sea in northern Europe, south of Latvia. Its low-lying countryside is scattered with small lakes.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/lh.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LU",
@@ -797,7 +1292,12 @@
     "capital": "Luxembourg",
     "region": "Western Europe",
     "latitude": 49.75,
-    "longitude": 6.16666666
+    "longitude": 6.16666666,
+    "introduction": {
+      "text": "Luxembourg is a small landlocked country between Belgium, France and Germany. Its rolling uplands slope toward the Moselle River in the southeast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/lu.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MG",
@@ -805,7 +1305,12 @@
     "capital": "Antananarivo",
     "region": "Eastern Africa",
     "latitude": -20,
-    "longitude": 47
+    "longitude": 47,
+    "introduction": {
+      "text": "Madagascar is a large island off the east coast of Africa in the Indian Ocean. Mountains and a high plateau rise inland from the coastal plain.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ma.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MW",
@@ -813,7 +1318,12 @@
     "capital": "Lilongwe",
     "region": "Eastern Africa",
     "latitude": -13.5,
-    "longitude": 34
+    "longitude": 34,
+    "introduction": {
+      "text": "Malawi is a long, narrow country in southeastern Africa. Much of its eastern side follows Lake Malawi, while hills and highlands rise inland.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mi.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MY",
@@ -821,7 +1331,12 @@
     "capital": "Kuala Lumpur",
     "region": "South-Eastern Asia",
     "latitude": 2.5,
-    "longitude": 112.5
+    "longitude": 112.5,
+    "introduction": {
+      "text": "Malaysia has two parts separated by the South China Sea. One extends along a peninsula south of Thailand, and the other occupies part of the island of Borneo.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/my.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MV",
@@ -829,7 +1344,12 @@
     "capital": "Malé",
     "region": "Southern Asia",
     "latitude": 3.25,
-    "longitude": 73
+    "longitude": 73,
+    "introduction": {
+      "text": "The Maldives are a chain of low coral islands in the Indian Ocean, southwest of India. Many are grouped around lagoons in rings called atolls.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mv.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "ML",
@@ -837,7 +1357,12 @@
     "capital": "Bamako",
     "region": "Western Africa",
     "latitude": 17,
-    "longitude": -4
+    "longitude": -4,
+    "introduction": {
+      "text": "Mali is a landlocked country in West Africa. Its northern plains stretch into the Sahara, while southern Mali has grassy savanna.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ml.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MT",
@@ -845,7 +1370,12 @@
     "capital": "Valletta",
     "region": "Southern Europe",
     "latitude": 35.83333333,
-    "longitude": 14.58333333
+    "longitude": 14.58333333,
+    "introduction": {
+      "text": "Malta is a group of rocky Mediterranean islands south of Sicily. Cliffs line parts of the coast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mt.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MH",
@@ -853,7 +1383,12 @@
     "capital": "Majuro",
     "region": "Micronesia",
     "latitude": 9,
-    "longitude": 168
+    "longitude": 168,
+    "introduction": {
+      "text": "The Marshall Islands lie in the North Pacific, roughly halfway between Hawaii and Australia. Its two main chains are known as Ratak, or Sunrise, and Ralik, or Sunset.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/rm.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MR",
@@ -861,7 +1396,12 @@
     "capital": "Nouakchott",
     "region": "Western Africa",
     "latitude": 20,
-    "longitude": -12
+    "longitude": -12,
+    "introduction": {
+      "text": "Mauritania faces the Atlantic on the western edge of the Sahara. Much of its land is flat desert plain, with hills in the centre.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mr.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MU",
@@ -869,7 +1409,12 @@
     "capital": "Port Louis",
     "region": "Eastern Africa",
     "latitude": -20.28333333,
-    "longitude": 57.55
+    "longitude": 57.55,
+    "introduction": {
+      "text": "Mauritius is an island country in the Indian Ocean east of Madagascar. On its main island, mountains rise around a central plateau.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mp.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MX",
@@ -877,7 +1422,12 @@
     "capital": "Mexico City",
     "region": "North America",
     "latitude": 23,
-    "longitude": -102
+    "longitude": -102,
+    "introduction": {
+      "text": "Mexico lies in North America between the United States, Guatemala and Belize. Its long coasts reach the Pacific Ocean, the Gulf of Mexico and the Caribbean Sea.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mx.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "FM",
@@ -885,7 +1435,12 @@
     "capital": "Palikir",
     "region": "Micronesia",
     "latitude": 6.91666666,
-    "longitude": 158.25
+    "longitude": 158.25,
+    "introduction": {
+      "text": "The Federated States of Micronesia is a Pacific island country between Hawaii and Southeast Asia. Its islands range from mountainous volcanic land to low coral atolls.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/fm.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MD",
@@ -893,7 +1448,12 @@
     "capital": "Chișinău",
     "region": "Eastern Europe",
     "latitude": 47,
-    "longitude": 29
+    "longitude": 29,
+    "introduction": {
+      "text": "Moldova is a landlocked country in eastern Europe between Romania and Ukraine. Its gently rolling land slopes south toward the Black Sea.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/md.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MC",
@@ -901,7 +1461,12 @@
     "capital": "Monaco",
     "region": "Western Europe",
     "latitude": 43.73333333,
-    "longitude": 7.4
+    "longitude": 7.4,
+    "introduction": {
+      "text": "Monaco is a small country on the Mediterranean coast of southern France, close to Italy. Buildings climb its rocky hills above the sea.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mn.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MN",
@@ -909,7 +1474,12 @@
     "capital": "Ulan Bator",
     "region": "Eastern Asia",
     "latitude": 46,
-    "longitude": 105
+    "longitude": 105,
+    "introduction": {
+      "text": "Mongolia lies between Russia and China. Its open grasslands stretch toward the Gobi Desert in the south and mountain ranges in the west.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mg.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "ME",
@@ -917,7 +1487,12 @@
     "capital": "Podgorica",
     "region": "Southeast Europe",
     "latitude": 42.5,
-    "longitude": 19.3
+    "longitude": 19.3,
+    "introduction": {
+      "text": "Montenegro sits on the Adriatic coast of southeastern Europe. The narrow shore rises sharply into rocky mountains and high plateaus.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mj.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MA",
@@ -925,7 +1500,12 @@
     "capital": "Rabat",
     "region": "Northern Africa",
     "latitude": 32,
-    "longitude": -5
+    "longitude": -5,
+    "introduction": {
+      "text": "Morocco lies in the northwest corner of Africa, with the Atlantic Ocean on one side and the Mediterranean Sea on another. Inland, the Atlas Mountains rise above valleys and plains.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mo.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MZ",
@@ -933,7 +1513,12 @@
     "capital": "Maputo",
     "region": "Eastern Africa",
     "latitude": -18.25,
-    "longitude": 35
+    "longitude": 35,
+    "introduction": {
+      "text": "Mozambique stretches along Africa’s southeast coast, with Tanzania to the north and South Africa to the south. The Zambezi River crosses the country on its way to the Indian Ocean.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mz.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MM",
@@ -941,7 +1526,12 @@
     "capital": "Naypyidaw",
     "region": "South-Eastern Asia",
     "latitude": 22,
-    "longitude": 98
+    "longitude": 98,
+    "introduction": {
+      "text": "Myanmar is in Southeast Asia, between India and Thailand. The Irrawaddy River flows south through lowlands framed by mountains.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bm.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "NA",
@@ -949,15 +1539,25 @@
     "capital": "Windhoek",
     "region": "Southern Africa",
     "latitude": -22,
-    "longitude": 17
+    "longitude": 17,
+    "introduction": {
+      "text": "Namibia is on the Atlantic coast of southern Africa. The Namib Desert runs along the coast, and the Kalahari reaches into the country from the east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/wa.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "NR",
-    "name": "Nauru",
-    "capital": "Yaren",
+    "name": "Naoero (Nauru)",
+    "capital": "Yaren (seat of government)",
     "region": "Micronesia",
     "latitude": -0.53333333,
-    "longitude": 166.91666666
+    "longitude": 166.91666666,
+    "introduction": {
+      "text": "Naoero is a small island in the Pacific Ocean, just south of the equator. A narrow ring of coastal land surrounds a higher, rocky interior.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/nr.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "NP",
@@ -965,7 +1565,12 @@
     "capital": "Kathmandu",
     "region": "Southern Asia",
     "latitude": 28,
-    "longitude": 84
+    "longitude": 84,
+    "introduction": {
+      "text": "Nepal is a South Asian country between India and China. Its landscape rises from southern river plains to the Himalayas in the north, where Mount Everest stands.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/np.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "NL",
@@ -973,7 +1578,12 @@
     "capital": "Amsterdam",
     "region": "Western Europe",
     "latitude": 52.5,
-    "longitude": 5.75
+    "longitude": 5.75,
+    "introduction": {
+      "text": "The Netherlands lies on Europe’s North Sea coast, between Germany and Belgium. Some of its flat land was reclaimed from water and lies below sea level.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/nl.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "NZ",
@@ -981,7 +1591,12 @@
     "capital": "Wellington",
     "region": "Australia and New Zealand",
     "latitude": -41,
-    "longitude": 174
+    "longitude": 174,
+    "introduction": {
+      "text": "New Zealand lies southeast of Australia in the South Pacific. Two large islands, the North Island and the South Island, make up most of the country.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/nz.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "NI",
@@ -989,7 +1604,12 @@
     "capital": "Managua",
     "region": "Central America",
     "latitude": 13,
-    "longitude": -85
+    "longitude": -85,
+    "introduction": {
+      "text": "Nicaragua lies between Honduras and Costa Rica in Central America. Its Caribbean side has broad coastal plains, while volcanoes rise near its Pacific shore.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/nu.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "NE",
@@ -997,7 +1617,12 @@
     "capital": "Niamey",
     "region": "Western Africa",
     "latitude": 16,
-    "longitude": 8
+    "longitude": 8,
+    "introduction": {
+      "text": "Niger sits inland in West Africa. Sand dunes and desert cover much of the north, giving way to grasslands in the south.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ng.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "NG",
@@ -1005,7 +1630,12 @@
     "capital": "Abuja",
     "region": "Western Africa",
     "latitude": 10,
-    "longitude": 8
+    "longitude": 8,
+    "introduction": {
+      "text": "Nigeria is on West Africa’s Atlantic coast, between Benin and Cameroon. The Niger River spreads into a delta as it reaches the Gulf of Guinea.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ni.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "KP",
@@ -1013,7 +1643,12 @@
     "capital": "Pyongyang",
     "region": "Eastern Asia",
     "latitude": 40,
-    "longitude": 127
+    "longitude": 127,
+    "introduction": {
+      "text": "North Korea occupies the northern part of the Korean Peninsula in East Asia. Hills and mountains fill much of its interior, with deep valleys between them.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/kn.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "MK",
@@ -1021,7 +1656,12 @@
     "capital": "Skopje",
     "region": "Southeast Europe",
     "latitude": 41.83333333,
-    "longitude": 22
+    "longitude": 22,
+    "introduction": {
+      "text": "North Macedonia is a mountainous country just north of Greece in southeastern Europe. The Vardar River cuts across it, and several lakes straddle its borders.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mk.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "NO",
@@ -1029,7 +1669,12 @@
     "capital": "Oslo",
     "region": "Northern Europe",
     "latitude": 62,
-    "longitude": 10
+    "longitude": 10,
+    "introduction": {
+      "text": "Norway runs along the western side of Scandinavia in northern Europe. Deep, narrow inlets called fjords bring the Atlantic far inland between mountains.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/no.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "OM",
@@ -1037,7 +1682,12 @@
     "capital": "Muscat",
     "region": "Western Asia",
     "latitude": 21,
-    "longitude": 57
+    "longitude": 57,
+    "introduction": {
+      "text": "Oman lies on the southeastern side of the Arabian Peninsula. Much of its interior is desert, and mountains rise near both ends of its long coast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mu.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "PK",
@@ -1045,7 +1695,12 @@
     "capital": "Islamabad",
     "region": "Southern Asia",
     "latitude": 30,
-    "longitude": 70
+    "longitude": 70,
+    "introduction": {
+      "text": "Pakistan is in South Asia, with India to the east and the Arabian Sea to the south. The Indus River crosses broad plains below the northern highlands.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pk.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "PW",
@@ -1053,15 +1708,25 @@
     "capital": "Ngerulmud",
     "region": "Micronesia",
     "latitude": 7.5,
-    "longitude": 134.5
+    "longitude": 134.5,
+    "introduction": {
+      "text": "Palau is a group of Pacific islands southeast of the Philippines. Its largest island is hilly, while many of the smaller islands sit low among coral reefs.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ps.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "PS",
     "name": "Palestine",
-    "capital": "Ramallah",
+    "capital": "Ramallah (administrative centre)",
     "region": "Western Asia",
     "latitude": 31.9,
-    "longitude": 35.2
+    "longitude": 35.2,
+    "introduction": {
+      "text": "Palestine includes the West Bank and the Gaza Strip in western Asia. The West Bank lies inland near the Jordan River, while Gaza has a Mediterranean coast.",
+      "sourceName": "United Nations · OCHA oPt reference map",
+      "sourceURL": "https://www.ochaopt.org/sites/default/files/ochaopt_hno_2014.pdf"
+    }
   },
   {
     "id": "PA",
@@ -1069,7 +1734,12 @@
     "capital": "Panama City",
     "region": "Central America",
     "latitude": 9,
-    "longitude": -80
+    "longitude": -80,
+    "introduction": {
+      "text": "Panama sits on the narrow strip of land that joins Central and South America. The Panama Canal gives ships a passage between the Atlantic and Pacific oceans.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pm.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "PG",
@@ -1077,7 +1747,12 @@
     "capital": "Port Moresby",
     "region": "Melanesia",
     "latitude": -6,
-    "longitude": 147
+    "longitude": 147,
+    "introduction": {
+      "text": "Papua New Guinea lies north of Australia. It includes the mountainous eastern half of New Guinea, which it shares with Indonesia, and smaller islands in the Pacific.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pp.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "PY",
@@ -1085,7 +1760,12 @@
     "capital": "Asunción",
     "region": "South America",
     "latitude": -23,
-    "longitude": -58
+    "longitude": -58,
+    "introduction": {
+      "text": "Paraguay lies inland in South America between Argentina, Brazil and Bolivia. The Paraguay River separates wooded hills and grassland in the east from the low plains of the Chaco in the west.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pa.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "PE",
@@ -1093,7 +1773,12 @@
     "capital": "Lima",
     "region": "South America",
     "latitude": -10,
-    "longitude": -76
+    "longitude": -76,
+    "introduction": {
+      "text": "Peru lies on South America’s Pacific coast. Travelling inland takes you from dry coastal plains across the Andes and down into Amazon rainforest.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pe.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "PH",
@@ -1101,7 +1786,12 @@
     "capital": "Manila",
     "region": "South-Eastern Asia",
     "latitude": 13,
-    "longitude": 122
+    "longitude": 122,
+    "introduction": {
+      "text": "The Philippines is a country of thousands of islands in Southeast Asia, east of Vietnam. Many of its islands have mountain ridges and coastal plains.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/rp.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "PL",
@@ -1109,7 +1799,12 @@
     "capital": "Warsaw",
     "region": "Central Europe",
     "latitude": 52,
-    "longitude": 20
+    "longitude": 20,
+    "introduction": {
+      "text": "Poland lies in central Europe, east of Germany. Broad plains cover much of the country between the Baltic coast in the north and mountains in the south.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pl.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "PT",
@@ -1117,7 +1812,12 @@
     "capital": "Lisbon",
     "region": "Southern Europe",
     "latitude": 39.5,
-    "longitude": -8
+    "longitude": -8,
+    "introduction": {
+      "text": "Portugal lies west of Spain on Europe’s Atlantic coast. Its territory also includes the Atlantic islands of Madeira and the Azores.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/po.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "QA",
@@ -1125,7 +1825,12 @@
     "capital": "Doha",
     "region": "Western Asia",
     "latitude": 25.5,
-    "longitude": 51.25
+    "longitude": 51.25,
+    "introduction": {
+      "text": "Qatar sits on a small peninsula jutting into the Persian Gulf from Saudi Arabia. Much of the land is flat desert.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/qa.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "RO",
@@ -1133,7 +1838,12 @@
     "capital": "Bucharest",
     "region": "Southeast Europe",
     "latitude": 46,
-    "longitude": 25
+    "longitude": 25,
+    "introduction": {
+      "text": "Romania is in southeastern Europe, with a coast on the Black Sea. The Carpathian Mountains curve around the central region of Transylvania.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ro.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "RU",
@@ -1141,7 +1851,12 @@
     "capital": "Moscow",
     "region": "Eastern Europe",
     "latitude": 60,
-    "longitude": 100
+    "longitude": 100,
+    "introduction": {
+      "text": "Russia extends from eastern Europe across northern Asia to the Pacific coast. Siberia, east of the Ural Mountains, includes enormous stretches of forest and tundra.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/rs.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "RW",
@@ -1149,7 +1864,12 @@
     "capital": "Kigali",
     "region": "Eastern Africa",
     "latitude": -2,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "Rwanda lies inland in Africa, just east of the Democratic Republic of the Congo. Its grassy hills rise toward mountains in the west.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/rw.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "KN",
@@ -1157,7 +1877,12 @@
     "capital": "Basseterre",
     "region": "Caribbean",
     "latitude": 17.33333333,
-    "longitude": -62.75
+    "longitude": -62.75,
+    "introduction": {
+      "text": "Saint Kitts and Nevis is a Caribbean country made up of two neighboring islands. Both islands have steep volcanic peaks rising above the coast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sc.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LC",
@@ -1165,7 +1890,12 @@
     "capital": "Castries",
     "region": "Caribbean",
     "latitude": 13.88333333,
-    "longitude": -60.96666666
+    "longitude": -60.96666666,
+    "introduction": {
+      "text": "Saint Lucia is a mountainous island in the eastern Caribbean. Two pointed peaks, Gros Piton and Petit Piton, rise near the town of Soufrière.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/st.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "VC",
@@ -1173,7 +1903,12 @@
     "capital": "Kingstown",
     "region": "Caribbean",
     "latitude": 13.25,
-    "longitude": -61.2
+    "longitude": -61.2,
+    "introduction": {
+      "text": "Saint Vincent and the Grenadines is a chain of islands in the eastern Caribbean. It includes the mountainous island of Saint Vincent and a string of smaller islands to its south.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/vc.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "WS",
@@ -1181,7 +1916,12 @@
     "capital": "Apia",
     "region": "Polynesia",
     "latitude": -13.58333333,
-    "longitude": -172.33333333
+    "longitude": -172.33333333,
+    "introduction": {
+      "text": "Samoa lies in the South Pacific, roughly halfway between Hawaii and New Zealand. On its two main islands, Upolu and Savai‘i, narrow coastal plains give way to volcanic mountains.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ws.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SM",
@@ -1189,7 +1929,12 @@
     "capital": "City of San Marino",
     "region": "Southern Europe",
     "latitude": 43.76666666,
-    "longitude": 12.41666666
+    "longitude": 12.41666666,
+    "introduction": {
+      "text": "San Marino is a small, independent country surrounded by Italy. Its hilly territory rises around Mount Titano.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sm.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SA",
@@ -1197,7 +1942,12 @@
     "capital": "Riyadh",
     "region": "Western Asia",
     "latitude": 25,
-    "longitude": 45
+    "longitude": 45,
+    "introduction": {
+      "text": "Saudi Arabia occupies much of the Arabian Peninsula in western Asia. Sandy deserts stretch across its interior between the Red Sea and the Persian Gulf.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sa.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SN",
@@ -1205,7 +1955,12 @@
     "capital": "Dakar",
     "region": "Western Africa",
     "latitude": 14,
-    "longitude": -14
+    "longitude": -14,
+    "introduction": {
+      "text": "Senegal is on the Atlantic coast of West Africa. From the coast, low plains extend inland and rise into foothills in the southeast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sg.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "RS",
@@ -1213,7 +1968,12 @@
     "capital": "Belgrade",
     "region": "Southeast Europe",
     "latitude": 44,
-    "longitude": 21
+    "longitude": 21,
+    "introduction": {
+      "text": "Serbia lies inland in southeastern Europe. Its northern plains give way to limestone hills and mountain ranges farther south.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ri.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SC",
@@ -1221,7 +1981,12 @@
     "capital": "Victoria",
     "region": "Eastern Africa",
     "latitude": -4.58333333,
-    "longitude": 55.66666666
+    "longitude": 55.66666666,
+    "introduction": {
+      "text": "The Seychelles are a group of islands in the Indian Ocean northeast of Madagascar. Some rise into rocky hills, while others are low coral islands.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/se.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SL",
@@ -1229,7 +1994,12 @@
     "capital": "Freetown",
     "region": "Western Africa",
     "latitude": 8.5,
-    "longitude": -11.5
+    "longitude": -11.5,
+    "introduction": {
+      "text": "Sierra Leone is on West Africa’s Atlantic coast, between Guinea and Liberia. Mangroves grow by the sea, and wooded hills lead toward mountains in the east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sl.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SG",
@@ -1237,7 +2007,12 @@
     "capital": "Singapore",
     "region": "South-Eastern Asia",
     "latitude": 1.36666666,
-    "longitude": 103.8
+    "longitude": 103.8,
+    "introduction": {
+      "text": "Singapore is an island country in Southeast Asia, between Malaysia and Indonesia. Its main island and smaller islands sit beside busy shipping routes.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sn.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SK",
@@ -1245,7 +2020,12 @@
     "capital": "Bratislava",
     "region": "Central Europe",
     "latitude": 48.66666666,
-    "longitude": 19.5
+    "longitude": 19.5,
+    "introduction": {
+      "text": "Slovakia lies in central Europe, south of Poland. The Tatra Mountains rise in the north, while the land opens into low plains to the south.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/lo.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SI",
@@ -1253,7 +2033,12 @@
     "capital": "Ljubljana",
     "region": "Central Europe",
     "latitude": 46.11666666,
-    "longitude": 14.81666666
+    "longitude": 14.81666666,
+    "introduction": {
+      "text": "Slovenia lies between the Alps and the Adriatic Sea in Europe. Its short coastline is in the southwest, and mountains rise near the Italian and Austrian borders.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/si.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SB",
@@ -1261,7 +2046,12 @@
     "capital": "Honiara",
     "region": "Melanesia",
     "latitude": -8,
-    "longitude": 159
+    "longitude": 159,
+    "introduction": {
+      "text": "The Solomon Islands lie in the South Pacific, east of Papua New Guinea. Some islands rise into rugged mountains, while others are low rings of coral.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bp.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SO",
@@ -1269,7 +2059,12 @@
     "capital": "Mogadishu",
     "region": "Eastern Africa",
     "latitude": 10,
-    "longitude": 49
+    "longitude": 49,
+    "introduction": {
+      "text": "Somalia occupies the eastern tip of the Horn of Africa. Its coast follows the Gulf of Aden in the north and the Indian Ocean in the east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/so.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "ZA",
@@ -1277,7 +2072,12 @@
     "capital": "Pretoria / Bloemfontein / Cape Town",
     "region": "Southern Africa",
     "latitude": -29,
-    "longitude": 24
+    "longitude": 24,
+    "introduction": {
+      "text": "South Africa sits at the southern tip of Africa. High ground fills much of the interior, and the neighboring country of Lesotho lies entirely inside South Africa’s borders.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sf.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "KR",
@@ -1285,7 +2085,12 @@
     "capital": "Seoul",
     "region": "Eastern Asia",
     "latitude": 37,
-    "longitude": 127.5
+    "longitude": 127.5,
+    "introduction": {
+      "text": "South Korea occupies the southern part of the Korean Peninsula in East Asia. Much of the land is hilly, with broad coastal plains in the west and south.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ks.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SS",
@@ -1293,7 +2098,12 @@
     "capital": "Juba",
     "region": "Middle Africa",
     "latitude": 7,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "South Sudan lies inland in Africa between Sudan and Uganda. The White Nile flows through a vast wetland called the Sudd.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/od.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "ES",
@@ -1301,15 +2111,25 @@
     "capital": "Madrid",
     "region": "Southern Europe",
     "latitude": 40,
-    "longitude": -4
+    "longitude": -4,
+    "introduction": {
+      "text": "Spain occupies most of the Iberian Peninsula in southwestern Europe. Its mainland has both Atlantic and Mediterranean coasts, with the Pyrenees along the border with France.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sp.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "LK",
     "name": "Sri Lanka",
-    "capital": "Colombo",
+    "capital": "Sri Jayawardenepura Kotte",
     "region": "Southern Asia",
     "latitude": 7,
-    "longitude": 81
+    "longitude": 81,
+    "introduction": {
+      "text": "Sri Lanka is an island in the Indian Ocean, just south of India. Much of the coast is low and flat, but mountains rise in the south-central interior.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ce.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SD",
@@ -1317,7 +2137,12 @@
     "capital": "Khartoum",
     "region": "Northern Africa",
     "latitude": 15,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "Sudan lies in northeastern Africa, south of Egypt, with a coast on the Red Sea. The Blue Nile and the White Nile meet at Khartoum and flow north as one river.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/su.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SR",
@@ -1325,7 +2150,12 @@
     "capital": "Paramaribo",
     "region": "South America",
     "latitude": 4,
-    "longitude": -56
+    "longitude": -56,
+    "introduction": {
+      "text": "Suriname lies on the Atlantic coast of South America, between Guyana and French Guiana. Beyond its narrow coastal plain, tropical rainforest covers much of the interior.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ns.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SE",
@@ -1333,7 +2163,12 @@
     "capital": "Stockholm",
     "region": "Northern Europe",
     "latitude": 62,
-    "longitude": 15
+    "longitude": 15,
+    "introduction": {
+      "text": "Sweden lies between Norway and Finland in northern Europe. Mountains rise along its western side, and its long eastern coast faces the Baltic Sea and the Gulf of Bothnia.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sw.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "CH",
@@ -1341,7 +2176,12 @@
     "capital": "Bern",
     "region": "Western Europe",
     "latitude": 47,
-    "longitude": 8
+    "longitude": 8,
+    "introduction": {
+      "text": "Switzerland lies inland in central Europe, north of Italy. The Alps rise in the south, and a belt of hills and lakes separates them from the Jura Mountains in the northwest.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sz.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "SY",
@@ -1349,7 +2189,12 @@
     "capital": "Damascus",
     "region": "Western Asia",
     "latitude": 35,
-    "longitude": 38
+    "longitude": 38,
+    "introduction": {
+      "text": "Syria lies in western Asia, with a short shore on the Mediterranean Sea. Mountains separate the coastal plain from the drier plateaus inland.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sy.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "ST",
@@ -1357,7 +2202,12 @@
     "capital": "São Tomé",
     "region": "Middle Africa",
     "latitude": 1,
-    "longitude": 7
+    "longitude": 7,
+    "introduction": {
+      "text": "São Tomé and Príncipe is an island country near the equator, off Africa’s Atlantic coast. Its two main islands are mountainous and were formed by volcanoes.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tp.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TJ",
@@ -1365,7 +2215,12 @@
     "capital": "Dushanbe",
     "region": "Central Asia",
     "latitude": 39,
-    "longitude": 71
+    "longitude": 71,
+    "introduction": {
+      "text": "Tajikistan lies inland in Central Asia, west of China. The Pamir Mountains rise in its southeast, while rivers cut through valleys in the west.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ti.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TZ",
@@ -1373,7 +2228,12 @@
     "capital": "Dodoma",
     "region": "Eastern Africa",
     "latitude": -6,
-    "longitude": 35
+    "longitude": 35,
+    "introduction": {
+      "text": "Tanzania stretches along the Indian Ocean in East Africa, between Kenya and Mozambique. Inland, plains rise toward highlands and Mount Kilimanjaro.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tz.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TH",
@@ -1381,7 +2241,12 @@
     "capital": "Bangkok",
     "region": "South-Eastern Asia",
     "latitude": 15,
-    "longitude": 100
+    "longitude": 100,
+    "introduction": {
+      "text": "Thailand lies in Southeast Asia, with coasts on the Andaman Sea and the Gulf of Thailand. Its landscape includes a broad central plain and a high plateau in the east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/th.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TL",
@@ -1389,7 +2254,12 @@
     "capital": "Dili",
     "region": "South-Eastern Asia",
     "latitude": -8.83333333,
-    "longitude": 125.91666666
+    "longitude": 125.91666666,
+    "introduction": {
+      "text": "Timor-Leste lies northwest of Australia in Southeast Asia. It includes the mountainous eastern half of Timor, a separate area on the island’s northwestern coast, and two smaller islands.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tt.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TG",
@@ -1397,7 +2267,12 @@
     "capital": "Lomé",
     "region": "Western Africa",
     "latitude": 8,
-    "longitude": 1.16666666
+    "longitude": 1.16666666,
+    "introduction": {
+      "text": "Togo is a narrow West African country between Ghana and Benin. Its Atlantic coast has lagoons, and its northern hills give way to open grassland.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/to.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TO",
@@ -1405,7 +2280,12 @@
     "capital": "Nuku'alofa",
     "region": "Polynesia",
     "latitude": -20,
-    "longitude": -175
+    "longitude": -175,
+    "introduction": {
+      "text": "Tonga is a group of islands in the South Pacific. Its western islands are volcanic, while many of its eastern islands are made of coral limestone.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tn.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TT",
@@ -1413,7 +2293,12 @@
     "capital": "Port of Spain",
     "region": "Caribbean",
     "latitude": 11,
-    "longitude": -61
+    "longitude": -61,
+    "introduction": {
+      "text": "Trinidad and Tobago lies off the northern coast of South America in the Caribbean. Trinidad and its smaller neighbor Tobago are the country’s two main islands.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/td.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TN",
@@ -1421,7 +2306,12 @@
     "capital": "Tunis",
     "region": "Northern Africa",
     "latitude": 34,
-    "longitude": 9
+    "longitude": 9,
+    "introduction": {
+      "text": "Tunisia lies on North Africa’s Mediterranean coast between Algeria and Libya. Mountains rise in the north, while the southern plains meet the Sahara.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ts.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TM",
@@ -1429,7 +2319,12 @@
     "capital": "Ashgabat",
     "region": "Central Asia",
     "latitude": 40,
-    "longitude": 60
+    "longitude": 60,
+    "introduction": {
+      "text": "Turkmenistan is a Central Asian country on the eastern shore of the Caspian Sea. The Karakum Desert covers much of the country, with mountains near the border with Iran.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tx.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TV",
@@ -1437,7 +2332,12 @@
     "capital": "Funafuti",
     "region": "Polynesia",
     "latitude": -8,
-    "longitude": 178
+    "longitude": 178,
+    "introduction": {
+      "text": "Tuvalu is a group of small coral islands in the South Pacific. The islands are so low and narrow that the ocean is never far away.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tv.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "TR",
@@ -1445,7 +2345,12 @@
     "capital": "Ankara",
     "region": "Western Asia",
     "latitude": 39,
-    "longitude": 35
+    "longitude": 35,
+    "introduction": {
+      "text": "Türkiye links southeastern Europe and western Asia. The Bosporus, a narrow strait near Istanbul, separates the country’s European and Asian sides.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tu.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "UG",
@@ -1453,7 +2358,12 @@
     "capital": "Kampala",
     "region": "Eastern Africa",
     "latitude": 1,
-    "longitude": 32
+    "longitude": 32,
+    "introduction": {
+      "text": "Uganda lies inland in East Africa, west of Kenya. The country has many lakes, including part of Lake Victoria along its southern edge.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ug.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "UA",
@@ -1461,7 +2371,12 @@
     "capital": "Kyiv",
     "region": "Eastern Europe",
     "latitude": 49,
-    "longitude": 32
+    "longitude": 32,
+    "introduction": {
+      "text": "Ukraine lies in eastern Europe with a coast on the Black Sea. Much of the country is open plain, with the Carpathian Mountains rising in the west.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/up.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "AE",
@@ -1469,7 +2384,12 @@
     "capital": "Abu Dhabi",
     "region": "Western Asia",
     "latitude": 24,
-    "longitude": 54
+    "longitude": 54,
+    "introduction": {
+      "text": "The United Arab Emirates lies on the Arabian Peninsula between Saudi Arabia and Oman. Its coastal plains give way to sand dunes inland and mountains in the east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ae.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "GB",
@@ -1477,7 +2397,12 @@
     "capital": "London",
     "region": "Northern Europe",
     "latitude": 54,
-    "longitude": -2
+    "longitude": -2,
+    "introduction": {
+      "text": "The United Kingdom lies off Europe’s northwestern coast. It includes Great Britain, the northeastern part of Ireland, and many smaller islands.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/uk.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "US",
@@ -1485,7 +2410,12 @@
     "capital": "Washington D.C.",
     "region": "North America",
     "latitude": 38,
-    "longitude": -97
+    "longitude": -97,
+    "introduction": {
+      "text": "The United States stretches across North America from the Atlantic to the Pacific. Alaska lies northwest of Canada, and Hawaii is a chain of islands in the Pacific.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/us.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "UY",
@@ -1493,7 +2423,12 @@
     "capital": "Montevideo",
     "region": "South America",
     "latitude": -33,
-    "longitude": -56
+    "longitude": -56,
+    "introduction": {
+      "text": "Uruguay lies on South America’s Atlantic coast, between Argentina and Brazil. Gently rolling grasslands cover much of the country.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/uy.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "UZ",
@@ -1501,7 +2436,12 @@
     "capital": "Tashkent",
     "region": "Central Asia",
     "latitude": 41,
-    "longitude": 64
+    "longitude": 64,
+    "introduction": {
+      "text": "Uzbekistan is an inland country in Central Asia. Broad deserts and sand dunes give way to irrigated river valleys, including the Fergana Valley in the east.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/uz.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "VU",
@@ -1509,7 +2449,12 @@
     "capital": "Port Vila",
     "region": "Melanesia",
     "latitude": -16,
-    "longitude": 167
+    "longitude": 167,
+    "introduction": {
+      "text": "Vanuatu is a chain of islands in the South Pacific. Many were formed by volcanoes, and narrow coastal plains sit below steep mountains.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/nh.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "VA",
@@ -1517,7 +2462,12 @@
     "capital": "Vatican City",
     "region": "Southern Europe",
     "latitude": 41.9,
-    "longitude": 12.45
+    "longitude": 12.45,
+    "introduction": {
+      "text": "Vatican City is an independent country entirely inside Rome, Italy. Its small territory sits on a low hill within the city.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/vt.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "VE",
@@ -1525,7 +2475,12 @@
     "capital": "Caracas",
     "region": "South America",
     "latitude": 8,
-    "longitude": -66
+    "longitude": -66,
+    "introduction": {
+      "text": "Venezuela lies on South America’s northern coast, facing the Caribbean Sea. The Andes reach its northwest, with wide plains inland and highlands to the southeast.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ve.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "VN",
@@ -1533,7 +2488,12 @@
     "capital": "Hanoi",
     "region": "South-Eastern Asia",
     "latitude": 16.16666666,
-    "longitude": 107.83333333
+    "longitude": 107.83333333,
+    "introduction": {
+      "text": "Vietnam runs along the eastern coast of mainland Southeast Asia. Its long, narrow shape takes in northern mountains, central highlands and low river deltas.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/vm.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "YE",
@@ -1541,7 +2501,12 @@
     "capital": "Sana'a",
     "region": "Western Asia",
     "latitude": 15,
-    "longitude": 48
+    "longitude": 48,
+    "introduction": {
+      "text": "Yemen sits at the southwestern end of the Arabian Peninsula, beside the Red Sea and the Gulf of Aden. Steep mountains rise inland from a narrow coastal plain.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ym.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "ZM",
@@ -1549,7 +2514,12 @@
     "capital": "Lusaka",
     "region": "Eastern Africa",
     "latitude": -15,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "Zambia lies inland in southern Africa. The Zambezi River forms part of its border with Zimbabwe, where the water plunges over Victoria Falls.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/za.html#field-anchor-geography-location"
+    }
   },
   {
     "id": "ZW",
@@ -1557,6 +2527,11 @@
     "capital": "Harare",
     "region": "Eastern Africa",
     "latitude": -20,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "Zimbabwe is an inland country in southern Africa, between Zambia and South Africa. The Zambezi River and Victoria Falls mark part of its northern border.",
+      "sourceName": "The World Factbook · 2020 geography",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/zi.html#field-anchor-geography-location"
+    }
   }
 ]

@@ -14,7 +14,7 @@ DEVICE = "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max"
 
 def classify(code, summary, log):
     if (code == 0 and summary.get("result") == "Passed"
-            and summary.get("passedTests", 0) >= 9 and summary.get("failedTests") == 0
+            and summary.get("passedTests", 0) >= 11 and summary.get("failedTests") == 0
             and summary.get("skippedTests") == 0 and not summary.get("testFailures")):
         return "passed"
     failures = summary.get("testFailures", [])
@@ -86,7 +86,10 @@ def run_attempt(number):
             "-destination", f"platform=iOS Simulator,id={device_id}",
             "-parallel-testing-enabled", "NO", "-resultBundlePath", str(bundle),
             "-only-testing:WorldNicheUITests/ProfileSetupUITests",
-            "-only-testing:WorldNicheUITests/JournalUITests", "CODE_SIGNING_ALLOWED=NO",
+            "-only-testing:WorldNicheUITests/JournalUITests",
+            "-only-testing:WorldNicheUITests/CountryReadingUITests/testOverviewHistoricalSourceAndChartAcrossCountries",
+            "-only-testing:WorldNicheUITests/CountryReadingUITests/testRadioChartShowsStationSampleAndProviderCredit",
+            "CODE_SIGNING_ALLOWED=NO",
         ], directory / "xcodebuild.log", 1200, check=False)
         phase = "test result verification"
         capture(["xcrun", "xcresulttool", "get", "test-results", "summary", "--path", str(bundle), "--compact"],
@@ -113,7 +116,7 @@ def run_tests(attempt=run_attempt):
     for number in (1, 2):
         verdict = attempt(number)
         if verdict == "passed":
-            report("All nine or more selected UI tests passed."
+            report("All selected UI tests passed."
                    + (" Recovered from the known XCTest startup stall on a fresh simulator." if number == 2 else ""))
             return 0
         if verdict == "runner-startup" and number == 1:

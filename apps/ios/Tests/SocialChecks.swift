@@ -358,11 +358,11 @@ private final class CheckSuite {
 
     func localData() async {
         let defaults = isolatedDefaults()
-        let culture = LiveCultureService(topics: [:], persistsHistory: true, historySuiteName: domains.last!)
         defaults.set(["Azonto"], forKey: "worldniche.culture.history.GH")
+        defaults.set(Data("cached article".utf8), forKey: "worldniche.culture.reading.GH")
         defaults.set("unrelated sentinel", forKey: "unrelated.preference")
         let journal = DiscoveryJournal(defaults: defaults)
-        let store = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory, configuration: nil, culture: culture)
+        let store = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory, configuration: nil)
         check(!store.isConfigured && !store.isSignedIn && store.profile == nil, "Local mode starts without fake profile or account")
         await store.saveProfile(name: "  Mira  ", avatar: "leaf", sharing: false)
         check(store.profile?.displayName == "Mira" && store.profile?.avatar == "leaf", "Local profile trims name and retains chosen avatar")
@@ -392,6 +392,7 @@ private final class CheckSuite {
         check((local["readingProgress"] as? [String: Any])?["MA"] != nil, "Local export includes private partial reading")
         await store.clearLocalData()
         check(defaults.object(forKey: "worldniche.culture.history.GH") == nil, "Local wipe must erase persisted cultural reading history")
+        check(defaults.object(forKey: "worldniche.culture.reading.GH") == nil, "Local wipe must erase the previous version's cached reading")
         check(store.profile == nil && journal.visitedIDs.isEmpty && journal.savedIDs.isEmpty, "Local wipe must clear profile, journal and saved countries")
         check(defaults.string(forKey: "unrelated.preference") == "unrelated sentinel", "Local wipe must preserve unrelated preferences")
         check(!FileManager.default.fileExists(atPath: exported.path), "Local wipe must erase exported private data")
@@ -988,7 +989,6 @@ private final class CheckSuite {
     func sharingAndDeletion() async {
         fixture.reset()
         let defaults = isolatedDefaults()
-        let culture = LiveCultureService(topics: [:], persistsHistory: true, historySuiteName: domains.last!)
         defaults.set(["Azonto"], forKey: "worldniche.culture.history.GH")
         defaults.set(userA.uuidString, forKey: "niche.localOwnerID")
         let journal = DiscoveryJournal(defaults: defaults)
@@ -996,7 +996,7 @@ private final class CheckSuite {
         journal.toggleSaved(CountryRepository.country(id: "CA")!)
         let vault = MemoryVault(savedSession())
         let service = api(vault: vault)
-        let store = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory, configuration: configuration, api: service, culture: culture)
+        let store = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory, configuration: configuration, api: service)
         await store.refresh()
         await store.synchronizeExploration()
         check(fixture.observed("/rest/v1/rpc/sync_explorations").isEmpty, "Private journal sync must not call the legacy sharing endpoint")
@@ -1024,7 +1024,7 @@ private final class CheckSuite {
               "Pending deletion must block export without using or refreshing its preserved session")
         check(store.deletionPending && store.profile != nil && !journal.visitedIDs.isEmpty,
               "Blocked export must preserve pending deletion and local data")
-        let relaunched = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory, configuration: configuration, api: service, culture: culture)
+        let relaunched = SocialStore(journal: journal, defaults: defaults, photoDirectory: photoDirectory, configuration: configuration, api: service)
         await relaunched.refresh()
         check(relaunched.deletionPending && fixture.observed().isEmpty, "Deletion safety state must survive store reconstruction without resync")
         await relaunched.deleteAccountAndData()

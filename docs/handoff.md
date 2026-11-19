@@ -15,7 +15,7 @@ The `v1.0.0` tag remains immutable. The `v1.0.1` GitHub release records the new 
 | Want to change | Edit |
 | --- | --- |
 | Globe, onboarding, country screens, profile, journal | `apps/ios/WorldNiche/` |
-| Country catalog, cultural topics, feed mappings | `apps/ios/WorldNiche/Resources/` |
+| Country catalog, historical facts and chart mappings | `apps/ios/WorldNiche/Resources/` |
 | Landing page, demos, friends animation, public policies | `apps/web/landing-site/` |
 | Friend link fallback and Universal Link routing | `apps/web/invite-site/`, `apps/web/invite-hosting/` |
 | Accounts, friendship access, journal sync, moderation | `backend/supabase/` |
@@ -28,14 +28,14 @@ The `v1.0.0` tag remains immutable. The `v1.0.1` GitHub release records the new 
 
 1. Pull `main`, check `AGENTS.md`, and create a branch. Inspect existing changes before editing.
 2. Enable the local commit guard with `git config core.hooksPath .githooks` (Python 3 and Gitleaks required). Run `bash scripts/check.sh private` and the relevant suites: `web`, `backend`, `swift`, or `assets`. `all` runs everything on a Mac with Swift 6, Node 24+ and PostgreSQL installed.
-3. For native UI changes, use XcodeBuildMCP to test the affected scenarios on a phone and an unfolded Duo. CI covers synthetic profile/journal flows; live news, Apple authorization, push-to-device and Duo testing remain release checks.
+3. For native UI changes, use XcodeBuildMCP to test the affected scenarios on a phone and an unfolded Duo. CI covers synthetic profile/journal flows; live music charts, Apple authorization, push-to-device and Duo testing remain release checks.
 4. Review the diff for credentials and private data, then commit under the owner's GitHub identity. Open a PR and inspect [GitHub Actions](https://github.com/RedaB2/WorldNiche/actions).
 5. Merge passing changes. Website changes publish through Vercel automatically; check `/deployment.json` against the merged commit. Backend and iOS publishing remain separate. Follow the [deployment guide](deployment.md) for the affected service.
 
 ## Important behavior
 
 - The app is usable as a guest. Account entry uses only Sign in with Apple. New profiles choose their name and an optional photo; initials cover skipped photos.
-- Music, news and cultural readings load and retry independently. News is attributed Global Voices content. Preserve source and image-license checks.
+- Country overviews and historical facts work offline and link to their sources. Music loads independently. Keep Apple Music and Tuneping radio charts labeled with the provider and listening community they represent.
 - Private journal notes and bookmarks never become friend-visible. Friend exploration sharing defaults on for new accounts and respects existing choices.
 - Profile edits are immediate for their owner. Approved versions become visible to friends. Backend quotas and a scheduled worker process the latest eligible revision.
 - Signup remembers the user's automatic-check choice. Do not reintroduce per-upload consent or remove the required privacy choice.

@@ -34,41 +34,41 @@ final class IntroInteractionUITests: XCTestCase {
         XCTAssertTrue(element("introMusicContent", in: app).waitForExistence(timeout: 5))
         for index in 0..<5 { XCTAssertTrue(element("introTrack\(index)", in: app).exists) }
         XCTAssertEqual(music.value as? String, "Expanded")
-        XCTAssertFalse(element("introNewsContent", in: app).exists)
-        XCTAssertFalse(element("introCultureContent", in: app).exists)
+        XCTAssertFalse(element("introOverviewContent", in: app).exists)
+        XCTAssertFalse(element("introHistoryContent", in: app).exists)
 
-        let news = app.buttons["introNewsPreview"]
-        reveal(news, on: 1, in: app)
-        news.tap()
-        XCTAssertTrue(element("introNewsContent", in: app).waitForExistence(timeout: 5))
+        let overview = app.buttons["introOverviewPreview"]
+        reveal(overview, on: 1, in: app)
+        overview.tap()
+        XCTAssertTrue(element("introOverviewContent", in: app).waitForExistence(timeout: 5))
         XCTAssertFalse(element("introMusicContent", in: app).exists)
         XCTAssertEqual(music.value as? String, "Collapsed")
 
-        let culture = app.buttons["introCulturePreview"]
-        reveal(culture, on: 1, in: app)
-        culture.tap()
-        XCTAssertTrue(element("introCultureContent", in: app).waitForExistence(timeout: 5))
-        XCTAssertFalse(element("introNewsContent", in: app).exists)
+        let history = app.buttons["introHistoryPreview"]
+        reveal(history, on: 1, in: app)
+        history.tap()
+        XCTAssertTrue(element("introHistoryContent", in: app).waitForExistence(timeout: 5))
+        XCTAssertFalse(element("introOverviewContent", in: app).exists)
         XCTAssertFalse(element("introMusicContent", in: app).exists)
-        reveal(culture, on: 1, in: app)
-        culture.tap()
-        XCTAssertEqual(culture.value as? String, "Collapsed")
-        XCTAssertFalse(element("introCultureContent", in: app).exists)
+        reveal(history, on: 1, in: app)
+        history.tap()
+        XCTAssertEqual(history.value as? String, "Collapsed")
+        XCTAssertFalse(element("introHistoryContent", in: app).exists)
         XCTAssertTrue(app.buttons["introContinue"].isHittable)
     }
 
     @MainActor
-    func testMusicRetryKeepsNewsUsableAndDoesNotOpenBothPanels() {
+    func testMusicRetryKeepsOverviewUsableAndDoesNotOpenBothPanels() {
         let app = launchIntro(previews: "music-retry")
         app.buttons["introContinue"].tap()
         let music = app.buttons["introMusicPreview"]
         reveal(music, on: 1, in: app)
         music.tap()
         XCTAssertTrue(app.buttons["introMusicRetry"].waitForExistence(timeout: 5))
-        let news = app.buttons["introNewsPreview"]
-        reveal(news, on: 1, in: app)
-        news.tap()
-        XCTAssertTrue(element("introNewsContent", in: app).waitForExistence(timeout: 5))
+        let overview = app.buttons["introOverviewPreview"]
+        reveal(overview, on: 1, in: app)
+        overview.tap()
+        XCTAssertTrue(element("introOverviewContent", in: app).waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["introMusicRetry"].exists)
         reveal(music, on: 1, in: app)
         music.tap()
@@ -77,7 +77,7 @@ final class IntroInteractionUITests: XCTestCase {
         retry.tap()
         XCTAssertTrue(element("introTrack4", in: app).waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["introMusicRetry"].exists)
-        XCTAssertFalse(element("introNewsContent", in: app).exists)
+        XCTAssertFalse(element("introOverviewContent", in: app).exists)
     }
 
     @MainActor
