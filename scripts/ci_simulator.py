@@ -14,7 +14,7 @@ DEVICE = "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max"
 
 def classify(code, summary, log):
     if (code == 0 and summary.get("result") == "Passed"
-            and summary.get("passedTests", 0) >= 12 and summary.get("failedTests") == 0
+            and summary.get("passedTests", 0) >= 14 and summary.get("failedTests") == 0
             and summary.get("skippedTests") == 0 and not summary.get("testFailures")):
         return "passed"
     failures = summary.get("testFailures", [])
@@ -94,7 +94,7 @@ def run_attempt(number):
         ], directory / "xcodebuild.log", 1200, check=False)
         phase = "test result verification"
         capture(["xcrun", "xcresulttool", "get", "test-results", "summary", "--path", str(bundle), "--compact"],
-                directory / "summary.json", 60)
+                directory / "summary.json", 300)
         summary = json.loads((directory / "summary.json").read_text())
         verdict = classify(code, summary, (directory / "xcodebuild.log").read_text(errors="replace"))
         report(f"Attempt {number}: {verdict}; {summary.get('passedTests', 0)} passed, "
