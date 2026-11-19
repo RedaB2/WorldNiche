@@ -427,8 +427,7 @@ private struct IntroFriendConnection: View {
                                 .frame(width: 38, height: 38)
                                 .background(Palette.card, in: Circle())
                                 .overlay(Circle().stroke(Palette.line, lineWidth: 1))
-                                .offset(x: reduceMotion ? 0 : (travel - 0.5) * distance,
-                                        y: reduceMotion ? 0 : -sin(travel * .pi) * 12)
+                                .offset(x: reduceMotion ? 0 : (travel - 0.5) * distance)
                                 .opacity(reduceMotion || elapsed < 3.1 ? 1 : 0)
                         }
                         .frame(width: geometry.size.width, height: geometry.size.height)
