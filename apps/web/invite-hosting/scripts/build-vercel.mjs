@@ -3,8 +3,10 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import { payload, securityHeaders } from "../dist/server/index.js";
+import { endpoint, readPublishedCatalog } from "./fact-catalog.mjs";
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+const catalog = await readPublishedCatalog(process.env.CATALOG_BASE_SHA, { production: process.env.VERCEL_ENV === "production" });
 const output = resolve(webRoot, ".vercel/output");
 await rm(output, { recursive: true, force: true });
 await mkdir(resolve(output, "static/_assets"), { recursive: true });
@@ -36,6 +38,14 @@ for (const path of ["/.well-known/apple-app-site-association", "/apple-app-site-
   await addRoute(path, payload.association);
 }
 
+const catalogPath = resolve(output, "static", endpoint.slice(1));
+await mkdir(dirname(catalogPath), { recursive: true });
+await writeFile(catalogPath, catalog.bytes);
+routing.push({
+  src: `^${escape(endpoint)}$`, methods: ["GET", "HEAD"], caseSensitive: true, dest: endpoint,
+  headers: { ...securityHeaders, "content-type": "application/json", "cache-control": "public, max-age=0, must-revalidate" },
+});
+
 const commit = process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA
   || execFileSync("git", ["rev-parse", "HEAD"], { cwd: webRoot, encoding: "utf8" }).trim();
 if (!/^[0-9a-f]{40}$/.test(commit)) throw new Error("Missing exact Git commit for deployment provenance");
@@ -63,4 +73,4 @@ await writeFile(resolve(functionRoot, "index.cjs"), await readFile(new URL("../w
 await writeFile(resolve(functionRoot, ".vc-config.json"), JSON.stringify({
   runtime: "nodejs24.x", handler: "index.cjs", launcherType: "Nodejs", maxDuration: 10,
 }, null, 2) + "\n");
-console.log(`Prepared Vercel build: ${written.size} CDN assets, invitation fallback, commit ${commit}.`);
+console.log(`Prepared Vercel build: ${written.size} media and page assets, fact catalog revision ${catalog.revision}, invitation fallback, commit ${commit}.`);

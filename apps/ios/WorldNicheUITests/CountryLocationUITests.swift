@@ -74,13 +74,19 @@ final class CountryLocationUITests: XCTestCase {
         let app = launch(largeText: true)
         let globe = open("Japan", in: app)
         let toggle = app.buttons["toggleCountryGlobe"]
+        let scroll = app.scrollViews["countryReadingScroll"]
+        // At accessibility sizes the country introduction can fill the first screen.
+        for _ in 0..<8 {
+            if toggle.isHittable && toggle.frame.maxY < app.buttons["askNiche"].frame.minY - 16 { break }
+            let margin = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.02, dy: 0.65))
+            margin.press(forDuration: 0.05, thenDragTo: margin.withOffset(CGVector(dx: 0, dy: -160)))
+        }
         XCTAssertTrue(toggle.isHittable)
         toggle.tap()
         XCTAssertTrue(globe.waitForNonExistence(timeout: 3))
         toggle.tap()
         XCTAssertTrue(globe.waitForExistence(timeout: 3))
         let originalY = toggle.frame.minY
-        let scroll = app.scrollViews.containing(.staticText, identifier: "countryTitle").firstMatch
         // The outside margin remains available for vertical reading gestures.
         let start = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.02, dy: 0.75))
         start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -160)))

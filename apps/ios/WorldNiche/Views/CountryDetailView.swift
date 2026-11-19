@@ -7,6 +7,7 @@ struct CountryDetailView: View {
     @Environment(SocialStore.self) private var social
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
+    @EnvironmentObject private var factCatalog: HistoricalFactCatalog
     @State private var currentProgress = CountryReadingProgress()
     @State private var scrollPhase = ScrollPhase.idle
     @State private var bottomPull = false
@@ -85,7 +86,7 @@ struct CountryDetailView: View {
                     Button(journal.savedIDs.contains(country.id) ? "Unsave country" : "Save country", systemImage: journal.savedIDs.contains(country.id) ? "bookmark.fill" : "bookmark") {
                         journal.toggleSaved(country)
                     }.labelStyle(.iconOnly).accessibilityIdentifier("saveCountry")
-                    ShareLink(item: "I’m exploring \(country.name) with WorldNiche. \(country.historicalFact?.title ?? "A little more local.")") {
+                    ShareLink(item: shareText) {
                         Label("Share", systemImage: "square.and.arrow.up")
                     }
                 }
@@ -107,17 +108,46 @@ struct CountryDetailView: View {
                 .accessibilityIdentifier("askNiche")
                 .padding(.horizontal, 24).padding(.bottom, 8)
             }
-            .sheet(isPresented: $showCompanion) { CompanionView(country: country, music: music) }
+            .sheet(isPresented: $showCompanion) {
+                CompanionView(country: country, fact: displayedFact, music: music)
+                    .id(displayedFact)
+            }
+            .onAppear { journal.selectFact(for: country, from: facts) }
+            .onChange(of: facts) { _, updated in journal.selectFact(for: country, from: updated) }
+            .onChange(of: journal.snapshot.deviceId) {
+                showCompanion = false
+                currentProgress = CountryReadingProgress()
+                journal.selectFact(for: country, from: facts)
+            }
+            .onChange(of: showCompanion) { _, visible in
+                if !visible { journal.selectFact(for: country, from: facts) }
+            }
             .task(id: "\(country.id)-music-\(musicRefreshID)-\(refreshID)") {
                 await loadMusic(forceRefresh: musicRefreshID > 0 || refreshID > 0)
             }
-            .refreshLiveContent { refreshID += 1 }
+            .refreshLiveContent {
+                if !showCompanion { journal.selectFact(for: country, from: facts) }
+                refreshID += 1
+            }
             .refreshSocialProfiles(enabled: social.isSignedIn)
-            .refreshable { await loadMusic(forceRefresh: true) }
+            .refreshable {
+                journal.selectFact(for: country, from: facts, advance: true)
+                async let chart: Void = loadMusic(forceRefresh: true)
+                await factCatalog.refresh(force: true)
+                await chart
+            }
         }
     }
 
     private var isExplored: Bool { journal.visitedIDs.contains(country.id) }
+    private var facts: [HistoricalFact] { factCatalog[country.id] }
+    private var displayedFact: HistoricalFact? { journal.displayedFact(for: country, from: facts) }
+
+    private var shareText: String {
+        guard let fact = displayedFact else { return "I’m exploring \(country.name) with WorldNiche." }
+        return "\(country.name) · \(fact.title)\n\n\(fact.body)\n\n\(fact.sourceName): \(fact.sourceURL.absoluteString)"
+    }
+
     private var readingProgress: CountryReadingProgress {
         var progress = currentProgress
         progress.record(journal.readingProgress(for: country.id).fraction)
@@ -130,7 +160,7 @@ struct CountryDetailView: View {
 
     @ViewBuilder
     private var historicalFactSection: some View {
-        if let fact = country.historicalFact {
+        if let fact = displayedFact {
             VStack(alignment: .leading, spacing: 12) {
                 Eyebrow(text: "A little history")
                 Text(fact.title)
@@ -150,6 +180,29 @@ struct CountryDetailView: View {
                 }
                 .accessibilityLabel("Historical source, \(fact.sourceName)")
                 .accessibilityIdentifier("historicalFactSource")
+                if facts.count > 1, let index = facts.firstIndex(of: fact) {
+                    HStack {
+                        Text("Fact \(index + 1) of \(facts.count)")
+                            .scaledFont(size: 12).foregroundStyle(Palette.muted)
+                            .accessibilityIdentifier("historicalFactPosition")
+                        Spacer()
+                        Button("Next fact", systemImage: "arrow.right") {
+                            journal.selectFact(for: country, from: facts, advance: true)
+                        }
+                        .scaledFont(size: 13, weight: .medium)
+                        .frame(minHeight: 44)
+                        .accessibilityIdentifier("nextHistoricalFact")
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .editorialCard()
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                Eyebrow(text: "A little history")
+                Text("There’s no reviewed fact for \(country.name) at the moment.")
+                    .scaledFont(size: 15).foregroundStyle(Palette.muted)
+                    .accessibilityIdentifier("historicalFactUnavailable")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .editorialCard()
@@ -193,6 +246,14 @@ struct CountryDetailView: View {
             Link(country.overviewSourceName, destination: country.overviewSourceURL)
                 .scaledFont(size: 13, weight: .medium)
                 .accessibilityIdentifier("countryOverviewSource")
+            if let label = country.populationLabel {
+                Link(destination: country.populationSourceURL) {
+                    Label(label, systemImage: "person.2")
+                        .scaledFont(size: 13, weight: .medium)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .accessibilityIdentifier("countryPopulation")
+            }
             countryLocation
             Rectangle().fill(Palette.line).frame(height: 1).padding(.top, 8)
         }

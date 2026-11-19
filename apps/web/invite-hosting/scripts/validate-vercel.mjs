@@ -4,11 +4,18 @@ import { createServer } from "node:http";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import worker, { payload } from "../dist/server/index.js";
+import { catalogFile, endpoint } from "./fact-catalog.mjs";
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const output = resolve(webRoot, ".vercel/output");
 const config = JSON.parse(await readFile(resolve(output, "config.json")));
 assert.equal(config.version, 3);
+const catalogRoute = config.routes.find(item => new RegExp(item.src).test(endpoint));
+assert.equal(catalogRoute.dest, endpoint);
+assert.deepEqual(catalogRoute.methods, ["GET", "HEAD"]);
+assert.equal(catalogRoute.headers["content-type"], "application/json");
+assert.match(catalogRoute.headers["cache-control"], /must-revalidate/);
+assert.deepEqual(await readFile(resolve(output, "static", endpoint.slice(1))), await readFile(catalogFile));
 const paths = [...Object.keys(payload.routes).filter(path => path !== "/invite-template"),
   "/index.html", "/.well-known/apple-app-site-association", "/apple-app-site-association"];
 for (const path of paths) {
@@ -76,4 +83,4 @@ try {
   if (previousPublicKey === undefined) delete process.env.WORLDNICHE_INVITE_PUBLIC_KEY;
   else process.env.WORLDNICHE_INVITE_PUBLIC_KEY = previousPublicKey;
 }
-console.log(`PASS: ${paths.length} CDN routes match current website bytes and headers; production AASA, invitation/error HTTP scenarios and personalized metadata pass.`);
+console.log(`PASS: country facts and ${paths.length} website routes match the build sources. Production AASA, invitation/error HTTP scenarios and personalized metadata pass.`);

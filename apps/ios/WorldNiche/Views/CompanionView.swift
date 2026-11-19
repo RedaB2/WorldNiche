@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CompanionView: View {
     let country: Country
+    let fact: HistoricalFact?
     let music: FeedSnapshot<MusicTrack>?
 
     @Environment(\.dismiss) private var dismiss
@@ -84,7 +85,7 @@ struct CompanionView: View {
         .tint(pine)
         .foregroundStyle(pine)
         .presentationDragIndicator(.visible)
-        .task(id: country.id) {
+        .task(id: fact) {
             question = ""
             companion.reset()
         }
@@ -118,7 +119,7 @@ struct CompanionView: View {
     }
 
     private var introductionDetail: String {
-        if companion.availability.isAvailable, let fact = country.historicalFact {
+        if companion.availability.isAvailable, let fact {
             return "Ask about “\(fact.title)” or the music chart for \(country.name)."
         }
         return companion.availability.detail
@@ -153,7 +154,7 @@ struct CompanionView: View {
 
     private var suggestedQuestions: [String] {
         var result: [String] = []
-        if let fact = country.historicalFact {
+        if let fact {
             result.append("What can we learn from “\(fact.title)”?")
             result.append("How could I bring this up in a conversation?")
         }
@@ -294,13 +295,14 @@ struct CompanionView: View {
                     .frame(minHeight: 44)
                     .contentShape(Rectangle())
                 }
+                .accessibilityIdentifier(source.id)
             }
         }
         .padding(.top, 2)
     }
 
     private struct SourceLink: Identifiable {
-        var id: String { url.absoluteString }
+        let id: String
         let title: String
         let subtitle: String
         let symbol: String
@@ -308,19 +310,23 @@ struct CompanionView: View {
     }
 
     private var sourceLinks: [SourceLink] {
-        var links = [SourceLink(title: "Country overview", subtitle: country.overviewSourceName,
+        var links = [SourceLink(id: "companionOverviewSource", title: "Country overview", subtitle: country.overviewSourceName,
                                 symbol: "globe", url: country.overviewSourceURL)]
-        if let fact = country.historicalFact {
-            links.append(SourceLink(title: fact.title, subtitle: fact.sourceName,
+        if let population = country.populationLabel {
+            links.append(SourceLink(id: "companionPopulationSource", title: population, subtitle: "United Nations population data",
+                                    symbol: "person.2", url: country.populationSourceURL))
+        }
+        if let fact {
+            links.append(SourceLink(id: "companionHistoricalSource", title: fact.title, subtitle: fact.sourceName,
                                     symbol: "book", url: fact.sourceURL))
         }
         links += music?.items.prefix(5).map { track in
             let destination = track.provider == .tuneping ? "MusicBrainz recording" : track.provider.rawValue
-            return SourceLink(title: track.title, subtitle: "\(track.artist) · \(destination)",
+            return SourceLink(id: "companionTrack-\(track.id)", title: track.title, subtitle: "\(track.artist) · \(destination)",
                               symbol: "music.note", url: track.url)
         } ?? []
         if music?.items.first?.provider == .tuneping {
-            links.append(SourceLink(title: "Data by Tuneping", subtitle: "Radio chart",
+            links.append(SourceLink(id: "companionRadioSource", title: "Data by Tuneping", subtitle: "Radio chart",
                                     symbol: "radio", url: URL(string: "https://tuneping.com")!))
         }
         var seen = Set<String>()
@@ -328,7 +334,7 @@ struct CompanionView: View {
     }
 
     private func send(_ text: String) {
-        if companion.send(text, country: country, music: music) {
+        if companion.send(text, country: country, fact: fact, music: music) {
             question = ""
             composerFocused = false
         }

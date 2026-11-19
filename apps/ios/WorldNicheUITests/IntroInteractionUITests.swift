@@ -41,6 +41,7 @@ final class IntroInteractionUITests: XCTestCase {
         reveal(overview, on: 1, in: app)
         overview.tap()
         XCTAssertTrue(element("introOverviewContent", in: app).waitForExistence(timeout: 5))
+        XCTAssertTrue(element("introCountryPopulation", in: app).exists)
         XCTAssertFalse(element("introMusicContent", in: app).exists)
         XCTAssertEqual(music.value as? String, "Collapsed")
 

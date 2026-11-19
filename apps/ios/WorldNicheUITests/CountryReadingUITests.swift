@@ -14,7 +14,9 @@ final class CountryReadingUITests: XCTestCase {
             let title = app.staticTexts["historicalFactTitle"]
             let body = app.staticTexts["historicalFactBody"]
             let source = app.descendants(matching: .any)["historicalFactSource"].firstMatch
-            XCTAssertTrue(overview.label.contains(country))
+            XCTAssertFalse(overview.label.isEmpty)
+            let population = app.descendants(matching: .any)["countryPopulation"].firstMatch
+            XCTAssertNotNil(population.label.range(of: #"\b20\d{2}\b"#, options: .regularExpression))
             XCTAssertFalse(app.staticTexts["In the conversation"].exists)
             app.buttons["toggleCountryGlobe"].tap()
             XCTAssertLessThan(overview.frame.maxY, title.frame.minY)
@@ -29,6 +31,31 @@ final class CountryReadingUITests: XCTestCase {
             capture("\(country) historical fact and source", app)
             app.navigationBars["A little more local"].buttons["Close"].tap()
         }
+    }
+
+    @MainActor
+    func testNextFactPersistsAndMatchesTheCompanionSourceWhenMusicIsUnavailable() {
+        let app = launch(mode: "unavailable")
+        openMorocco(app)
+        app.buttons["toggleCountryGlobe"].tap()
+        let title = app.staticTexts["historicalFactTitle"]
+        let original = title.label
+        let next = app.buttons["nextHistoricalFact"]
+        for _ in 0..<12 where !next.isHittable { readStep(app) }
+        XCTAssertTrue(next.isHittable)
+        next.tap()
+        let selected = title.label
+        XCTAssertNotEqual(selected, original)
+        app.buttons["askNiche"].tap()
+        let source = app.descendants(matching: .any)["companionHistoricalSource"].firstMatch
+        XCTAssertTrue(source.waitForExistence(timeout: 5))
+        XCTAssertTrue(source.label.contains(selected), source.label)
+        XCTAssertTrue(app.descendants(matching: .any)["companionPopulationSource"].firstMatch.exists)
+        app.terminate()
+        app.launchArguments = arguments(reset: false, mode: "unavailable")
+        app.launch()
+        openMorocco(app)
+        XCTAssertEqual(title.label, selected)
     }
 
     @MainActor

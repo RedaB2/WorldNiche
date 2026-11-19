@@ -7,6 +7,8 @@ struct IntroView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var page = 0
     @State private var previews = IntroPreviewStore()
+    @Environment(DiscoveryJournal.self) private var journal
+    @EnvironmentObject private var factCatalog: HistoricalFactCatalog
 
     private var reduceMotion: Bool {
         #if DEBUG && targetEnvironment(simulator)
@@ -150,7 +152,7 @@ struct IntroView: View {
         ScrollView {
             VStack(spacing: 28) {
                 VStack(spacing: 12) {
-                    discoverySection(.overview, title: "Meet a country", symbol: "globe")
+                    discoverySection(.overview, title: "A country through time", symbol: "globe")
                     discoverySection(.history, title: "A detail from its past", symbol: "book.pages")
                     discoverySection(.music, title: "A song to bring home", symbol: "music.note")
                 }
@@ -317,7 +319,7 @@ struct IntroView: View {
                     .font(.caption.weight(.medium))
             }
             if let fetchedAt = previews.musicFetchedAt, !previews.tracks.isEmpty {
-                Text("Updated \(fetchedAt.formatted(date: .abbreviated, time: .shortened))")
+                Text("Checked \(fetchedAt.formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption2).foregroundStyle(Palette.muted)
             }
         }
@@ -331,18 +333,38 @@ struct IntroView: View {
                 .foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true)
             Link(country.overviewSourceName, destination: country.overviewSourceURL)
                 .font(.caption.weight(.medium))
+            if let label = country.populationLabel {
+                Link(label, destination: country.populationSourceURL)
+                    .font(.subheadline.weight(.medium))
+                    .accessibilityIdentifier("introCountryPopulation")
+            }
         }
     }
 
     @ViewBuilder
     private var historyPreview: some View {
-        if let fact = CountryRepository.country(id: "US")?.historicalFact {
-            previewHeading(fact.title, source: "United States")
-            Text(fact.body).font(.subheadline)
-                .foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true)
-            Link(fact.sourceName, destination: fact.sourceURL).font(.caption.weight(.medium))
-        } else {
-            Text("A historical fact is unavailable for this country.").font(.subheadline)
+        if let country = CountryRepository.country(id: "US") {
+            let facts = factCatalog[country.id]
+            Group {
+                if let fact = journal.displayedFact(for: country, from: facts) {
+                    previewHeading(fact.title, source: "United States")
+                    Text(fact.body).font(.subheadline)
+                        .foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true)
+                    Link(fact.sourceName, destination: fact.sourceURL).font(.caption.weight(.medium))
+                    if facts.count > 1 {
+                        Button("Next fact", systemImage: "arrow.right") {
+                            journal.selectFact(for: country, from: facts, advance: true)
+                        }
+                        .font(.subheadline.weight(.medium))
+                        .frame(minHeight: 44)
+                        .accessibilityIdentifier("introNextHistoricalFact")
+                    }
+                } else {
+                    Text("A historical fact is unavailable for this country.").font(.subheadline)
+                }
+            }
+            .onAppear { journal.selectFact(for: country, from: facts) }
+            .onChange(of: facts) { _, updated in journal.selectFact(for: country, from: updated) }
         }
     }
 

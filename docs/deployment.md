@@ -33,6 +33,14 @@ After Vercel reports success for the current `main` commit, [`Check live website
 
 The generated `.vercel/output` uses Vercel's Build Output API. Pages, images and videos are CDN files. A small Node function handles invitations, unsupported methods and unknown URLs using the existing handler. Its invitation metadata lookup reads only an approved display name and never redeems invites. The build gets the public Apple team/bundle IDs from `ops/production.json`.
 
+### Publishing historical fact corrections
+
+Edit the [website fact catalog](../apps/web/content/v1/historical-facts.json) and increment its integer `revision`. Keep the same fact ID when correcting its text or citation. Give a different story a new country-prefixed ID. Each of the 195 countries has an ordered list of up to five sourced facts. An empty list withdraws every fact for that country. The native bundle supplies an offline copy, so a routine editorial update needs only the website file.
+
+Run `bash scripts/check.sh web` and `npm --prefix apps/web run build:vercel`. The website suite checks all destination codes, IDs, text, source links and response size against the app’s version 1 format. GitHub compares the proposed revision to the target commit. The production build also compares it to the currently published revision before packaging the file. If a correction needs reversing, publish the restored content with a higher revision so devices that downloaded the correction can apply the reversal.
+
+Once a reviewed change reaches `main`, Vercel serves the canonical JSON at [the historical facts endpoint](https://worldniche.app/content/v1/historical-facts.json). The live website check compares its response bytes to the merged catalog. Future iOS releases can refresh their bundled offline copy from the validated website file.
+
 ### Personalized friend previews
 
 The Add a friend change requires migration `202611010009_invitation_link_metadata.sql` and these Vercel runtime environment variables:
@@ -56,7 +64,7 @@ The RPC allows holders of a valid, unexpired invitation token to read only its o
    node apps/web/invite-hosting/scripts/check-live.mjs https://worldniche.app <full-commit-sha>
    ```
 
-   This verifies all public policy pages, direct JSON AASA responses, both demo videos' byte ranges, invitation/error behavior and commit provenance. Its invitation token is synthetic and never connects accounts. Apple/iMessage testing is still needed if the association rules change.
+   This verifies all public policy pages, the historical fact catalog, direct JSON AASA responses, both demo videos' byte ranges, invitation/error behavior and commit provenance. Its invitation token is synthetic and never connects accounts. Apple/iMessage testing is still needed if the association rules change.
 
 Project settings: framework `Other`, Node `24.x`, root `apps/web`, include source outside the root directory so `ops/production.json` is available. Keep build settings in `vercel.json`; do not add production API secrets or enable analytics as part of deployment maintenance. Existing preview access controls can remain in place while the production domain stays public.
 
@@ -72,9 +80,9 @@ The former apex A records were `162.159.143.30` and `172.66.3.26`. Do not restor
 
 The app supports iOS 26 at runtime but needs Xcode 27 to compile its availability-guarded APIs. GitHub's `xcode-27` runner uses an explicit Xcode 27.0 installation and iOS 27.0 runtime. `Swift logic tests` and `iOS build and UI tests` report separately. Native jobs skip only when every changed file is under `apps/web/`, `docs/`, `marketing/` or `metadata/`. Native, backend, shared configuration, CI and unknown paths still run them. Manual `Checks` runs always run the full suite. Secret, website and backend checks run on every PR and main push.
 
-The UI job validates device/runtime compatibility, compiles first, then creates a disposable iPhone 17 Pro Max and waits up to five minutes for `simctl bootstatus` before running the eleven profile, journal and country-reading tests with synthetic account and chart data. It preserves the build log, environment inventory, per-attempt logs, summaries and `.xcresult` bundles in `simulator-results` for seven days. Update the Xcode/runtime pins together with a passing native CI run when the runner image changes. Check supported device types before changing a runtime: the image's iOS 27.1 runtime is Duo-only. A missing or incompatible pinned toolchain/runtime is an environment error, not an application test failure.
+The UI job validates device/runtime compatibility, compiles first, then creates a disposable iPhone 17 Pro Max and waits up to five minutes for `simctl bootstatus` before running the twelve profile, journal and country-reading tests with synthetic account and chart data. It preserves the build log, environment inventory, per-attempt logs, summaries and `.xcresult` bundles in `simulator-results` for seven days. Update the Xcode/runtime pins together with a passing native CI run when the runner image changes. Check supported device types before changing a runtime: the image's iOS 27.1 runtime is Duo-only. A missing or incompatible pinned toolchain/runtime is an environment error, not an application test failure.
 
-PR5 exposed an XCTest accessibility initialization stall before any test began, also seen on PR4. The harness retries once on a fresh simulator only when the result contains that exact runner bootstrap failure, no test has started, and no test passed or was skipped. Each attempt remains available and recovery produces a warning. Assertions, app launch timeouts after a test starts, unknown failures, and missing/incomplete results fail without retries. Green requires a successful process exit and at least eleven passing tests with no failures or skips. An exhausted startup retry remains red and explicitly reports that CI could not validate the build.
+PR5 exposed an XCTest accessibility initialization stall before any test began, also seen on PR4. The harness retries once on a fresh simulator only when the result contains that exact runner bootstrap failure, no test has started, and no test passed or was skipped. Each attempt remains available and recovery produces a warning. Assertions, app launch timeouts after a test starts, unknown failures, and missing/incomplete results fail without retries. Green requires a successful process exit and at least twelve passing tests with no failures or skips. An exhausted startup retry remains red and explicitly reports that CI could not validate the build.
 
 Regression checks for change routing and retry boundaries run with `bash scripts/check.sh private`. Release testing still uses the owner's phone and unfolded Duo simulators, plus real Apple authorization when that behavior changes. CI does not sign, upload or release the app.
 

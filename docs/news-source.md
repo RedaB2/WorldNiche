@@ -1,6 +1,6 @@
 # News sources in earlier releases
 
-These notes describe the shipped Global Voices integration. The revised country experience bundles overviews and historical facts and fetches only the music chart.
+These notes describe the shipped Global Voices integration. The revised country experience bundles historical overviews, downloads the reviewed fact catalog, and fetches music charts separately.
 
 Build 7 replaces Google News RSS with Global Voices' licensed country feeds. Each story shows its author, publisher, publication date, original link and a CC BY 3.0 license link. The app does not copy article bodies or news photographs. [Rights and attribution](../licenses/GLOBAL-VOICES.md).
 

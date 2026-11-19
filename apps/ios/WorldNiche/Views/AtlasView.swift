@@ -70,6 +70,7 @@ struct AtlasView: View {
 }
 
 struct CountryRow: View {
+    @EnvironmentObject private var factCatalog: HistoricalFactCatalog
     let country: Country
     var body: some View {
         HStack(spacing: 16) {
@@ -79,7 +80,7 @@ struct CountryRow: View {
                 Text(country.capital).scaledFont(size: 11).foregroundStyle(Palette.muted)
             }
             Spacer()
-            if country.historicalFact != nil {
+            if !factCatalog[country.id].isEmpty {
                 Image(systemName: "sparkle").scaledFont(size: 12).foregroundStyle(Palette.clay)
                     .accessibilityLabel("Includes a sourced historical fact")
             }
@@ -249,7 +250,7 @@ struct AboutView: View {
                     Link("Natural Earth · public-domain map data", destination: URL(string: "https://www.naturalearthdata.com/about/terms-of-use/")!)
                     Link("Country data · mledoze/countries · ODbL", destination: URL(string: "https://github.com/mledoze/countries")!)
                     Link("Open Database License", destination: URL(string: "https://opendatacommons.org/licenses/odbl/1-0/")!)
-                    Text("Each historical fact links to its source. Apple Music charts reflect local streams. Where a country has no Apple chart, Tuneping may have a chart of songs played by monitored local radio stations.")
+                    Text("Each country opens with a short history and a dated population figure. Its fact changes the next day you visit. Tap Next fact to read another sourced story. Apple Music charts reflect local streams. Where a country has no Apple chart, Tuneping may have a chart of songs played by monitored local radio stations.")
                     Link("Radio chart data by Tuneping", destination: URL(string: "https://tuneping.com/")!)
                     Text("WorldNiche · 1.0").scaledFont(size: 11, design: .monospaced).tracking(2).padding(.top, 12)
                 }.scaledFont(size: 14).lineSpacing(5).foregroundStyle(Palette.pine).padding(26).frame(maxWidth: 650).frame(maxWidth: .infinity)

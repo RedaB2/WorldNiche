@@ -8,6 +8,6 @@
 | Global Voices headlines in older releases | Author and publisher attribution, original links, and [CC BY 3.0 terms](GLOBAL-VOICES.md). |
 | Apple Music chart links and cover art | Apple's official public chart feeds, used to link to listening on Apple Music. [Review Guidelines 4.5](https://developer.apple.com/app-store/review/guidelines/#apple-sites-and-services) and [Apple Music identity guidelines](https://marketing.services.apple/apple-music-identity-guidelines). No music is downloaded or embedded in marketing media. |
 
-Country overviews summarize the geography material linked on each card. Most cite the [archived World Factbook](https://simonw.github.io/cia-world-factbook-2020/). Country facts use original wording and link to the source for each claim. The seven-day radio rankings credit [Tuneping](https://tuneping.com/docs/) and link each recording to MusicBrainz.
+Country histories use original summaries with a link to the supporting historical record on each card. Population figures are rounded midyear 2025 projections from United Nations, Department of Economic and Social Affairs, Population Division (2024), [World Population Prospects 2024](https://population.un.org/wpp/). Country facts use original wording and link to the source for each claim. The seven-day radio rankings credit [Tuneping](https://tuneping.com/docs/) and link each recording to MusicBrainz.
 
 These notices cover third-party material. They do not assign a license to the app’s Swift source code.

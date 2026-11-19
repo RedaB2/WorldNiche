@@ -15,7 +15,8 @@ The `v1.0.0` tag remains immutable. The `v1.0.1` GitHub release records the new 
 | Want to change | Edit |
 | --- | --- |
 | Globe, onboarding, country screens, profile, journal | `apps/ios/WorldNiche/` |
-| Country catalog, historical facts and chart mappings | `apps/ios/WorldNiche/Resources/` |
+| Bundled country histories, population figures, initial facts and chart mappings | `apps/ios/WorldNiche/Resources/` |
+| Published fact catalog for installed apps | `apps/web/content/v1/historical-facts.json` |
 | Landing page, demos, friends animation, public policies | `apps/web/landing-site/` |
 | Friend link fallback and Universal Link routing | `apps/web/invite-site/`, `apps/web/invite-hosting/` |
 | Accounts, friendship access, journal sync, moderation | `backend/supabase/` |
