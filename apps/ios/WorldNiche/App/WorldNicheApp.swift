@@ -5,6 +5,8 @@ import AuthenticationServices
 struct WorldNicheApp: App {
     @State private var journal: DiscoveryJournal
     @State private var social: SocialStore
+    @StateObject private var factCatalog = HistoricalFactCatalog.shared
+    @State private var catalogRefreshID = 0
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
@@ -29,6 +31,9 @@ struct WorldNicheApp: App {
             RootView()
                 .environment(journal)
                 .environment(social)
+                .environmentObject(factCatalog)
+                .task(id: catalogRefreshID) { await factCatalog.refresh() }
+                .refreshLiveContent { catalogRefreshID += 1 }
                 .tint(Palette.pine)
                 .task { await restoreSession() }
                 .task(id: journal.revision) {

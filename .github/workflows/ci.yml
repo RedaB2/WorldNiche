@@ -46,6 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
@@ -53,6 +54,8 @@ jobs:
       - run: bash scripts/check.sh assets
       - run: bash scripts/check.sh web
       - run: npm --prefix apps/web run build:vercel
+        env:
+          CATALOG_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
 
   backend:
     name: Backend security and database
@@ -108,7 +111,7 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath outputs/ci/DerivedData \
             CODE_SIGNING_ALLOWED=NO 2>&1 | tee outputs/ci/build.log
-      - name: Run profile and journal tests on a ready simulator
+      - name: Run profile, journal and country-reading tests on a ready simulator
         run: python3 scripts/ci_simulator.py
       - name: Preserve simulator results
         if: always()

@@ -24,6 +24,26 @@ struct JournalChange: Codable, Equatable, Sendable {
     var key: String { "\(countryId).\(field)" }
 }
 
+struct FactRotation: Codable, Equatable, Sendable {
+    private(set) var seenIDs: [String] = []
+    private(set) var selectedDay: DateComponents?
+
+    mutating func select(from ids: [String], advance: Bool, now: Date, calendar: Calendar) {
+        let previous = seenIDs.last
+        seenIDs.removeAll { !ids.contains($0) }
+        guard !ids.isEmpty else { selectedDay = nil; return }
+        let today = calendar.dateComponents([.era, .year, .month, .day], from: now)
+        if !advance, let previous, ids.contains(previous),
+           selectedDay == today { return }
+        if let unseen = ids.first(where: { !seenIDs.contains($0) }) {
+            seenIDs.append(unseen)
+        } else {
+            seenIDs = [ids.first(where: { $0 != previous }) ?? ids[0]]
+        }
+        selectedDay = today
+    }
+}
+
 struct JournalSnapshot: Codable, Sendable {
     var deviceId = UUID()
     var sequence: Int64 = 0
@@ -31,6 +51,7 @@ struct JournalSnapshot: Codable, Sendable {
     var pending: [String: JournalChange] = [:]
     // Optional so journals from before reading progress still decode without a migration.
     var readingProgress: [String: CountryReadingProgress]?
+    var factRotations: [String: FactRotation]?
 }
 
 struct JournalSyncResult: Decodable, Sendable { let entries: [JournalEntry] }
@@ -65,6 +86,20 @@ final class DiscoveryJournal {
 
     func readingProgress(for id: String) -> CountryReadingProgress {
         snapshot.readingProgress?[id] ?? CountryReadingProgress()
+    }
+
+    func displayedFact(for country: Country, from facts: [HistoricalFact]) -> HistoricalFact? {
+        let selectedID = snapshot.factRotations?[country.id]?.seenIDs.last
+        return facts.first { $0.id == selectedID } ?? facts.first
+    }
+
+    func selectFact(for country: Country, from facts: [HistoricalFact], advance: Bool = false, now: Date = Date(), calendar: Calendar = .current) {
+        var history = snapshot.factRotations?[country.id] ?? FactRotation()
+        history.select(from: facts.map(\.id), advance: advance, now: now, calendar: calendar)
+        guard history != snapshot.factRotations?[country.id] else { return }
+        if snapshot.factRotations == nil { snapshot.factRotations = [:] }
+        snapshot.factRotations?[country.id] = history
+        persist()
     }
 
     func saveReadingProgress(_ progress: CountryReadingProgress, for country: Country) {

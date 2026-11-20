@@ -1043,7 +1043,7 @@ private struct ProfilePrivacyView: View {
                 Text("The account service also stores invitation links, blocks and reports used to protect the community. A first name or nickname is enough; you don’t need to share your real name.")
             }
             Section("Content and conversations") {
-                Text("Public music, news and cultural content is requested directly from Apple, Global Voices and Wikimedia. These services receive network requests. Ask Niche uses Apple Intelligence on supported devices; the app doesn’t send that conversation to a remote AI service.")
+                Text("Country overviews and population figures are stored in the app. WorldNiche downloads the full catalog of reviewed facts so the request is the same whichever country you read. Your place in each country’s facts stays in your local journal. Loading a music chart sends a request for that country to Apple or Tuneping. Opening a source or song link connects to its publisher. Ask Niche uses Apple Intelligence on supported devices; the app doesn’t send that conversation to a remote AI service.")
                 Text("WorldNiche doesn’t include advertising, tracking or an analytics SDK.")
             }
             Section("Your choices") {

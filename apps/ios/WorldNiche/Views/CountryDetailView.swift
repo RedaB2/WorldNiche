@@ -7,39 +7,27 @@ struct CountryDetailView: View {
     @Environment(SocialStore.self) private var social
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
+    @EnvironmentObject private var factCatalog: HistoricalFactCatalog
     @State private var currentProgress = CountryReadingProgress()
     @State private var scrollPhase = ScrollPhase.idle
     @State private var bottomPull = false
     @State private var showsGlobe = true
     @State private var globeResetToken = 0
     @State private var music: FeedSnapshot<MusicTrack>?
-    @State private var news: FeedSnapshot<NewsStory>?
     @State private var musicLoading = true
-    @State private var newsLoading = true
     @State private var musicRequestID = UUID()
-    @State private var newsRequestID = UUID()
     @State private var musicRefreshID = 0
-    @State private var newsRefreshID = 0
-    @State private var cultureReading: CultureReading?
-    @State private var cultureMessage: String?
-    @State private var cultureLoaded = false
-    @State private var cultureLoading = false
-    @State private var cultureRequestID = UUID()
-    @State private var cultureRotation = 0
-    @State private var cultureSessionID = UUID()
     @State private var showCompanion = false
     @State private var refreshID = 0
     private static let feedService = DiscoveryFeedService()
-    private static let cultureService = LiveCultureService.shared
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 26) {
                     countryHeader
-                    liveCultureSection
+                    historicalFactSection
                     musicSection
-                    newsSection
                     Text("A country contains many cultures. Use these discoveries as invitations to ask, never assumptions about a person.")
                         .scaledFont(size: 12).lineSpacing(4).foregroundStyle(Palette.muted)
                         .padding(.horizontal, 4)
@@ -98,7 +86,7 @@ struct CountryDetailView: View {
                     Button(journal.savedIDs.contains(country.id) ? "Unsave country" : "Save country", systemImage: journal.savedIDs.contains(country.id) ? "bookmark.fill" : "bookmark") {
                         journal.toggleSaved(country)
                     }.labelStyle(.iconOnly).accessibilityIdentifier("saveCountry")
-                    ShareLink(item: "I’m exploring \(country.name) with WorldNiche. \(cultureReading?.title ?? country.insights.first?.title ?? "A little more local.")") {
+                    ShareLink(item: shareText) {
                         Label("Share", systemImage: "square.and.arrow.up")
                     }
                 }
@@ -118,29 +106,48 @@ struct CountryDetailView: View {
                 .buttonStyle(.glass)
                 .buttonBorderShape(.capsule)
                 .accessibilityIdentifier("askNiche")
-                .disabled(!cultureLoaded || cultureLoading)
                 .padding(.horizontal, 24).padding(.bottom, 8)
             }
-            .sheet(isPresented: $showCompanion) { CompanionView(country: country, feed: feed, reading: cultureReading) }
+            .sheet(isPresented: $showCompanion) {
+                CompanionView(country: country, fact: displayedFact, music: music)
+                    .id(displayedFact)
+            }
+            .onAppear { journal.selectFact(for: country, from: facts) }
+            .onChange(of: facts) { _, updated in journal.selectFact(for: country, from: updated) }
+            .onChange(of: journal.snapshot.deviceId) {
+                showCompanion = false
+                currentProgress = CountryReadingProgress()
+                journal.selectFact(for: country, from: facts)
+            }
+            .onChange(of: showCompanion) { _, visible in
+                if !visible { journal.selectFact(for: country, from: facts) }
+            }
             .task(id: "\(country.id)-music-\(musicRefreshID)-\(refreshID)") {
                 await loadMusic(forceRefresh: musicRefreshID > 0 || refreshID > 0)
             }
-            .task(id: "\(country.id)-news-\(newsRefreshID)-\(refreshID)") {
-                await loadNews(forceRefresh: newsRefreshID > 0 || refreshID > 0)
+            .refreshLiveContent {
+                if !showCompanion { journal.selectFact(for: country, from: facts) }
+                refreshID += 1
             }
-            .refreshLiveContent { refreshID += 1 }
             .refreshSocialProfiles(enabled: social.isSignedIn)
-            .task(id: "\(country.id)-\(cultureRotation)-\(refreshID)") { await loadCulture(forceRefresh: refreshID > 0) }
             .refreshable {
-                async let music: () = loadMusic(forceRefresh: true)
-                async let news: () = loadNews(forceRefresh: true)
-                async let culture: () = loadCulture(forceRefresh: true)
-                _ = await (music, news, culture)
+                journal.selectFact(for: country, from: facts, advance: true)
+                async let chart: Void = loadMusic(forceRefresh: true)
+                await factCatalog.refresh(force: true)
+                await chart
             }
         }
     }
 
     private var isExplored: Bool { journal.visitedIDs.contains(country.id) }
+    private var facts: [HistoricalFact] { factCatalog[country.id] }
+    private var displayedFact: HistoricalFact? { journal.displayedFact(for: country, from: facts) }
+
+    private var shareText: String {
+        guard let fact = displayedFact else { return "I’m exploring \(country.name) with WorldNiche." }
+        return "\(country.name) · \(fact.title)\n\n\(fact.body)\n\n\(fact.sourceName): \(fact.sourceURL.absoluteString)"
+    }
+
     private var readingProgress: CountryReadingProgress {
         var progress = currentProgress
         progress.record(journal.readingProgress(for: country.id).fraction)
@@ -151,106 +158,55 @@ struct CountryDetailView: View {
         journal.saveReadingProgress(readingProgress, for: country)
     }
 
-    private func loadCulture(forceRefresh: Bool) async {
-        #if DEBUG && targetEnvironment(simulator)
-        if CountryReadingFixture.mode != nil {
-            cultureLoaded = true
-            cultureLoading = false
-            return
-        }
-        #endif
-        let requestID = UUID()
-        cultureRequestID = requestID
-        cultureLoading = true
-        for await result in Self.cultureService.updates(for: country, rotation: cultureRotation, forceRefresh: forceRefresh, discoverySessionID: cultureSessionID) {
-            guard !Task.isCancelled && cultureRequestID == requestID else { break }
-            cultureReading = result.reading
-            cultureMessage = result.message
-            cultureLoaded = true
-            cultureLoading = false
-        }
-    }
-
-    private var liveCultureSection: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            sectionHeading("The local lens", subtitle: cultureLoaded && cultureReading == nil ? "SAVED CULTURAL NOTE" : "TODAY’S CULTURAL DISCOVERY", icon: "book.pages")
-            if let reading = cultureReading {
-                if let image = reading.image {
-                    cultureImage(image)
-                }
-                Text(reading.displayTitle).scaledFont(size: 24, design: .serif).foregroundStyle(Palette.pine)
-                    .accessibilityIdentifier("liveCultureTitle")
-                Text(reading.displayBody).scaledFont(size: 15).lineSpacing(5).foregroundStyle(Palette.muted)
+    @ViewBuilder
+    private var historicalFactSection: some View {
+        if let fact = displayedFact {
+            VStack(alignment: .leading, spacing: 12) {
+                Eyebrow(text: "A little history")
+                Text(fact.title)
+                    .scaledFont(size: 26, design: .serif).foregroundStyle(Palette.pine)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier("historicalFactTitle")
+                Text(fact.body)
+                    .scaledFont(size: 16).lineSpacing(5).foregroundStyle(Palette.pine)
+                    .fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled)
-                if let fact = reading.generatedFact, !fact.conversationStarter.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Eyebrow(text: "A conversation starter")
-                        Text(fact.conversationStarter).scaledFont(size: 14).lineSpacing(4)
-                            .foregroundStyle(Palette.pine)
-                    }.padding(.vertical, 8)
+                    .accessibilityIdentifier("historicalFactBody")
+                Link(destination: fact.sourceURL) {
+                    Label(fact.sourceName, systemImage: "book")
+                        .scaledFont(size: 13, weight: .medium)
+                        .multilineTextAlignment(.leading)
+                        .frame(minHeight: 44, alignment: .leading)
                 }
-                Link("Read on Wikipedia", destination: reading.sourceURL).font(.footnote)
-                    .frame(minHeight: 44, alignment: .leading)
-                HStack(alignment: .top) {
-                    Text(reading.generatedFact == nil ? "Wikipedia contributors · source excerpt" : "AI-selected detail · from the linked source")
-                    Link("CC BY-SA 4.0", destination: URL(string: "https://creativecommons.org/licenses/by-sa/4.0/")!)
-                }.font(.caption2).foregroundStyle(Palette.muted)
-                updatedLabel(reading.fetchedAt)
-            } else if !cultureLoaded {
-                loadingRow("Following a local cultural thread…")
-            }
-            if let message = cultureMessage {
-                Text(message).font(.footnote).foregroundStyle(Palette.muted)
-            }
-            if cultureLoaded && cultureReading == nil {
-                Eyebrow(text: "Saved source note · reviewed Oct 17, 2026")
-                if let insight = country.insights.first {
-                    Text(insight.title).scaledFont(size: 24, design: .serif).foregroundStyle(Palette.pine)
-                    Text(insight.body).scaledFont(size: 15).lineSpacing(5).foregroundStyle(Palette.muted)
-                    Link(insight.sourceName, destination: insight.sourceURL).font(.footnote)
+                .accessibilityLabel("Historical source, \(fact.sourceName)")
+                .accessibilityIdentifier("historicalFactSource")
+                if facts.count > 1, let index = facts.firstIndex(of: fact) {
+                    HStack {
+                        Text("Fact \(index + 1) of \(facts.count)")
+                            .scaledFont(size: 12).foregroundStyle(Palette.muted)
+                            .accessibilityIdentifier("historicalFactPosition")
+                        Spacer()
+                        Button("Next fact", systemImage: "arrow.right") {
+                            journal.selectFact(for: country, from: facts, advance: true)
+                        }
+                        .scaledFont(size: 13, weight: .medium)
+                        .frame(minHeight: 44)
+                        .accessibilityIdentifier("nextHistoricalFact")
+                    }
                 }
             }
-            if cultureLoaded {
-                Button { cultureRotation += 1 } label: {
-                    Label("Show me another", systemImage: "shuffle")
-                }.font(.footnote).buttonStyle(.glass).controlSize(.regular)
-                .disabled(cultureLoading)
-                .accessibilityIdentifier("anotherDiscovery")
-                if cultureLoading { ProgressView("Finding another thread…").font(.footnote) }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .editorialCard()
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                Eyebrow(text: "A little history")
+                Text("There’s no reviewed fact for \(country.name) at the moment.")
+                    .scaledFont(size: 15).foregroundStyle(Palette.muted)
+                    .accessibilityIdentifier("historicalFactUnavailable")
             }
-        }.editorialCard()
-    }
-
-    private func cultureImage(_ image: CultureImage) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            AsyncImage(url: image.url) { phase in
-                if let photo = phase.image {
-                    photo.resizable().scaledToFill()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 210)
-                        .clipped()
-                        // Cropped image pixels must not intercept the country controls above.
-                        .contentShape(Rectangle())
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .accessibilityLabel("Photo illustrating \(cultureReading?.title ?? country.name)")
-                }
-            }
-            HStack(alignment: .top, spacing: 6) {
-                Link(image.attribution, destination: image.sourceURL)
-                if let licenseURL = image.licenseURL {
-                    Link(image.license, destination: licenseURL)
-                }
-            }.font(.caption2).foregroundStyle(Palette.muted)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .editorialCard()
         }
-    }
-
-    private var feed: CountryFeed? {
-        guard music != nil || news != nil else { return nil }
-        return CountryFeed(
-            tracks: music?.items ?? [], stories: news?.items ?? [],
-            musicFetchedAt: music?.fetchedAt, newsFetchedAt: news?.fetchedAt,
-            musicUnavailable: music?.unavailable, newsUnavailable: news?.unavailable
-        )
     }
 
     private func loadMusic(forceRefresh: Bool) async {
@@ -271,24 +227,6 @@ struct CountryDetailView: View {
         }
     }
 
-    private func loadNews(forceRefresh: Bool) async {
-        #if DEBUG && targetEnvironment(simulator)
-        if CountryReadingFixture.mode != nil {
-            news = CountryReadingFixture.news()
-            newsLoading = false
-            return
-        }
-        #endif
-        let requestID = UUID()
-        newsRequestID = requestID
-        newsLoading = true
-        let result = await Self.feedService.fetchNews(for: country, forceRefresh: forceRefresh)
-        if !Task.isCancelled && newsRequestID == requestID {
-            news = result
-            newsLoading = false
-        }
-    }
-
     private var countryHeader: some View {
         VStack(alignment: .leading, spacing: 13) {
             HStack {
@@ -300,8 +238,22 @@ struct CountryDetailView: View {
                 .scaledFont(size: 48, weight: .regular, design: .serif)
                 .tracking(-2).foregroundStyle(Palette.pine)
                 .accessibilityIdentifier("countryTitle")
-            Label(country.capital, systemImage: "mappin")
-                .scaledFont(size: 13).foregroundStyle(Palette.muted)
+            Text(country.overview)
+                .scaledFont(size: 16).lineSpacing(5).foregroundStyle(Palette.pine)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
+                .accessibilityIdentifier("countryOverview")
+            Link(country.overviewSourceName, destination: country.overviewSourceURL)
+                .scaledFont(size: 13, weight: .medium)
+                .accessibilityIdentifier("countryOverviewSource")
+            if let label = country.populationLabel {
+                Link(destination: country.populationSourceURL) {
+                    Label(label, systemImage: "person.2")
+                        .scaledFont(size: 13, weight: .medium)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .accessibilityIdentifier("countryPopulation")
+            }
             countryLocation
             Rectangle().fill(Palette.line).frame(height: 1).padding(.top, 8)
         }
@@ -357,8 +309,8 @@ struct CountryDetailView: View {
 
     private var musicSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            sectionHeading("On repeat", subtitle: "APPLE MUSIC · \(country.name.uppercased())", icon: "waveform")
-            if let music, !music.items.isEmpty {
+            sectionHeading("On repeat", subtitle: "\(music?.items.first?.provider.rawValue.uppercased() ?? "MUSIC CHART") · \(country.name.uppercased())", icon: "waveform")
+            if let music, let provider = music.items.first?.provider {
                 VStack(spacing: 0) {
                     ForEach(Array(music.items.prefix(5).enumerated()), id: \.element.id) { index, track in
                         Link(destination: track.url) {
@@ -374,6 +326,9 @@ struct CountryDetailView: View {
                                 VStack(alignment: .leading, spacing: 5) {
                                     Text(track.title).scaledFont(size: 14, weight: .medium).foregroundStyle(Palette.pine).lineLimit(1)
                                     Text(track.artist).scaledFont(size: 12).foregroundStyle(Palette.muted).lineLimit(1)
+                                    if let sample = track.radioSample {
+                                        Text(sample).scaledFont(size: 11).foregroundStyle(Palette.muted)
+                                    }
                                 }
                                 Spacer(minLength: 4)
                             }.padding(.vertical, 10)
@@ -382,50 +337,20 @@ struct CountryDetailView: View {
                         if index < min(music.items.count, 5) - 1 { Divider().overlay(Palette.line) }
                     }
                 }
-                Text("Most-played songs in this Apple Music storefront. One listening community, not a whole country.")
+                Text(provider.chartDescription)
                     .scaledFont(size: 11).lineSpacing(3).foregroundStyle(Palette.muted)
+                if provider == .tuneping {
+                    Text("Tap a song to see its recording details on MusicBrainz.")
+                        .scaledFont(size: 12).foregroundStyle(Palette.muted)
+                    Link("Data by Tuneping", destination: URL(string: "https://tuneping.com")!)
+                        .scaledFont(size: 13, weight: .medium)
+                }
                 updatedLabel(music.fetchedAt)
             } else if musicLoading {
                 loadingRow("Finding the local soundtrack…").accessibilityIdentifier("musicLoading")
             } else {
                 unavailable(music?.unavailable ?? "A chart isn’t available for this country right now.", retryID: "retryMusic") {
                     musicRefreshID += 1
-                }
-            }
-        }
-    }
-
-    private var newsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            sectionHeading("In the conversation", subtitle: "HEADLINES ABOUT \(country.name.uppercased())", icon: "text.alignleft")
-            if let news, !news.items.isEmpty {
-                ForEach(news.items.prefix(4)) { story in
-                    Link(destination: story.url) {
-                        VStack(alignment: .leading, spacing: 11) {
-                            HStack {
-                                Text(story.source.uppercased()).scaledFont(size: 11, weight: .medium, design: .monospaced).tracking(1)
-                                Spacer()
-                            }.foregroundStyle(Palette.muted)
-                            if let author = story.author {
-                                Text("By \(author)").scaledFont(size: 12).foregroundStyle(Palette.muted)
-                            }
-                            Text(story.title).scaledFont(size: 19, design: .serif).foregroundStyle(Palette.pine).multilineTextAlignment(.leading)
-                            if let date = story.publishedAt {
-                                Text(date.formatted(date: .abbreviated, time: .omitted)).scaledFont(size: 11).foregroundStyle(Palette.muted)
-                            }
-                        }.frame(maxWidth: .infinity, alignment: .leading).editorialCard()
-                    }.accessibilityIdentifier("newsStory-\(story.id)")
-                }
-                Text("Local perspectives from Global Voices. Coverage varies by country. Headlines link to the original reporting.")
-                    .scaledFont(size: 11).lineSpacing(3).foregroundStyle(Palette.muted)
-                Link("Headlines: CC BY 3.0", destination: URL(string: "https://creativecommons.org/licenses/by/3.0/")!)
-                    .scaledFont(size: 11)
-                updatedLabel(news.fetchedAt)
-            } else if newsLoading {
-                loadingRow("Finding another point of view…").accessibilityIdentifier("newsLoading")
-            } else {
-                unavailable(news?.unavailable ?? "Headlines are unavailable right now.", retryID: "retryNews") {
-                    newsRefreshID += 1
                 }
             }
         }

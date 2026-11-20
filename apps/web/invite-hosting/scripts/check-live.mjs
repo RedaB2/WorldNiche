@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { catalogFile, endpoint } from "./fact-catalog.mjs";
 
 const origin = new URL(process.argv[2] || "https://worldniche.app");
 assert.equal(origin.protocol, "https:", "Use a public HTTPS deployment URL");
@@ -26,6 +27,12 @@ for (const path of ["/.well-known/apple-app-site-association", "/apple-app-site-
   assert.deepEqual(association.applinks.details[0].appIDs, [`${production.apple.teamID}.${production.apple.bundleID}`]);
   assert.equal(association.applinks.details[0].components[0]["/"], "/invite/*");
 }
+const catalog = await request(endpoint);
+assert.equal(catalog.status, 200, endpoint);
+assert.match(catalog.headers.get("content-type"), /application\/json/);
+assert.match(catalog.headers.get("cache-control"), /must-revalidate/);
+assert.deepEqual(Buffer.from(await catalog.arrayBuffer()), await readFile(catalogFile),
+  "Live country facts must match the checked-out deployment");
 for (const name of ["app-demo.mp4", "duo-demo.mp4"]) {
   const path = `/landing/assets/${name}`;
   const expected = await readFile(new URL(`../../landing-site/assets/${name}`, import.meta.url));
@@ -53,4 +60,4 @@ if (expectedCommit) {
   assert.equal(response.status, 200);
   assert.equal((await response.json()).commit, expectedCommit, "Live commit must match the merged GitHub commit");
 }
-console.log(`PASS: ${origin.origin} pages, security headers, direct JSON AASA, both video ranges, invitations and deployment provenance.`);
+console.log(`PASS: ${origin.origin} pages, security headers, JSON AASA, country facts, both video ranges, invitations and deployment provenance.`);

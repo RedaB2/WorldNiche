@@ -5,7 +5,14 @@
     "capital": "Kabul",
     "region": "Southern Asia",
     "latitude": 33,
-    "longitude": 65
+    "longitude": 65,
+    "introduction": {
+      "text": "Ahmad Shah Durrani brought Pashtun tribes together in 1747 to found an Afghan state. In 1919, Afghanistan won independence from British control over its foreign affairs.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/af.html#field-anchor-introduction-background"
+    },
+    "population2025": 43844112,
+    "unPopulationLocation": 4
   },
   {
     "id": "AL",
@@ -13,7 +20,14 @@
     "capital": "Tirana",
     "region": "Southeast Europe",
     "latitude": 41,
-    "longitude": 20
+    "longitude": 20,
+    "introduction": {
+      "text": "Albania declared independence from the Ottoman Empire in 1912. After decades of communist rule, it returned to multiparty politics in the early 1990s.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/al.html#field-anchor-introduction-background"
+    },
+    "population2025": 2771508,
+    "unPopulationLocation": 8
   },
   {
     "id": "DZ",
@@ -21,7 +35,14 @@
     "capital": "Algiers",
     "region": "Northern Africa",
     "latitude": 28,
-    "longitude": 3
+    "longitude": 3,
+    "introduction": {
+      "text": "The ancient kingdom of Numidia once ruled much of what is now Algeria. Algerians won independence from France in 1962 after an eight-year war.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ag.html#field-anchor-introduction-background"
+    },
+    "population2025": 47435312,
+    "unPopulationLocation": 12
   },
   {
     "id": "AD",
@@ -29,7 +50,14 @@
     "capital": "Andorra la Vella",
     "region": "Southern Europe",
     "latitude": 42.5,
-    "longitude": 1.5
+    "longitude": 1.5,
+    "introduction": {
+      "text": "A 1278 agreement gave Andorra two rulers who shared power. More than seven centuries later, Andorrans adopted a written constitution in 1993.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/an.html#field-anchor-introduction-background"
+    },
+    "population2025": 82904,
+    "unPopulationLocation": 20
   },
   {
     "id": "AO",
@@ -37,7 +65,14 @@
     "capital": "Luanda",
     "region": "Middle Africa",
     "latitude": -12.5,
-    "longitude": 18.5
+    "longitude": 18.5,
+    "introduction": {
+      "text": "The Kingdom of Kongo once ruled part of what is now Angola. Portugal set up coastal trading posts in the 1500s, and Angola gained independence from Portugal in 1975.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ao.html#field-anchor-introduction-background"
+    },
+    "population2025": 39040039,
+    "unPopulationLocation": 24
   },
   {
     "id": "AG",
@@ -45,7 +80,14 @@
     "capital": "Saint John's",
     "region": "Caribbean",
     "latitude": 17.05,
-    "longitude": -61.8
+    "longitude": -61.8,
+    "introduction": {
+      "text": "Indigenous communities lived on Antigua and Barbuda for thousands of years before European settlement. The islands became an independent country in 1981 after centuries of British rule.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ac.html#field-anchor-introduction-background"
+    },
+    "population2025": 94208,
+    "unPopulationLocation": 28
   },
   {
     "id": "AR",
@@ -53,7 +95,14 @@
     "capital": "Buenos Aires",
     "region": "South America",
     "latitude": -34,
-    "longitude": -64
+    "longitude": -64,
+    "introduction": {
+      "text": "In 1816, the United Provinces of the Río de la Plata declared independence from Spain. Part of that territory became Argentina, where large numbers of Italian and Spanish immigrants later settled.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ar.html#field-anchor-introduction-background"
+    },
+    "population2025": 45851378,
+    "unPopulationLocation": 32
   },
   {
     "id": "AM",
@@ -61,7 +110,14 @@
     "capital": "Yerevan",
     "region": "Western Asia",
     "latitude": 40,
-    "longitude": 45
+    "longitude": 45,
+    "introduction": {
+      "text": "Armenia adopted Christianity in the early 300s. The modern republic regained independence in 1991 after decades as part of the Soviet Union.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/am.html#field-anchor-introduction-background"
+    },
+    "population2025": 2952365,
+    "unPopulationLocation": 51
   },
   {
     "id": "AU",
@@ -69,7 +125,14 @@
     "capital": "Canberra",
     "region": "Australia and New Zealand",
     "latitude": -27,
-    "longitude": 133
+    "longitude": 133,
+    "introduction": {
+      "text": "Aboriginal and Torres Strait Islander peoples lived in Australia for tens of thousands of years before British colonization. In 1901, six colonies joined to form the Commonwealth of Australia.",
+      "sourceName": "Parliament of Australia · Federation",
+      "sourceURL": "https://www.aph.gov.au/About_Parliament/House_of_Representatives/About_the_House_News/News/Parliament_Explained_Federation"
+    },
+    "population2025": 26974026,
+    "unPopulationLocation": 36
   },
   {
     "id": "AT",
@@ -77,7 +140,14 @@
     "capital": "Vienna",
     "region": "Central Europe",
     "latitude": 47.33333333,
-    "longitude": 13.33333333
+    "longitude": 13.33333333,
+    "introduction": {
+      "text": "Austria was at the heart of the Austro-Hungarian Empire until that empire broke apart after World War I. In 1955, a treaty ended the Allied occupation that followed World War II.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/au.html#field-anchor-introduction-background"
+    },
+    "population2025": 9113574,
+    "unPopulationLocation": 40
   },
   {
     "id": "AZ",
@@ -85,7 +155,14 @@
     "capital": "Baku",
     "region": "Western Asia",
     "latitude": 40.5,
-    "longitude": 47.5
+    "longitude": 47.5,
+    "introduction": {
+      "text": "Azerbaijan first became an independent republic in 1918. After roughly seven decades of Soviet rule, it regained independence in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/aj.html#field-anchor-introduction-background"
+    },
+    "population2025": 10397713,
+    "unPopulationLocation": 31
   },
   {
     "id": "BS",
@@ -93,7 +170,14 @@
     "capital": "Nassau",
     "region": "Caribbean",
     "latitude": 24.25,
-    "longitude": -76
+    "longitude": -76,
+    "introduction": {
+      "text": "The Lucayan people lived in the Bahamas when Columbus arrived in 1492. British settlers came in the 1600s, and the Bahamas became independent in 1973.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bf.html#field-anchor-introduction-background"
+    },
+    "population2025": 403033,
+    "unPopulationLocation": 44
   },
   {
     "id": "BH",
@@ -101,7 +185,14 @@
     "capital": "Manama",
     "region": "Western Asia",
     "latitude": 26,
-    "longitude": 50.55
+    "longitude": 50.55,
+    "introduction": {
+      "text": "The Al Khalifa family took power in Bahrain in 1783. Later treaties placed Bahrain under British protection, an arrangement that ended with independence in 1971.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ba.html#field-anchor-introduction-background"
+    },
+    "population2025": 1643332,
+    "unPopulationLocation": 48
   },
   {
     "id": "BD",
@@ -109,7 +200,14 @@
     "capital": "Dhaka",
     "region": "Southern Asia",
     "latitude": 24,
-    "longitude": 90
+    "longitude": 90,
+    "introduction": {
+      "text": "When British India was divided in 1947, eastern Bengal became part of Pakistan. A war of independence in 1971 gave rise to Bangladesh.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bg.html#field-anchor-introduction-background"
+    },
+    "population2025": 175686900,
+    "unPopulationLocation": 50
   },
   {
     "id": "BB",
@@ -117,7 +215,14 @@
     "capital": "Bridgetown",
     "region": "Caribbean",
     "latitude": 13.16666666,
-    "longitude": -59.53333333
+    "longitude": -59.53333333,
+    "introduction": {
+      "text": "Under British rule, enslaved Africans grew sugar in Barbados. The island gained independence from Britain in 1966.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bb.html#field-anchor-introduction-background"
+    },
+    "population2025": 282623,
+    "unPopulationLocation": 52
   },
   {
     "id": "BY",
@@ -125,7 +230,14 @@
     "capital": "Minsk",
     "region": "Eastern Europe",
     "latitude": 53,
-    "longitude": 28
+    "longitude": 28,
+    "introduction": {
+      "text": "Belarus spent much of the twentieth century as a republic of the Soviet Union. It became independent in 1991 as the union broke apart.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bo.html#field-anchor-introduction-background"
+    },
+    "population2025": 8997603,
+    "unPopulationLocation": 112
   },
   {
     "id": "BE",
@@ -133,7 +245,14 @@
     "capital": "Brussels",
     "region": "Western Europe",
     "latitude": 50.83333333,
-    "longitude": 4
+    "longitude": 4,
+    "introduction": {
+      "text": "Belgium became independent in 1830. Beginning in 1970, reforms gave its regions and language communities a larger role in governing the country.",
+      "sourceName": "Belgian federal government · History of the state",
+      "sourceURL": "https://www.belgium.be/en/about_belgium/government/federale_staat"
+    },
+    "population2025": 11758603,
+    "unPopulationLocation": 56
   },
   {
     "id": "BZ",
@@ -141,7 +260,14 @@
     "capital": "Belmopan",
     "region": "Central America",
     "latitude": 17.25,
-    "longitude": -88.75
+    "longitude": -88.75,
+    "introduction": {
+      "text": "Maya city-states flourished in what is now Belize long before European colonization. Later called British Honduras, the country became independent from Britain in 1981.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bh.html#field-anchor-introduction-background"
+    },
+    "population2025": 422924,
+    "unPopulationLocation": 84
   },
   {
     "id": "BJ",
@@ -149,7 +275,14 @@
     "capital": "Porto-Novo",
     "region": "Western Africa",
     "latitude": 9.5,
-    "longitude": 2.25
+    "longitude": 2.25,
+    "introduction": {
+      "text": "The kingdom of Dahomey grew into a regional power in the 1600s. After French colonial rule, the country gained independence in 1960 and took the name Benin in 1975.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bn.html#field-anchor-introduction-background"
+    },
+    "population2025": 14814460,
+    "unPopulationLocation": 204
   },
   {
     "id": "BT",
@@ -157,7 +290,14 @@
     "capital": "Thimphu",
     "region": "Southern Asia",
     "latitude": 27.5,
-    "longitude": 90.5
+    "longitude": 90.5,
+    "introduction": {
+      "text": "Ugyen Wangchuck became Bhutan’s king in 1907. A century later, in 2008, Bhutan held its first parliamentary election under a new constitution.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bt.html#field-anchor-introduction-background"
+    },
+    "population2025": 796682,
+    "unPopulationLocation": 64
   },
   {
     "id": "BO",
@@ -165,7 +305,14 @@
     "capital": "Sucre",
     "region": "South America",
     "latitude": -17,
-    "longitude": -65
+    "longitude": -65,
+    "introduction": {
+      "text": "Bolivia gained independence from Spain in 1825 and took its name from independence leader Simón Bolívar. After a series of military governments, civilian rule returned in 1982.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bl.html#field-anchor-introduction-background"
+    },
+    "population2025": 12581842,
+    "unPopulationLocation": 68
   },
   {
     "id": "BA",
@@ -173,7 +320,14 @@
     "capital": "Sarajevo",
     "region": "Southeast Europe",
     "latitude": 44,
-    "longitude": 18
+    "longitude": 18,
+    "introduction": {
+      "text": "Bosnia and Herzegovina declared independence from Yugoslavia in 1992. The Dayton peace agreement ended the ensuing war in 1995 and set out how the country would be governed.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bk.html#field-anchor-introduction-background"
+    },
+    "population2025": 3140096,
+    "unPopulationLocation": 70
   },
   {
     "id": "BW",
@@ -181,7 +335,14 @@
     "capital": "Gaborone",
     "region": "Southern Africa",
     "latitude": -22,
-    "longitude": 24
+    "longitude": 24,
+    "introduction": {
+      "text": "Britain administered the territory as a protectorate called Bechuanaland. It gained independence in 1966 and took the name Botswana.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bc.html#field-anchor-introduction-background"
+    },
+    "population2025": 2562122,
+    "unPopulationLocation": 72
   },
   {
     "id": "BR",
@@ -189,7 +350,14 @@
     "capital": "Brasília",
     "region": "South America",
     "latitude": -10,
-    "longitude": -55
+    "longitude": -55,
+    "introduction": {
+      "text": "After more than three centuries of Portuguese rule, Brazil became independent in 1822 with a monarch of its own. Brazil abolished slavery in 1888 and became a republic the following year.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/br.html#field-anchor-introduction-background"
+    },
+    "population2025": 212812405,
+    "unPopulationLocation": 76
   },
   {
     "id": "BN",
@@ -197,7 +365,14 @@
     "capital": "Bandar Seri Begawan",
     "region": "South-Eastern Asia",
     "latitude": 4.5,
-    "longitude": 114.66666666
+    "longitude": 114.66666666,
+    "introduction": {
+      "text": "Brunei’s sultans once ruled trading territories well beyond the borders of modern Brunei. The sultanate became a British protectorate in 1888 and regained full independence in 1984.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bx.html#field-anchor-introduction-background"
+    },
+    "population2025": 466330,
+    "unPopulationLocation": 96
   },
   {
     "id": "BG",
@@ -205,7 +380,14 @@
     "capital": "Sofia",
     "region": "Southeast Europe",
     "latitude": 43,
-    "longitude": 25
+    "longitude": 25,
+    "introduction": {
+      "text": "Bulgars and Slavic communities formed a Bulgarian state in the late 600s. After centuries of Ottoman rule, Bulgaria declared full independence in 1908.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bu.html#field-anchor-introduction-background"
+    },
+    "population2025": 6714560,
+    "unPopulationLocation": 100
   },
   {
     "id": "BF",
@@ -213,7 +395,14 @@
     "capital": "Ouagadougou",
     "region": "Western Africa",
     "latitude": 13,
-    "longitude": -2
+    "longitude": -2,
+    "introduction": {
+      "text": "Medieval kingdoms flourished in what is now Burkina Faso. The country gained independence from France in 1960 as Upper Volta and adopted its present name in 1984.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/uv.html#field-anchor-introduction-background"
+    },
+    "population2025": 24074580,
+    "unPopulationLocation": 854
   },
   {
     "id": "BI",
@@ -221,7 +410,14 @@
     "capital": "Gitega",
     "region": "Eastern Africa",
     "latitude": -3.5,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "A kingdom took shape in Burundi in the 1600s. It survived German and then Belgian colonial rule, and Burundi became independent in 1962.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/by.html#field-anchor-introduction-background"
+    },
+    "population2025": 14390002,
+    "unPopulationLocation": 108
   },
   {
     "id": "KH",
@@ -229,7 +425,14 @@
     "capital": "Phnom Penh",
     "region": "South-Eastern Asia",
     "latitude": 13,
-    "longitude": 105
+    "longitude": 105,
+    "introduction": {
+      "text": "The Khmer Empire once ruled much of Southeast Asia from Angkor. Centuries later, Cambodia became part of French Indochina and gained independence from France in 1953.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cb.html#field-anchor-introduction-background"
+    },
+    "population2025": 17847982,
+    "unPopulationLocation": 116
   },
   {
     "id": "CM",
@@ -237,7 +440,14 @@
     "capital": "Yaoundé",
     "region": "Middle Africa",
     "latitude": 6,
-    "longitude": 12
+    "longitude": 12,
+    "introduction": {
+      "text": "Germany colonized Cameroon in 1884, and France and Britain divided its administration after World War I. French Cameroon gained independence in 1960, and the southern part of British Cameroon joined it in 1961.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cm.html#field-anchor-introduction-background"
+    },
+    "population2025": 29879337,
+    "unPopulationLocation": 120
   },
   {
     "id": "CA",
@@ -245,7 +455,14 @@
     "capital": "Ottawa",
     "region": "North America",
     "latitude": 60,
-    "longitude": -95
+    "longitude": -95,
+    "introduction": {
+      "text": "In 1867, three British colonies joined to form Canada. In 1982, Canada gained the power to change its constitution without approval from Britain.",
+      "sourceName": "Government of Canada · Confederation",
+      "sourceURL": "https://www.canada.ca/en/intergovernmental-affairs/services/provinces-territories.html"
+    },
+    "population2025": 40126723,
+    "unPopulationLocation": 124
   },
   {
     "id": "CV",
@@ -253,7 +470,14 @@
     "capital": "Praia",
     "region": "Western Africa",
     "latitude": 16,
-    "longitude": -24
+    "longitude": -24,
+    "introduction": {
+      "text": "Portugal colonized Cabo Verde in the 1400s, and the islands became a center of the Atlantic slave trade. Cabo Verde gained independence in 1975.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cv.html#field-anchor-introduction-background"
+    },
+    "population2025": 527326,
+    "unPopulationLocation": 132
   },
   {
     "id": "CF",
@@ -261,7 +485,14 @@
     "capital": "Bangui",
     "region": "Middle Africa",
     "latitude": 7,
-    "longitude": 21
+    "longitude": 21,
+    "introduction": {
+      "text": "France governed the territory as a colony called Ubangi-Shari. It became independent as the Central African Republic in 1960.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ct.html#field-anchor-introduction-background"
+    },
+    "population2025": 5513282,
+    "unPopulationLocation": 140
   },
   {
     "id": "TD",
@@ -269,7 +500,14 @@
     "capital": "N'Djamena",
     "region": "Middle Africa",
     "latitude": 15,
-    "longitude": 19
+    "longitude": 19,
+    "introduction": {
+      "text": "The empires of Kanem and Bornu controlled trade routes across the Sahara for centuries. France later colonized Chad, which became independent in 1960.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cd.html#field-anchor-introduction-background"
+    },
+    "population2025": 21003705,
+    "unPopulationLocation": 148
   },
   {
     "id": "CL",
@@ -277,7 +515,14 @@
     "capital": "Santiago",
     "region": "South America",
     "latitude": -30,
-    "longitude": -71
+    "longitude": -71,
+    "introduction": {
+      "text": "The Mapuche lived in much of what is now Chile, while the Inca governed parts of the north. In 1818, independence fighters won a decisive victory against Spanish rule.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ci.html#field-anchor-introduction-background"
+    },
+    "population2025": 19859921,
+    "unPopulationLocation": 152
   },
   {
     "id": "CN",
@@ -285,7 +530,14 @@
     "capital": "Beijing",
     "region": "Eastern Asia",
     "latitude": 35,
-    "longitude": 105
+    "longitude": 105,
+    "introduction": {
+      "text": "For some two thousand years, successive dynasties ruled China, sometimes uniting it and sometimes sharing power with rival states. After World War II, Mao Zedong’s Communist Party came to power on the mainland.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ch.html#field-anchor-introduction-background"
+    },
+    "population2025": 1416096094,
+    "unPopulationLocation": 156
   },
   {
     "id": "CO",
@@ -293,7 +545,14 @@
     "capital": "Bogotá",
     "region": "South America",
     "latitude": 4,
-    "longitude": -72
+    "longitude": -72,
+    "introduction": {
+      "text": "Modern Colombia emerged in 1830 when Gran Colombia, a larger republic that also included Ecuador and Venezuela, broke apart. In 2016, Colombia signed a peace agreement with the FARC guerrilla movement.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/co.html#field-anchor-introduction-background"
+    },
+    "population2025": 53425635,
+    "unPopulationLocation": 170
   },
   {
     "id": "KM",
@@ -301,7 +560,14 @@
     "capital": "Moroni",
     "region": "Eastern Africa",
     "latitude": -12.16666666,
-    "longitude": 44.25
+    "longitude": 44.25,
+    "introduction": {
+      "text": "Comoros declared independence from France in 1975. Three of the islands came under the new country’s government, while Mayotte remained under French administration.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cn.html#field-anchor-introduction-background"
+    },
+    "population2025": 882848,
+    "unPopulationLocation": 174
   },
   {
     "id": "CG",
@@ -309,7 +575,14 @@
     "capital": "Brazzaville",
     "region": "Middle Africa",
     "latitude": -1,
-    "longitude": 15
+    "longitude": 15,
+    "introduction": {
+      "text": "France once governed the territory as Middle Congo. It became independent as the Republic of the Congo in 1960 and elected a multiparty government in 1992.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cf.html#field-anchor-introduction-background"
+    },
+    "population2025": 6484437,
+    "unPopulationLocation": 178
   },
   {
     "id": "CR",
@@ -317,7 +590,14 @@
     "capital": "San José",
     "region": "Central America",
     "latitude": 10,
-    "longitude": -84
+    "longitude": -84,
+    "introduction": {
+      "text": "Costa Rica broke from Spain in 1821 and later left a federation of Central American states. A civil war in 1948 helped shape its modern democracy.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cs.html#field-anchor-introduction-background"
+    },
+    "population2025": 5152950,
+    "unPopulationLocation": 188
   },
   {
     "id": "HR",
@@ -325,7 +605,14 @@
     "capital": "Zagreb",
     "region": "Southeast Europe",
     "latitude": 45.16666666,
-    "longitude": 15.5
+    "longitude": 15.5,
+    "introduction": {
+      "text": "After World War I, Croatia joined a new kingdom that later took the name Yugoslavia. Croatia declared independence in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/hr.html#field-anchor-introduction-background"
+    },
+    "population2025": 3848160,
+    "unPopulationLocation": 191
   },
   {
     "id": "CU",
@@ -333,7 +620,14 @@
     "capital": "Havana",
     "region": "Caribbean",
     "latitude": 21.5,
-    "longitude": -80
+    "longitude": -80,
+    "introduction": {
+      "text": "Cubans fought to end centuries of Spanish rule, which ended in 1898. After a period of US military occupation, Cuba became an independent republic in 1902.",
+      "sourceName": "The World Factbook · Cuba, historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cu.html#field-anchor-introduction-background"
+    },
+    "population2025": 10937204,
+    "unPopulationLocation": 192
   },
   {
     "id": "CY",
@@ -341,7 +635,14 @@
     "capital": "Nicosia",
     "region": "Southern Europe",
     "latitude": 35,
-    "longitude": 33
+    "longitude": 33,
+    "introduction": {
+      "text": "Cyprus became an independent republic in 1960 after British colonial rule. The island has been divided since 1974.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cy.html#field-anchor-introduction-background"
+    },
+    "population2025": 1370754,
+    "unPopulationLocation": 196
   },
   {
     "id": "CZ",
@@ -349,7 +650,14 @@
     "capital": "Prague",
     "region": "Central Europe",
     "latitude": 49.75,
-    "longitude": 15.5
+    "longitude": 15.5,
+    "introduction": {
+      "text": "After World War I, Czechs and Slovaks joined to form Czechoslovakia. In 1993, they peacefully divided it into two countries, Czechia and Slovakia.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ez.html#field-anchor-introduction-background"
+    },
+    "population2025": 10609240,
+    "unPopulationLocation": 203
   },
   {
     "id": "CD",
@@ -357,7 +665,14 @@
     "capital": "Kinshasa",
     "region": "Middle Africa",
     "latitude": 0,
-    "longitude": 25
+    "longitude": 25,
+    "introduction": {
+      "text": "The kingdoms of Kongo, Luba and Lunda once governed different parts of what is now the Democratic Republic of the Congo. Belgian colonial rule ended with independence in 1960.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/cg.html#field-anchor-introduction-background"
+    },
+    "population2025": 112832473,
+    "unPopulationLocation": 180
   },
   {
     "id": "DK",
@@ -365,7 +680,14 @@
     "capital": "Copenhagen",
     "region": "Northern Europe",
     "latitude": 56,
-    "longitude": 10
+    "longitude": 10,
+    "introduction": {
+      "text": "In the 900s, King Harald Bluetooth helped establish Christianity in Denmark. A new constitution in 1849 limited royal power and helped lay the foundations of Danish democracy.",
+      "sourceName": "Ministry of Foreign Affairs of Denmark · History",
+      "sourceURL": "https://denmark.dk/people-and-culture/history"
+    },
+    "population2025": 6002507,
+    "unPopulationLocation": 208
   },
   {
     "id": "DJ",
@@ -373,7 +695,14 @@
     "capital": "Djibouti",
     "region": "Eastern Africa",
     "latitude": 11.5,
-    "longitude": 43
+    "longitude": 43,
+    "introduction": {
+      "text": "The medieval sultanates of Ifat and Adal ruled parts of what is now Djibouti. France later colonized the territory, and Djibouti became independent in 1977.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/dj.html#field-anchor-introduction-background"
+    },
+    "population2025": 1184076,
+    "unPopulationLocation": 262
   },
   {
     "id": "DM",
@@ -381,7 +710,14 @@
     "capital": "Roseau",
     "region": "Caribbean",
     "latitude": 15.41666666,
-    "longitude": -61.33333333
+    "longitude": -61.33333333,
+    "introduction": {
+      "text": "The Kalinago people resisted European settlement for generations. France ceded Dominica to Britain in 1763, and the island became independent in 1978.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/do.html#field-anchor-introduction-background"
+    },
+    "population2025": 65872,
+    "unPopulationLocation": 212
   },
   {
     "id": "DO",
@@ -389,7 +725,14 @@
     "capital": "Santo Domingo",
     "region": "Caribbean",
     "latitude": 19,
-    "longitude": -70.66666666
+    "longitude": -70.66666666,
+    "introduction": {
+      "text": "Taíno chiefdoms governed Hispaniola before Spanish colonization. The Dominican Republic declared independence from Haiti in 1844 and restored independence in 1865 after a brief return to Spanish rule.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/dr.html#field-anchor-introduction-background"
+    },
+    "population2025": 11520487,
+    "unPopulationLocation": 214
   },
   {
     "id": "EC",
@@ -397,7 +740,14 @@
     "capital": "Quito",
     "region": "South America",
     "latitude": -2,
-    "longitude": -77.5
+    "longitude": -77.5,
+    "introduction": {
+      "text": "When Spanish forces arrived in the 1500s, much of what is now Ecuador belonged to the Inca Empire. After Spanish rule ended, Ecuador joined a larger republic and then became a separate country in 1830.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ec.html#field-anchor-introduction-background"
+    },
+    "population2025": 18289896,
+    "unPopulationLocation": 218
   },
   {
     "id": "EG",
@@ -405,7 +755,14 @@
     "capital": "Cairo",
     "region": "Northern Africa",
     "latitude": 27,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "Around 5,000 years ago, a unified kingdom emerged along the Nile and generations of pharaohs ruled Egypt. In 1922, Britain recognized Egypt’s independence while keeping some powers for itself.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/eg.html#field-anchor-introduction-background"
+    },
+    "population2025": 118365994,
+    "unPopulationLocation": 818
   },
   {
     "id": "SV",
@@ -413,15 +770,29 @@
     "capital": "San Salvador",
     "region": "Central America",
     "latitude": 13.83333333,
-    "longitude": -88.91666666
+    "longitude": -88.91666666,
+    "introduction": {
+      "text": "El Salvador broke from Spain in 1821 and left a Central American federation in 1839. A 1992 peace agreement ended a twelve-year civil war.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/es.html#field-anchor-introduction-background"
+    },
+    "population2025": 6365503,
+    "unPopulationLocation": 222
   },
   {
     "id": "GQ",
     "name": "Equatorial Guinea",
-    "capital": "Malabo",
+    "capital": "Ciudad de la Paz",
     "region": "Middle Africa",
     "latitude": 2,
-    "longitude": 10
+    "longitude": 10,
+    "introduction": {
+      "text": "Spain governed the territories that make up Equatorial Guinea for much of their colonial history. They became an independent country in 1968.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ek.html#field-anchor-introduction-background"
+    },
+    "population2025": 1938431,
+    "unPopulationLocation": 226
   },
   {
     "id": "ER",
@@ -429,7 +800,14 @@
     "capital": "Asmara",
     "region": "Eastern Africa",
     "latitude": 15,
-    "longitude": 39
+    "longitude": 39,
+    "introduction": {
+      "text": "Italy colonized Eritrea, and Britain administered it during and after World War II. After federation with Ethiopia, annexation and a long war, Eritreans voted for independence in 1993.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/er.html#field-anchor-introduction-background"
+    },
+    "population2025": 3607003,
+    "unPopulationLocation": 232
   },
   {
     "id": "EE",
@@ -437,7 +815,14 @@
     "capital": "Tallinn",
     "region": "Northern Europe",
     "latitude": 59,
-    "longitude": 26
+    "longitude": 26,
+    "introduction": {
+      "text": "Estonia declared independence in 1918 after centuries under foreign rulers. The Soviet Union annexed it in 1940, and Estonia restored independence in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/en.html#field-anchor-introduction-background"
+    },
+    "population2025": 1344232,
+    "unPopulationLocation": 233
   },
   {
     "id": "SZ",
@@ -445,7 +830,14 @@
     "capital": "Lobamba",
     "region": "Southern Africa",
     "latitude": -26.5,
-    "longitude": 31.5
+    "longitude": 31.5,
+    "introduction": {
+      "text": "The kingdom gained independence from Britain in 1968 under the name Swaziland. In 2018, King Mswati III changed its English name to Eswatini.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/wz.html#field-anchor-introduction-background"
+    },
+    "population2025": 1256174,
+    "unPopulationLocation": 748
   },
   {
     "id": "ET",
@@ -453,7 +845,14 @@
     "capital": "Addis Ababa",
     "region": "Eastern Africa",
     "latitude": 8,
-    "longitude": 38
+    "longitude": 38,
+    "introduction": {
+      "text": "Ethiopia’s monarchy survived the European colonization of much of Africa, including an Italian occupation from 1936 to 1941. Military officers overthrew Emperor Haile Selassie in 1974.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/et.html#field-anchor-introduction-background"
+    },
+    "population2025": 135472051,
+    "unPopulationLocation": 231
   },
   {
     "id": "FJ",
@@ -461,7 +860,14 @@
     "capital": "Suva",
     "region": "Melanesia",
     "latitude": -18,
-    "longitude": 175
+    "longitude": 175,
+    "introduction": {
+      "text": "Britain recruited workers from India to work in colonial Fiji, and their descendants became a large part of Fijian society. Fiji gained independence in 1970 after nearly a century of British rule.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/fj.html#field-anchor-introduction-background"
+    },
+    "population2025": 933154,
+    "unPopulationLocation": 242
   },
   {
     "id": "FI",
@@ -469,7 +875,14 @@
     "capital": "Helsinki",
     "region": "Northern Europe",
     "latitude": 64,
-    "longitude": 26
+    "longitude": 26,
+    "introduction": {
+      "text": "Finland was ruled first by Sweden and then, from 1809, as a largely self-governing part of the Russian Empire. It declared independence in 1917.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/fi.html#field-anchor-introduction-background"
+    },
+    "population2025": 5623330,
+    "unPopulationLocation": 246
   },
   {
     "id": "FR",
@@ -477,7 +890,14 @@
     "capital": "Paris",
     "region": "Western Europe",
     "latitude": 46,
-    "longitude": 2
+    "longitude": 2,
+    "introduction": {
+      "text": "In 1789, during the French Revolution, an elected assembly declared that citizens had fundamental rights. That declaration helped shape the constitution of France’s Fifth Republic in 1958.",
+      "sourceName": "Élysée · France’s declaration of rights",
+      "sourceURL": "https://www.elysee.fr/en/french-presidency/the-declaration-of-the-rights-of-man-and-of-the-citizen"
+    },
+    "population2025": 66650804,
+    "unPopulationLocation": 250
   },
   {
     "id": "GA",
@@ -485,7 +905,14 @@
     "capital": "Libreville",
     "region": "Middle Africa",
     "latitude": -1,
-    "longitude": 11.75
+    "longitude": 11.75,
+    "introduction": {
+      "text": "Gabon gained independence from France in 1960. Omar Bongo became president seven years later and held office for more than four decades.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gb.html#field-anchor-introduction-background"
+    },
+    "population2025": 2593130,
+    "unPopulationLocation": 266
   },
   {
     "id": "GM",
@@ -493,7 +920,14 @@
     "capital": "Banjul",
     "region": "Western Africa",
     "latitude": 13.46666666,
-    "longitude": -16.56666666
+    "longitude": -16.56666666,
+    "introduction": {
+      "text": "The Gambia became independent from Britain in 1965. From 1982 to 1989, it shared a confederation with Senegal called Senegambia.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ga.html#field-anchor-introduction-background"
+    },
+    "population2025": 2822093,
+    "unPopulationLocation": 270
   },
   {
     "id": "GE",
@@ -501,7 +935,14 @@
     "capital": "Tbilisi",
     "region": "Western Asia",
     "latitude": 42,
-    "longitude": 43.5
+    "longitude": 43.5,
+    "introduction": {
+      "text": "Ancient kingdoms called Colchis and Iberia ruled parts of what is now Georgia. Georgia briefly became independent after World War I and regained independence from the Soviet Union in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gg.html#field-anchor-introduction-background"
+    },
+    "population2025": 3806671,
+    "unPopulationLocation": 268
   },
   {
     "id": "DE",
@@ -509,7 +950,14 @@
     "capital": "Berlin",
     "region": "Western Europe",
     "latitude": 51,
-    "longitude": 9
+    "longitude": 9,
+    "introduction": {
+      "text": "After World War II, occupation by the victorious allies led to two German states, East and West Germany. They reunited in 1990.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gm.html#field-anchor-introduction-background"
+    },
+    "population2025": 84075075,
+    "unPopulationLocation": 276
   },
   {
     "id": "GH",
@@ -517,7 +965,14 @@
     "capital": "Accra",
     "region": "Western Africa",
     "latitude": 8,
-    "longitude": -2
+    "longitude": -2,
+    "introduction": {
+      "text": "The British colony called the Gold Coast and the British-administered part of Togoland joined to form Ghana. Ghana gained independence in 1957.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gh.html#field-anchor-introduction-background"
+    },
+    "population2025": 35064272,
+    "unPopulationLocation": 288
   },
   {
     "id": "GR",
@@ -525,7 +980,14 @@
     "capital": "Athens",
     "region": "Southern Europe",
     "latitude": 39,
-    "longitude": 22
+    "longitude": 22,
+    "introduction": {
+      "text": "Greece became independent from the Ottoman Empire in 1830. Its borders grew over the following century as more islands and mainland territories joined the country.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gr.html#field-anchor-introduction-background"
+    },
+    "population2025": 9938844,
+    "unPopulationLocation": 300
   },
   {
     "id": "GD",
@@ -533,7 +995,14 @@
     "capital": "St. George's",
     "region": "Caribbean",
     "latitude": 12.11666666,
-    "longitude": -61.66666666
+    "longitude": -61.66666666,
+    "introduction": {
+      "text": "French colonists established sugar estates worked by enslaved Africans in Grenada. Britain later took control, and Grenada gained independence in 1974.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gj.html#field-anchor-introduction-background"
+    },
+    "population2025": 117304,
+    "unPopulationLocation": 308
   },
   {
     "id": "GT",
@@ -541,7 +1010,14 @@
     "capital": "Guatemala City",
     "region": "Central America",
     "latitude": 15.5,
-    "longitude": -90.25
+    "longitude": -90.25,
+    "introduction": {
+      "text": "Maya civilization flourished in what is now Guatemala long before Spain colonized it. After almost three centuries of Spanish rule, Guatemala declared independence in 1821.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gt.html#field-anchor-introduction-background"
+    },
+    "population2025": 18687881,
+    "unPopulationLocation": 320
   },
   {
     "id": "GN",
@@ -549,7 +1025,14 @@
     "capital": "Conakry",
     "region": "Western Africa",
     "latitude": 11,
-    "longitude": -10
+    "longitude": -10,
+    "introduction": {
+      "text": "Guinea gained independence from France in 1958. Its first president, Sékou Touré, served until his death in 1984.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gv.html#field-anchor-introduction-background"
+    },
+    "population2025": 15099727,
+    "unPopulationLocation": 324
   },
   {
     "id": "GW",
@@ -557,7 +1040,14 @@
     "capital": "Bissau",
     "region": "Western Africa",
     "latitude": 12,
-    "longitude": -15
+    "longitude": -15,
+    "introduction": {
+      "text": "Guinea-Bissau declared independence from Portugal in 1973. A year later it joined the United Nations.",
+      "sourceName": "United Nations Treaty Series · Guinea-Bissau",
+      "sourceURL": "https://treaties.un.org/doc/Publication/UNTS/Volume%20950/volume-950-I-13545-English.pdf"
+    },
+    "population2025": 2249515,
+    "unPopulationLocation": 624
   },
   {
     "id": "GY",
@@ -565,7 +1055,14 @@
     "capital": "Georgetown",
     "region": "South America",
     "latitude": 5,
-    "longitude": -59
+    "longitude": -59,
+    "introduction": {
+      "text": "Dutch colonists established plantations in what is now Guyana, and Britain later took control. Guyana gained independence from Britain in 1966.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/gy.html#field-anchor-introduction-background"
+    },
+    "population2025": 835986,
+    "unPopulationLocation": 328
   },
   {
     "id": "HT",
@@ -573,7 +1070,14 @@
     "capital": "Port-au-Prince",
     "region": "Caribbean",
     "latitude": 19,
-    "longitude": -72.41666666
+    "longitude": -72.41666666,
+    "introduction": {
+      "text": "Enslaved people in the French colony of Saint-Domingue rose against plantation slavery and colonial rule. Their revolution led to Haitian independence in 1804.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ha.html#field-anchor-introduction-background"
+    },
+    "population2025": 11906096,
+    "unPopulationLocation": 332
   },
   {
     "id": "HN",
@@ -581,7 +1085,14 @@
     "capital": "Tegucigalpa",
     "region": "Central America",
     "latitude": 15,
-    "longitude": -86.5
+    "longitude": -86.5,
+    "introduction": {
+      "text": "Honduras broke away from Spain in 1821. After a long period of military rule in the twentieth century, an elected civilian government took office in 1982.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ho.html#field-anchor-introduction-background"
+    },
+    "population2025": 11005850,
+    "unPopulationLocation": 340
   },
   {
     "id": "HU",
@@ -589,7 +1100,14 @@
     "capital": "Budapest",
     "region": "Central Europe",
     "latitude": 47,
-    "longitude": 20
+    "longitude": 20,
+    "introduction": {
+      "text": "A Hungarian Christian kingdom took shape around the year 1000. Hungary later shared an empire with Austria until it broke apart during World War I.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/hu.html#field-anchor-introduction-background"
+    },
+    "population2025": 9632287,
+    "unPopulationLocation": 348
   },
   {
     "id": "IS",
@@ -597,7 +1115,14 @@
     "capital": "Reykjavik",
     "region": "Northern Europe",
     "latitude": 65,
-    "longitude": -18
+    "longitude": -18,
+    "introduction": {
+      "text": "Settlers in Iceland established an assembly called the Althing in 930. After centuries under Norwegian and Danish rule, Iceland became an independent republic in 1944.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ic.html#field-anchor-introduction-background"
+    },
+    "population2025": 398266,
+    "unPopulationLocation": 352
   },
   {
     "id": "IN",
@@ -605,7 +1130,14 @@
     "capital": "New Delhi",
     "region": "Southern Asia",
     "latitude": 20,
-    "longitude": 77
+    "longitude": 77,
+    "introduction": {
+      "text": "The Indus Valley civilization flourished in parts of what is now India more than 4,000 years ago. Modern India gained independence from Britain in 1947, when British India was divided into India and Pakistan.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/in.html#field-anchor-introduction-background"
+    },
+    "population2025": 1463865525,
+    "unPopulationLocation": 356
   },
   {
     "id": "ID",
@@ -613,7 +1145,14 @@
     "capital": "Jakarta",
     "region": "South-Eastern Asia",
     "latitude": -5,
-    "longitude": 120
+    "longitude": 120,
+    "introduction": {
+      "text": "The Dutch began colonizing the Indonesian islands in the 1600s, and Japan occupied them during World War II. Indonesians declared independence in 1945 and secured Dutch recognition four years later.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/id.html#field-anchor-introduction-background"
+    },
+    "population2025": 285721236,
+    "unPopulationLocation": 360
   },
   {
     "id": "IR",
@@ -621,7 +1160,14 @@
     "capital": "Tehran",
     "region": "Southern Asia",
     "latitude": 32,
-    "longitude": 53
+    "longitude": 53,
+    "introduction": {
+      "text": "For centuries, much of the world knew Iran as Persia. A revolution overthrew the shah, or monarch, in 1979 and Iran became an Islamic republic.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ir.html#field-anchor-introduction-background"
+    },
+    "population2025": 92417681,
+    "unPopulationLocation": 364
   },
   {
     "id": "IQ",
@@ -629,7 +1175,14 @@
     "capital": "Baghdad",
     "region": "Western Asia",
     "latitude": 33,
-    "longitude": 44
+    "longitude": 44,
+    "introduction": {
+      "text": "After centuries of Ottoman rule, Britain administered Iraq following World War I. Iraq became an independent kingdom in 1932 and a republic in 1958.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/iz.html#field-anchor-introduction-background"
+    },
+    "population2025": 47020774,
+    "unPopulationLocation": 368
   },
   {
     "id": "IE",
@@ -637,7 +1190,14 @@
     "capital": "Dublin",
     "region": "Northern Europe",
     "latitude": 53,
-    "longitude": -8
+    "longitude": -8,
+    "introduction": {
+      "text": "The 1916 Easter Rising helped spark a struggle for independence from Britain. The Irish Free State came into being in 1922, while Northern Ireland remained in the United Kingdom.",
+      "sourceName": "Government of Ireland · Centenary of the Irish Free State",
+      "sourceURL": "https://www.gov.ie/en/department-of-the-taoiseach/speeches/the-taoiseachs-address-at-the-academic-conference-on-the-centenary-of-the-establishment-of-the-irish-free-state/"
+    },
+    "population2025": 5308039,
+    "unPopulationLocation": 372
   },
   {
     "id": "IL",
@@ -645,7 +1205,14 @@
     "capital": "Jerusalem",
     "region": "Western Asia",
     "latitude": 31.47,
-    "longitude": 35.13
+    "longitude": 35.13,
+    "introduction": {
+      "text": "Israel declared independence in 1948 as Britain’s mandate over Palestine ended. It joined the United Nations in 1949, and immigration from Europe and the Middle East helped shape the new state.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/is.html#field-anchor-introduction-background"
+    },
+    "population2025": 9517180,
+    "unPopulationLocation": 376
   },
   {
     "id": "IT",
@@ -653,7 +1220,14 @@
     "capital": "Rome",
     "region": "Southern Europe",
     "latitude": 42.83333333,
-    "longitude": 12.83333333
+    "longitude": 12.83333333,
+    "introduction": {
+      "text": "In 1861, former regional states united under a king to form the Kingdom of Italy. After World War II, Italians replaced the monarchy with a republic.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/it.html#field-anchor-introduction-background"
+    },
+    "population2025": 59146260,
+    "unPopulationLocation": 380
   },
   {
     "id": "CI",
@@ -661,7 +1235,14 @@
     "capital": "Yamoussoukro",
     "region": "Western Africa",
     "latitude": 8,
-    "longitude": -5
+    "longitude": -5,
+    "introduction": {
+      "text": "Côte d’Ivoire gained independence from France in 1960. Cocoa exports helped shape its economy in the decades that followed.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/iv.html#field-anchor-introduction-background"
+    },
+    "population2025": 32711547,
+    "unPopulationLocation": 384
   },
   {
     "id": "JM",
@@ -669,7 +1250,14 @@
     "capital": "Kingston",
     "region": "Caribbean",
     "latitude": 18.25,
-    "longitude": -77.5
+    "longitude": -77.5,
+    "introduction": {
+      "text": "Taíno communities lived in Jamaica for centuries before Spain colonized the island. England seized it in 1655, and Jamaica gained independence from Britain in 1962.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/jm.html#field-anchor-introduction-background"
+    },
+    "population2025": 2837077,
+    "unPopulationLocation": 388
   },
   {
     "id": "JP",
@@ -677,7 +1265,14 @@
     "capital": "Tokyo",
     "region": "Eastern Asia",
     "latitude": 36,
-    "longitude": 138
+    "longitude": 138,
+    "introduction": {
+      "text": "Military rulers called shoguns governed Japan for centuries. The last shogun returned power to the emperor’s court in 1867.",
+      "sourceName": "Web Japan · Japan’s Ministry of Foreign Affairs",
+      "sourceURL": "https://web-japan.org/kidsweb/explore/history/q8.html"
+    },
+    "population2025": 123103479,
+    "unPopulationLocation": 392
   },
   {
     "id": "JO",
@@ -685,7 +1280,14 @@
     "capital": "Amman",
     "region": "Western Asia",
     "latitude": 31,
-    "longitude": 36
+    "longitude": 36,
+    "introduction": {
+      "text": "After the Ottoman Empire fell, Britain oversaw a partly self-governing territory called Transjordan. It gained independence in 1946 and later took the name Jordan.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/jo.html#field-anchor-introduction-background"
+    },
+    "population2025": 11520684,
+    "unPopulationLocation": 400
   },
   {
     "id": "KZ",
@@ -693,7 +1295,14 @@
     "capital": "Astana",
     "region": "Central Asia",
     "latitude": 48,
-    "longitude": 68
+    "longitude": 68,
+    "introduction": {
+      "text": "The Russian Empire conquered Kazakh lands in the 1700s and 1800s. Kazakhstan later became part of the Soviet Union and regained independence in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/kz.html#field-anchor-introduction-background"
+    },
+    "population2025": 20843754,
+    "unPopulationLocation": 398
   },
   {
     "id": "KE",
@@ -701,7 +1310,14 @@
     "capital": "Nairobi",
     "region": "Eastern Africa",
     "latitude": 1,
-    "longitude": 38
+    "longitude": 38,
+    "introduction": {
+      "text": "Kenya gained independence from Britain in 1963. Jomo Kenyatta, a leader in the independence movement, became its first president.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ke.html#field-anchor-introduction-background"
+    },
+    "population2025": 57532492,
+    "unPopulationLocation": 404
   },
   {
     "id": "KI",
@@ -709,7 +1325,14 @@
     "capital": "South Tarawa",
     "region": "Micronesia",
     "latitude": 1.41666666,
-    "longitude": 173
+    "longitude": 173,
+    "introduction": {
+      "text": "Britain governed the islands that make up much of modern Kiribati under the name Gilbert Islands. In 1979, the country became independent and took the name Kiribati.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/kr.html#field-anchor-introduction-background"
+    },
+    "population2025": 136488,
+    "unPopulationLocation": 296
   },
   {
     "id": "KW",
@@ -717,7 +1340,14 @@
     "capital": "Kuwait City",
     "region": "Western Asia",
     "latitude": 29.5,
-    "longitude": 45.75
+    "longitude": 45.75,
+    "introduction": {
+      "text": "The Al Sabah family has ruled Kuwait since the 1700s. Britain took responsibility for Kuwait’s defense and foreign affairs under a treaty in 1899, and Kuwait gained independence in 1961.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ku.html#field-anchor-introduction-background"
+    },
+    "population2025": 5026078,
+    "unPopulationLocation": 414
   },
   {
     "id": "KG",
@@ -725,7 +1355,14 @@
     "capital": "Bishkek",
     "region": "Central Asia",
     "latitude": 41,
-    "longitude": 75
+    "longitude": 75,
+    "introduction": {
+      "text": "The Russian Empire annexed much of what is now Kyrgyzstan in 1876. Kyrgyzstan later became a Soviet republic and gained independence in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/kg.html#field-anchor-introduction-background"
+    },
+    "population2025": 7295034,
+    "unPopulationLocation": 417
   },
   {
     "id": "LA",
@@ -733,7 +1370,14 @@
     "capital": "Vientiane",
     "region": "South-Eastern Asia",
     "latitude": 18,
-    "longitude": 105
+    "longitude": 105,
+    "introduction": {
+      "text": "King Fa Ngum founded the kingdom of Lan Xang in the 1300s. Centuries later, Laos came under French colonial rule, and its monarchy ended in 1975.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/la.html#field-anchor-introduction-background"
+    },
+    "population2025": 7873046,
+    "unPopulationLocation": 418
   },
   {
     "id": "LV",
@@ -741,7 +1385,14 @@
     "capital": "Riga",
     "region": "Northern Europe",
     "latitude": 57,
-    "longitude": 25
+    "longitude": 25,
+    "introduction": {
+      "text": "Latvia first became a republic after World War I. The Soviet Union annexed it in 1940, and Latvia restored independence in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/lg.html#field-anchor-introduction-background"
+    },
+    "population2025": 1853559,
+    "unPopulationLocation": 428
   },
   {
     "id": "LB",
@@ -749,7 +1400,14 @@
     "capital": "Beirut",
     "region": "Western Asia",
     "latitude": 33.83333333,
-    "longitude": 35.83333333
+    "longitude": 35.83333333,
+    "introduction": {
+      "text": "After centuries of Ottoman rule, France drew the boundaries of a new Lebanese state in 1920. Lebanon gained independence from French rule in 1943.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/le.html#field-anchor-introduction-background"
+    },
+    "population2025": 5849420,
+    "unPopulationLocation": 422
   },
   {
     "id": "LS",
@@ -757,7 +1415,14 @@
     "capital": "Maseru",
     "region": "Southern Africa",
     "latitude": -29.5,
-    "longitude": 28.5
+    "longitude": 28.5,
+    "introduction": {
+      "text": "In the early 1800s, King Moshoeshoe I united communities into a kingdom that later came under British protection. It gained independence as Lesotho in 1966.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/lt.html#field-anchor-introduction-background"
+    },
+    "population2025": 2363325,
+    "unPopulationLocation": 426
   },
   {
     "id": "LR",
@@ -765,7 +1430,14 @@
     "capital": "Monrovia",
     "region": "Western Africa",
     "latitude": 6.5,
-    "longitude": -9.5
+    "longitude": -9.5,
+    "introduction": {
+      "text": "Beginning in 1822, free Black settlers from the United States established settlements among peoples already living in what is now Liberia. The settlers proclaimed a republic in 1847.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/li.html#field-anchor-introduction-background"
+    },
+    "population2025": 5731206,
+    "unPopulationLocation": 430
   },
   {
     "id": "LY",
@@ -773,7 +1445,14 @@
     "capital": "Tripoli",
     "region": "Northern Africa",
     "latitude": 25,
-    "longitude": 17
+    "longitude": 17,
+    "introduction": {
+      "text": "Italy took control of much of Libya from the Ottoman Empire in the early 1900s. After World War II, Libya became an independent country in 1951.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ly.html#field-anchor-introduction-background"
+    },
+    "population2025": 7458554,
+    "unPopulationLocation": 434
   },
   {
     "id": "LI",
@@ -781,7 +1460,14 @@
     "capital": "Vaduz",
     "region": "Western Europe",
     "latitude": 47.26666666,
-    "longitude": 9.53333333
+    "longitude": 9.53333333,
+    "introduction": {
+      "text": "Liechtenstein became a principality within the Holy Roman Empire in 1719. It became a sovereign state in 1806 and later belonged to the German Confederation until that union dissolved in 1866.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ls.html#field-anchor-introduction-background"
+    },
+    "population2025": 40128,
+    "unPopulationLocation": 438
   },
   {
     "id": "LT",
@@ -789,7 +1475,14 @@
     "capital": "Vilnius",
     "region": "Northern Europe",
     "latitude": 56,
-    "longitude": 24
+    "longitude": 24,
+    "introduction": {
+      "text": "Lithuania and Poland formed a commonwealth in 1569. Centuries later, after Soviet occupation, Lithuania declared its independence restored in 1990.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/lh.html#field-anchor-introduction-background"
+    },
+    "population2025": 2830144,
+    "unPopulationLocation": 440
   },
   {
     "id": "LU",
@@ -797,7 +1490,14 @@
     "capital": "Luxembourg",
     "region": "Western Europe",
     "latitude": 49.75,
-    "longitude": 6.16666666
+    "longitude": 6.16666666,
+    "introduction": {
+      "text": "Luxembourg became a grand duchy in 1815, a small state ruled by a grand duke. In 1957 it helped found the European Economic Community, which later became part of the European Union.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/lu.html#field-anchor-introduction-background"
+    },
+    "population2025": 680454,
+    "unPopulationLocation": 442
   },
   {
     "id": "MG",
@@ -805,7 +1505,14 @@
     "capital": "Antananarivo",
     "region": "Eastern Africa",
     "latitude": -20,
-    "longitude": 47
+    "longitude": 47,
+    "introduction": {
+      "text": "The Merina kingdom once ruled much of Madagascar. France made the island a colony in 1896, and Madagascar regained its independence in 1960.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ma.html#field-anchor-introduction-background"
+    },
+    "population2025": 32740678,
+    "unPopulationLocation": 450
   },
   {
     "id": "MW",
@@ -813,7 +1520,14 @@
     "capital": "Lilongwe",
     "region": "Eastern Africa",
     "latitude": -13.5,
-    "longitude": 34
+    "longitude": 34,
+    "introduction": {
+      "text": "Malawi takes its name from the Maravi kingdom, which once extended into present-day Zambia and Mozambique. Under British rule the country was called Nyasaland, until independence in 1964.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mi.html#field-anchor-introduction-background"
+    },
+    "population2025": 22216120,
+    "unPopulationLocation": 454
   },
   {
     "id": "MY",
@@ -821,7 +1535,14 @@
     "capital": "Kuala Lumpur",
     "region": "South-Eastern Asia",
     "latitude": 2.5,
-    "longitude": 112.5
+    "longitude": 112.5,
+    "introduction": {
+      "text": "Malaya gained independence from Britain in 1957. In 1963 it joined with Sabah, Sarawak and Singapore to form Malaysia, and Singapore left two years later.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/my.html#field-anchor-introduction-background"
+    },
+    "population2025": 35977838,
+    "unPopulationLocation": 458
   },
   {
     "id": "MV",
@@ -829,7 +1550,14 @@
     "capital": "Malé",
     "region": "Southern Asia",
     "latitude": 3.25,
-    "longitude": 73
+    "longitude": 73,
+    "introduction": {
+      "text": "Sultans ruled the Maldives for centuries before the islands became a British protectorate. The country gained independence in 1965 and became a republic three years later.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mv.html#field-anchor-introduction-background"
+    },
+    "population2025": 529676,
+    "unPopulationLocation": 462
   },
   {
     "id": "ML",
@@ -837,7 +1565,14 @@
     "capital": "Bamako",
     "region": "Western Africa",
     "latitude": 17,
-    "longitude": -4
+    "longitude": -4,
+    "introduction": {
+      "text": "Mali takes its name from a medieval empire that once reached the Atlantic coast. The modern republic emerged in 1960, after a short-lived union with Senegal ended.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ml.html#field-anchor-introduction-background"
+    },
+    "population2025": 25198821,
+    "unPopulationLocation": 466
   },
   {
     "id": "MT",
@@ -845,7 +1580,14 @@
     "capital": "Valletta",
     "region": "Southern Europe",
     "latitude": 35.83333333,
-    "longitude": 14.58333333
+    "longitude": 14.58333333,
+    "introduction": {
+      "text": "Phoenicians, Romans and later the Knights of St John all ruled Malta at different times. The islands gained independence from Britain in 1964 and became a republic a decade later.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mt.html#field-anchor-introduction-background"
+    },
+    "population2025": 545405,
+    "unPopulationLocation": 470
   },
   {
     "id": "MH",
@@ -853,7 +1595,14 @@
     "capital": "Majuro",
     "region": "Micronesia",
     "latitude": 9,
-    "longitude": 168
+    "longitude": 168,
+    "introduction": {
+      "text": "The Marshall Islands became self-governing in 1979. In 1986 they became independent under an agreement that left the United States responsible for their defense.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/marshall-islands"
+    },
+    "population2025": 36282,
+    "unPopulationLocation": 584
   },
   {
     "id": "MR",
@@ -861,7 +1610,14 @@
     "capital": "Nouakchott",
     "region": "Western Africa",
     "latitude": 20,
-    "longitude": -12
+    "longitude": -12,
+    "introduction": {
+      "text": "Mauritania was under French colonial rule until 1960, when it became an independent republic.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/mauritania"
+    },
+    "population2025": 5315065,
+    "unPopulationLocation": 478
   },
   {
     "id": "MU",
@@ -869,7 +1625,14 @@
     "capital": "Port Louis",
     "region": "Eastern Africa",
     "latitude": -20.28333333,
-    "longitude": 57.55
+    "longitude": 57.55,
+    "introduction": {
+      "text": "Under French rule, Mauritius grew into a naval base and sugar-producing island. Britain took control in 1810, and Mauritius gained independence in 1968.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mp.html#field-anchor-introduction-background"
+    },
+    "population2025": 1268280,
+    "unPopulationLocation": 480
   },
   {
     "id": "MX",
@@ -877,7 +1640,14 @@
     "capital": "Mexico City",
     "region": "North America",
     "latitude": 23,
-    "longitude": -102
+    "longitude": -102,
+    "introduction": {
+      "text": "The Maya and the Aztecs built civilizations in what is now Mexico. After three centuries of Spanish rule, Mexico won independence in the early 1800s.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mx.html#field-anchor-introduction-background"
+    },
+    "population2025": 131946900,
+    "unPopulationLocation": 484
   },
   {
     "id": "FM",
@@ -885,7 +1655,14 @@
     "capital": "Palikir",
     "region": "Micronesia",
     "latitude": 6.91666666,
-    "longitude": 158.25
+    "longitude": 158.25,
+    "introduction": {
+      "text": "In 1979 four island groups adopted a shared constitution and became the Federated States of Micronesia. The federation gained independence in 1986 under an agreement with the United States.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/fm.html#field-anchor-introduction-background"
+    },
+    "population2025": 113683,
+    "unPopulationLocation": 583
   },
   {
     "id": "MD",
@@ -893,7 +1670,14 @@
     "capital": "Chișinău",
     "region": "Eastern Europe",
     "latitude": 47,
-    "longitude": 29
+    "longitude": 29,
+    "introduction": {
+      "text": "Much of today’s Moldova belonged to the Russian Empire and later joined Romania. It became part of the Soviet Union and gained independence in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/md.html#field-anchor-introduction-background"
+    },
+    "population2025": 2996106,
+    "unPopulationLocation": 498
   },
   {
     "id": "MC",
@@ -901,7 +1685,14 @@
     "capital": "Monaco",
     "region": "Western Europe",
     "latitude": 43.73333333,
-    "longitude": 7.4
+    "longitude": 7.4,
+    "introduction": {
+      "text": "Monaco was already an independent principality when France annexed it during the French Revolution in 1793. It regained its independence in 1814.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/monaco"
+    },
+    "population2025": 38341,
+    "unPopulationLocation": 492
   },
   {
     "id": "MN",
@@ -909,7 +1700,14 @@
     "capital": "Ulan Bator",
     "region": "Eastern Asia",
     "latitude": 46,
-    "longitude": 105
+    "longitude": 105,
+    "introduction": {
+      "text": "Genghis Khan founded a Mongol empire in the 1200s that would stretch across Asia and into Europe. Centuries later, in 1911, Mongolia declared independence from the Qing dynasty.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mg.html#field-anchor-introduction-background"
+    },
+    "population2025": 3517100,
+    "unPopulationLocation": 496
   },
   {
     "id": "ME",
@@ -917,7 +1715,14 @@
     "capital": "Podgorica",
     "region": "Southeast Europe",
     "latitude": 42.5,
-    "longitude": 19.3
+    "longitude": 19.3,
+    "introduction": {
+      "text": "Montenegro was internationally recognized as an independent principality in 1878 and later became part of Yugoslavia. In 2006 its voters chose to leave their union with Serbia.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mj.html#field-anchor-introduction-background"
+    },
+    "population2025": 632729,
+    "unPopulationLocation": 499
   },
   {
     "id": "MA",
@@ -925,7 +1730,14 @@
     "capital": "Rabat",
     "region": "Northern Africa",
     "latitude": 32,
-    "longitude": -5
+    "longitude": -5,
+    "introduction": {
+      "text": "In the Middle Ages, Amazigh rulers governed an empire that stretched from Morocco into Spain. After decades of French and Spanish control, Morocco regained its independence in 1956.",
+      "sourceName": "U.S. Peace Corps · Morocco country history",
+      "sourceURL": "https://www.govinfo.gov/content/pkg/GOVPUB-PE1-PURL-gpo66805/pdf/GOVPUB-PE1-PURL-gpo66805.pdf#page=8"
+    },
+    "population2025": 38430770,
+    "unPopulationLocation": 504
   },
   {
     "id": "MZ",
@@ -933,7 +1745,14 @@
     "capital": "Maputo",
     "region": "Eastern Africa",
     "latitude": -18.25,
-    "longitude": 35
+    "longitude": 35,
+    "introduction": {
+      "text": "Traders from Arabia, Persia and India visited ports in what is now Mozambique long before Portugal established colonies there. Mozambique gained independence from Portugal in 1975.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/mz.html#field-anchor-introduction-background"
+    },
+    "population2025": 35631653,
+    "unPopulationLocation": 508
   },
   {
     "id": "MM",
@@ -941,7 +1760,14 @@
     "capital": "Naypyidaw",
     "region": "South-Eastern Asia",
     "latitude": 22,
-    "longitude": 98
+    "longitude": 98,
+    "introduction": {
+      "text": "Britain conquered the kingdoms of what is now Myanmar in the 1800s and governed the territory as part of British India. The country gained independence in 1948 under the name Burma.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/bm.html#field-anchor-introduction-background"
+    },
+    "population2025": 54850648,
+    "unPopulationLocation": 104
   },
   {
     "id": "NA",
@@ -949,15 +1775,29 @@
     "capital": "Windhoek",
     "region": "Southern Africa",
     "latitude": -22,
-    "longitude": 17
+    "longitude": 17,
+    "introduction": {
+      "text": "Germany colonized much of present-day Namibia in the 1880s. After decades of South African rule, Namibia became independent in 1990.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/wa.html#field-anchor-introduction-background"
+    },
+    "population2025": 3092816,
+    "unPopulationLocation": 516
   },
   {
     "id": "NR",
-    "name": "Nauru",
-    "capital": "Yaren",
+    "name": "Naoero (Nauru)",
+    "capital": "Yaren (seat of government)",
     "region": "Micronesia",
     "latitude": -0.53333333,
-    "longitude": 166.91666666
+    "longitude": 166.91666666,
+    "introduction": {
+      "text": "After World War II, the United Nations placed Nauru under international trusteeship. The island became independent in 1968.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/naoero"
+    },
+    "population2025": 12025,
+    "unPopulationLocation": 520
   },
   {
     "id": "NP",
@@ -965,7 +1805,14 @@
     "capital": "Kathmandu",
     "region": "Southern Asia",
     "latitude": 28,
-    "longitude": 84
+    "longitude": 84,
+    "introduction": {
+      "text": "The kingdom of Nepal grew as Gorkha rulers united smaller Himalayan states. In 2008 an elected assembly ended the monarchy and made Nepal a republic.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/np.html#field-anchor-introduction-background"
+    },
+    "population2025": 29618118,
+    "unPopulationLocation": 524
   },
   {
     "id": "NL",
@@ -973,7 +1820,14 @@
     "capital": "Amsterdam",
     "region": "Western Europe",
     "latitude": 52.5,
-    "longitude": 5.75
+    "longitude": 5.75,
+    "introduction": {
+      "text": "The Dutch Republic built a trading empire across the seas in the 1600s. After a period of French rule, the Kingdom of the Netherlands formed in 1815.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/nl.html#field-anchor-introduction-background"
+    },
+    "population2025": 18346819,
+    "unPopulationLocation": 528
   },
   {
     "id": "NZ",
@@ -981,7 +1835,14 @@
     "capital": "Wellington",
     "region": "Australia and New Zealand",
     "latitude": -41,
-    "longitude": 174
+    "longitude": 174,
+    "introduction": {
+      "text": "Polynesian voyagers settled New Zealand around 1250 to 1300. In 1840 Māori leaders and representatives of the British Crown signed the Treaty of Waitangi.",
+      "sourceName": "Archives New Zealand",
+      "sourceURL": "https://www.archives.govt.nz/discover-our-stories/the-treaty-of-waitangi/the-treaty-of-waitangi-and-how-it-happened"
+    },
+    "population2025": 5251899,
+    "unPopulationLocation": 554
   },
   {
     "id": "NI",
@@ -989,7 +1850,14 @@
     "capital": "Managua",
     "region": "Central America",
     "latitude": 13,
-    "longitude": -85
+    "longitude": -85,
+    "introduction": {
+      "text": "After Spanish rule ended, Nicaragua joined a federation with four Central American neighbors. It left the federation in 1838 to govern itself separately.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/nicaragua"
+    },
+    "population2025": 7007502,
+    "unPopulationLocation": 558
   },
   {
     "id": "NE",
@@ -997,7 +1865,14 @@
     "capital": "Niamey",
     "region": "Western Africa",
     "latitude": 16,
-    "longitude": 8
+    "longitude": 8,
+    "introduction": {
+      "text": "France made Niger a colony in 1922. Niger gained independence in 1960.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ng.html#field-anchor-introduction-background"
+    },
+    "population2025": 27917831,
+    "unPopulationLocation": 562
   },
   {
     "id": "NG",
@@ -1005,7 +1880,14 @@
     "capital": "Abuja",
     "region": "Western Africa",
     "latitude": 10,
-    "longitude": 8
+    "longitude": 8,
+    "introduction": {
+      "text": "Kingdoms such as Benin and empires such as Kanem-Borno flourished in what is now Nigeria. Britain brought northern and southern territories together in 1914, and Nigeria became independent in 1960.",
+      "sourceName": "Nigerian Ministry of Foreign Affairs",
+      "sourceURL": "https://foreignaffairs.gov.ng/nigeria/history-of-nigeria/"
+    },
+    "population2025": 237527782,
+    "unPopulationLocation": 566
   },
   {
     "id": "KP",
@@ -1013,7 +1895,14 @@
     "capital": "Pyongyang",
     "region": "Eastern Asia",
     "latitude": 40,
-    "longitude": 127
+    "longitude": 127,
+    "introduction": {
+      "text": "When World War II ended Japanese rule in Korea, the Soviet Union occupied the north and the United States occupied the south. A truce in 1953 halted the Korean War and left the peninsula divided.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/milestones/1945-1952/korean-war"
+    },
+    "population2025": 26571036,
+    "unPopulationLocation": 408
   },
   {
     "id": "MK",
@@ -1021,7 +1910,14 @@
     "capital": "Skopje",
     "region": "Southeast Europe",
     "latitude": 41.83333333,
-    "longitude": 22
+    "longitude": 22,
+    "introduction": {
+      "text": "North Macedonia became independent from Yugoslavia in 1991. It took its current name in 2019 after reaching an agreement with neighboring Greece.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/macedonia"
+    },
+    "population2025": 1813791,
+    "unPopulationLocation": 807
   },
   {
     "id": "NO",
@@ -1029,7 +1925,14 @@
     "capital": "Oslo",
     "region": "Northern Europe",
     "latitude": 62,
-    "longitude": 10
+    "longitude": 10,
+    "introduction": {
+      "text": "In 1814 Norway adopted a constitution and then entered a union with Sweden under one king. The union ended in 1905, and Norway kept its own monarchy.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/norway"
+    },
+    "population2025": 5623071,
+    "unPopulationLocation": 578
   },
   {
     "id": "OM",
@@ -1037,7 +1940,14 @@
     "capital": "Muscat",
     "region": "Western Asia",
     "latitude": 21,
-    "longitude": 57
+    "longitude": 57,
+    "introduction": {
+      "text": "For centuries, merchants from Oman sailed to ports in East Africa, India and China. Oman’s rulers built an empire across the Indian Ocean and even made the African island of Zanzibar their capital for a time.",
+      "sourceName": "Omani Foreign Ministry",
+      "sourceURL": "https://www.fm.gov.om/en/about-oman/state/history/"
+    },
+    "population2025": 5494691,
+    "unPopulationLocation": 512
   },
   {
     "id": "PK",
@@ -1045,7 +1955,14 @@
     "capital": "Islamabad",
     "region": "Southern Asia",
     "latitude": 30,
-    "longitude": 70
+    "longitude": 70,
+    "introduction": {
+      "text": "The ancient Indus Valley civilization flourished in much of what is now Pakistan. The modern country was created in 1947 when British India was divided into India and Pakistan.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pk.html#field-anchor-introduction-background"
+    },
+    "population2025": 255219554,
+    "unPopulationLocation": 586
   },
   {
     "id": "PW",
@@ -1053,15 +1970,29 @@
     "capital": "Ngerulmud",
     "region": "Micronesia",
     "latitude": 7.5,
-    "longitude": 134.5
+    "longitude": 134.5,
+    "introduction": {
+      "text": "After World War II, the United States administered Palau for the United Nations. Palau began the transition to self-government in 1978 and became independent in 1994.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/palau"
+    },
+    "population2025": 17663,
+    "unPopulationLocation": 585
   },
   {
     "id": "PS",
     "name": "Palestine",
-    "capital": "Ramallah",
+    "capital": "Ramallah (administrative centre)",
     "region": "Western Asia",
     "latitude": 31.9,
-    "longitude": 35.2
+    "longitude": 35.2,
+    "introduction": {
+      "text": "In 1988 the Palestine National Council proclaimed the State of Palestine. In 2012 the United Nations General Assembly granted Palestine the status of a non-member observer state.",
+      "sourceName": "United Nations General Assembly",
+      "sourceURL": "https://digitallibrary.un.org/record/739031/files/A_RES_67_19-EN.pdf"
+    },
+    "population2025": 5589623,
+    "unPopulationLocation": 275
   },
   {
     "id": "PA",
@@ -1069,7 +2000,14 @@
     "capital": "Panama City",
     "region": "Central America",
     "latitude": 9,
-    "longitude": -80
+    "longitude": -80,
+    "introduction": {
+      "text": "Panama declared independence from Colombia in 1903. The canal across Panama opened in 1914, and Panama took full control of it in 1999.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/panama"
+    },
+    "population2025": 4571189,
+    "unPopulationLocation": 591
   },
   {
     "id": "PG",
@@ -1077,7 +2015,14 @@
     "capital": "Port Moresby",
     "region": "Melanesia",
     "latitude": -6,
-    "longitude": 147
+    "longitude": 147,
+    "introduction": {
+      "text": "Germany and Britain once ruled different parts of what is now Papua New Guinea. Australia later administered the territory until independence in 1975.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pp.html#field-anchor-introduction-background"
+    },
+    "population2025": 10762817,
+    "unPopulationLocation": 598
   },
   {
     "id": "PY",
@@ -1085,7 +2030,14 @@
     "capital": "Asunción",
     "region": "South America",
     "latitude": -23,
-    "longitude": -58
+    "longitude": -58,
+    "introduction": {
+      "text": "Paraguay broke away from Spain in 1811. In the 1860s it fought a war against Argentina, Brazil and Uruguay that cost the country much of its territory.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pa.html#field-anchor-introduction-background"
+    },
+    "population2025": 7013078,
+    "unPopulationLocation": 600
   },
   {
     "id": "PE",
@@ -1093,7 +2045,14 @@
     "capital": "Lima",
     "region": "South America",
     "latitude": -10,
-    "longitude": -76
+    "longitude": -76,
+    "introduction": {
+      "text": "The Inca built stone cities across what is now Peru. Spain took control in the 1500s, and Peru declared independence in 1821.",
+      "sourceName": "PROMPERÚ · Peru’s national tourism board",
+      "sourceURL": "https://www.peru.travel/yourperfectperu/about-peru/History"
+    },
+    "population2025": 34576665,
+    "unPopulationLocation": 604
   },
   {
     "id": "PH",
@@ -1101,7 +2060,14 @@
     "capital": "Manila",
     "region": "South-Eastern Asia",
     "latitude": 13,
-    "longitude": 122
+    "longitude": 122,
+    "introduction": {
+      "text": "Filipino revolutionaries declared independence from Spain in 1898. After decades of American rule, the Philippines gained full independence in 1946.",
+      "sourceName": "Philippine Information Agency",
+      "sourceURL": "https://pia.gov.ph/regions/did-you-know-the-3-hard-won-dates-of-philippine-independence/"
+    },
+    "population2025": 116786962,
+    "unPopulationLocation": 608
   },
   {
     "id": "PL",
@@ -1109,7 +2075,14 @@
     "capital": "Warsaw",
     "region": "Central Europe",
     "latitude": 52,
-    "longitude": 20
+    "longitude": 20,
+    "introduction": {
+      "text": "Poland once shared a commonwealth with Lithuania. Neighboring powers divided its lands in the late 1700s, and Poland regained independence in 1918.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/pl.html#field-anchor-introduction-background"
+    },
+    "population2025": 38140910,
+    "unPopulationLocation": 616
   },
   {
     "id": "PT",
@@ -1117,7 +2090,14 @@
     "capital": "Lisbon",
     "region": "Southern Europe",
     "latitude": 39.5,
-    "longitude": -8
+    "longitude": -8,
+    "introduction": {
+      "text": "Portuguese ships built a global trading empire in the 1400s and 1500s. A revolution ended the monarchy in 1910, and another in 1974 opened the way to democracy.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/po.html#field-anchor-introduction-background"
+    },
+    "population2025": 10411834,
+    "unPopulationLocation": 620
   },
   {
     "id": "QA",
@@ -1125,7 +2105,14 @@
     "capital": "Doha",
     "region": "Western Asia",
     "latitude": 25.5,
-    "longitude": 51.25
+    "longitude": 51.25,
+    "introduction": {
+      "text": "Qatar gained independence in 1971, when its treaty relationship with Britain ended.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/qatar"
+    },
+    "population2025": 3115888,
+    "unPopulationLocation": 634
   },
   {
     "id": "RO",
@@ -1133,7 +2120,14 @@
     "capital": "Bucharest",
     "region": "Southeast Europe",
     "latitude": 46,
-    "longitude": 25
+    "longitude": 25,
+    "introduction": {
+      "text": "The principalities of Moldavia and Wallachia united under the name Romania in 1862. In 1878 European treaties recognized its independence from the Ottoman Empire.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/romania"
+    },
+    "population2025": 18908650,
+    "unPopulationLocation": 642
   },
   {
     "id": "RU",
@@ -1141,7 +2135,14 @@
     "capital": "Moscow",
     "region": "Eastern Europe",
     "latitude": 60,
-    "longitude": 100
+    "longitude": 100,
+    "introduction": {
+      "text": "Russia grew from a principality centered on Moscow into an empire that stretched to the Pacific. The monarchy fell in 1917, and Russia later became the largest republic in the Soviet Union.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/rs.html#field-anchor-introduction-background"
+    },
+    "population2025": 143997393,
+    "unPopulationLocation": 643
   },
   {
     "id": "RW",
@@ -1149,7 +2150,14 @@
     "capital": "Kigali",
     "region": "Eastern Africa",
     "latitude": -2,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "Rwanda was a kingdom before Germany and then Belgium gained control. In 1962 it became independent from Belgium.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/rw.html#field-anchor-introduction-background"
+    },
+    "population2025": 14569340,
+    "unPopulationLocation": 646
   },
   {
     "id": "KN",
@@ -1157,7 +2165,14 @@
     "capital": "Basseterre",
     "region": "Caribbean",
     "latitude": 17.33333333,
-    "longitude": -62.75
+    "longitude": -62.75,
+    "introduction": {
+      "text": "Britain and France both colonized Saint Kitts in the 1600s. Saint Kitts and the neighboring island of Nevis became independent together in 1983.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/saint-kitts-nevis"
+    },
+    "population2025": 46922,
+    "unPopulationLocation": 659
   },
   {
     "id": "LC",
@@ -1165,7 +2180,14 @@
     "capital": "Castries",
     "region": "Caribbean",
     "latitude": 13.88333333,
-    "longitude": -60.96666666
+    "longitude": -60.96666666,
+    "introduction": {
+      "text": "Saint Lucia was a British colony and later joined a short-lived federation of Caribbean islands. It became independent in 1979.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/saint-lucia"
+    },
+    "population2025": 180149,
+    "unPopulationLocation": 662
   },
   {
     "id": "VC",
@@ -1173,7 +2195,14 @@
     "capital": "Kingstown",
     "region": "Caribbean",
     "latitude": 13.25,
-    "longitude": -61.2
+    "longitude": -61.2,
+    "introduction": {
+      "text": "Indigenous people resisted European settlement on Saint Vincent for generations. Britain took control in the 1700s, and Saint Vincent and the Grenadines became independent in 1979.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/vc.html#field-anchor-introduction-background"
+    },
+    "population2025": 99924,
+    "unPopulationLocation": 670
   },
   {
     "id": "WS",
@@ -1181,7 +2210,14 @@
     "capital": "Apia",
     "region": "Polynesia",
     "latitude": -13.58333333,
-    "longitude": -172.33333333
+    "longitude": -172.33333333,
+    "introduction": {
+      "text": "New Zealand administered Western Samoa after taking control from Germany during World War I. The islands gained independence in 1962 and changed the country’s name to Samoa in 1997.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ws.html#field-anchor-introduction-background"
+    },
+    "population2025": 219306,
+    "unPopulationLocation": 882
   },
   {
     "id": "SM",
@@ -1189,7 +2225,14 @@
     "capital": "City of San Marino",
     "region": "Southern Europe",
     "latitude": 43.76666666,
-    "longitude": 12.41666666
+    "longitude": 12.41666666,
+    "introduction": {
+      "text": "San Marino grew from a medieval city-state on Mount Titano. It has kept its own republican institutions for more than seven centuries.",
+      "sourceName": "UNESCO World Heritage Centre",
+      "sourceURL": "https://whc.unesco.org/en/list/1245"
+    },
+    "population2025": 33572,
+    "unPopulationLocation": 674
   },
   {
     "id": "SA",
@@ -1197,7 +2240,14 @@
     "capital": "Riyadh",
     "region": "Western Asia",
     "latitude": 25,
-    "longitude": 45
+    "longitude": 45,
+    "introduction": {
+      "text": "Islam began in what is now Saudi Arabia, home to Mecca and Medina. King Abdulaziz founded the modern kingdom in 1932 after uniting much of the Arabian Peninsula.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sa.html#field-anchor-introduction-background"
+    },
+    "population2025": 34566328,
+    "unPopulationLocation": 682
   },
   {
     "id": "SN",
@@ -1205,7 +2255,14 @@
     "capital": "Dakar",
     "region": "Western Africa",
     "latitude": 14,
-    "longitude": -14
+    "longitude": -14,
+    "introduction": {
+      "text": "The Jolof Empire once ruled parts of what is now Senegal. Senegal gained independence from France in 1960 as part of a federation with Mali that lasted only months.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sg.html#field-anchor-introduction-background"
+    },
+    "population2025": 18931966,
+    "unPopulationLocation": 686
   },
   {
     "id": "RS",
@@ -1213,7 +2270,14 @@
     "capital": "Belgrade",
     "region": "Southeast Europe",
     "latitude": 44,
-    "longitude": 21
+    "longitude": 21,
+    "introduction": {
+      "text": "After World War I, Serbs, Croats and Slovenes formed a kingdom later called Yugoslavia. Serbia became a separate state again in 2006 when its union with Montenegro ended.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ri.html#field-anchor-introduction-background"
+    },
+    "population2025": 6689039,
+    "unPopulationLocation": 688
   },
   {
     "id": "SC",
@@ -1221,7 +2285,14 @@
     "capital": "Victoria",
     "region": "Eastern Africa",
     "latitude": -4.58333333,
-    "longitude": 55.66666666
+    "longitude": 55.66666666,
+    "introduction": {
+      "text": "France and Britain competed for control of the Seychelles until the islands passed to Britain in 1814. Seychelles became independent in 1976.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/se.html#field-anchor-introduction-background"
+    },
+    "population2025": 132779,
+    "unPopulationLocation": 690
   },
   {
     "id": "SL",
@@ -1229,7 +2300,14 @@
     "capital": "Freetown",
     "region": "Western Africa",
     "latitude": 8.5,
-    "longitude": -11.5
+    "longitude": -11.5,
+    "introduction": {
+      "text": "The colony that grew around Freetown became a home for formerly enslaved people, including settlers from Nova Scotia. Sierra Leone gained independence from Britain in 1961.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sl.html#field-anchor-introduction-background"
+    },
+    "population2025": 8819794,
+    "unPopulationLocation": 694
   },
   {
     "id": "SG",
@@ -1237,7 +2315,14 @@
     "capital": "Singapore",
     "region": "South-Eastern Asia",
     "latitude": 1.36666666,
-    "longitude": 103.8
+    "longitude": 103.8,
+    "introduction": {
+      "text": "Singapore was a Malay trading port by the 1300s, centuries before Britain set up a trading post there. It joined Malaysia in 1963 and became a separate country in 1965.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sn.html#field-anchor-introduction-background"
+    },
+    "population2025": 5870750,
+    "unPopulationLocation": 702
   },
   {
     "id": "SK",
@@ -1245,7 +2330,14 @@
     "capital": "Bratislava",
     "region": "Central Europe",
     "latitude": 48.66666666,
-    "longitude": 19.5
+    "longitude": 19.5,
+    "introduction": {
+      "text": "Slovakia and the Czech Republic once shared a country called Czechoslovakia. They negotiated a peaceful split and became separate countries on January 1, 1993.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/slovakia"
+    },
+    "population2025": 5474881,
+    "unPopulationLocation": 703
   },
   {
     "id": "SI",
@@ -1253,7 +2345,14 @@
     "capital": "Ljubljana",
     "region": "Central Europe",
     "latitude": 46.11666666,
-    "longitude": 14.81666666
+    "longitude": 14.81666666,
+    "introduction": {
+      "text": "At the end of World War I, Slovenes joined Serbs and Croats in a new state that later took the name Yugoslavia. Slovenia declared independence in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/si.html#field-anchor-introduction-background"
+    },
+    "population2025": 2117072,
+    "unPopulationLocation": 705
   },
   {
     "id": "SB",
@@ -1261,7 +2360,14 @@
     "capital": "Honiara",
     "region": "Melanesia",
     "latitude": -8,
-    "longitude": 159
+    "longitude": 159,
+    "introduction": {
+      "text": "During World War II, the Solomon Islands were the site of major battles on Guadalcanal. The islands gained independence from Britain in 1978.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/solomon-islands"
+    },
+    "population2025": 838646,
+    "unPopulationLocation": 90
   },
   {
     "id": "SO",
@@ -1269,7 +2375,14 @@
     "capital": "Mogadishu",
     "region": "Eastern Africa",
     "latitude": 10,
-    "longitude": 49
+    "longitude": 49,
+    "introduction": {
+      "text": "For centuries, Somali states traded across the Indian Ocean. In 1960 the former British and Italian territories joined to form the Somali Republic.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/so.html#field-anchor-introduction-background"
+    },
+    "population2025": 19654739,
+    "unPopulationLocation": 706
   },
   {
     "id": "ZA",
@@ -1277,7 +2390,14 @@
     "capital": "Pretoria / Bloemfontein / Cape Town",
     "region": "Southern Africa",
     "latitude": -29,
-    "longitude": 24
+    "longitude": 24,
+    "introduction": {
+      "text": "Four colonies formed the Union of South Africa in 1910, excluding Black South Africans from power. In 1994, after the end of apartheid, people of every race could vote in a national election for the first time.",
+      "sourceName": "South African Government",
+      "sourceURL": "https://www.gov.za/about-sa/history"
+    },
+    "population2025": 64747319,
+    "unPopulationLocation": 710
   },
   {
     "id": "KR",
@@ -1285,7 +2405,14 @@
     "capital": "Seoul",
     "region": "Eastern Asia",
     "latitude": 37,
-    "longitude": 127.5
+    "longitude": 127.5,
+    "introduction": {
+      "text": "Korea regained independence from Japanese rule in 1945. Three years later, the Republic of Korea established its government in the southern part of the peninsula.",
+      "sourceName": "National Museum of Korea",
+      "sourceURL": "https://www.museum.go.kr/ENG/contents/E0202030000.do?exhiSpThemId=462360&listType=list&menuId=past&schM=view"
+    },
+    "population2025": 51667029,
+    "unPopulationLocation": 410
   },
   {
     "id": "SS",
@@ -1293,7 +2420,14 @@
     "capital": "Juba",
     "region": "Middle Africa",
     "latitude": 7,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "A peace agreement in 2005 ended a long civil war in Sudan and gave southerners a vote on independence. In 2011 they voted to form their own country, South Sudan.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/south-sudan"
+    },
+    "population2025": 12188788,
+    "unPopulationLocation": 728
   },
   {
     "id": "ES",
@@ -1301,15 +2435,29 @@
     "capital": "Madrid",
     "region": "Southern Europe",
     "latitude": 40,
-    "longitude": -4
+    "longitude": -4,
+    "introduction": {
+      "text": "Spain built a worldwide empire in the 1500s and 1600s. A civil war in the 1930s brought Francisco Franco to power, and Spain began its transition to democracy after his death in 1975.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sp.html#field-anchor-introduction-background"
+    },
+    "population2025": 47889958,
+    "unPopulationLocation": 724
   },
   {
     "id": "LK",
     "name": "Sri Lanka",
-    "capital": "Colombo",
+    "capital": "Sri Jayawardenepura Kotte",
     "region": "Southern Asia",
     "latitude": 7,
-    "longitude": 81
+    "longitude": 81,
+    "introduction": {
+      "text": "Ancient kingdoms grew around cities such as Anuradhapura, and a Tamil kingdom later ruled in the north. The island became independent from Britain in 1948 under the name Ceylon.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ce.html#field-anchor-introduction-background"
+    },
+    "population2025": 23229470,
+    "unPopulationLocation": 144
   },
   {
     "id": "SD",
@@ -1317,7 +2465,14 @@
     "capital": "Khartoum",
     "region": "Northern Africa",
     "latitude": 15,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "The ancient kingdoms of Kerma and Kush grew along the Nile in what is now Sudan. The modern country gained independence from joint British and Egyptian rule in 1956.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/su.html#field-anchor-introduction-background"
+    },
+    "population2025": 51662148,
+    "unPopulationLocation": 729
   },
   {
     "id": "SR",
@@ -1325,7 +2480,14 @@
     "capital": "Paramaribo",
     "region": "South America",
     "latitude": 4,
-    "longitude": -56
+    "longitude": -56,
+    "introduction": {
+      "text": "Suriname was a Dutch colony from the 1600s. It gradually gained control over its own affairs and became independent from the Netherlands in 1975.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/suriname"
+    },
+    "population2025": 639850,
+    "unPopulationLocation": 740
   },
   {
     "id": "SE",
@@ -1333,7 +2495,14 @@
     "capital": "Stockholm",
     "region": "Northern Europe",
     "latitude": 62,
-    "longitude": 15
+    "longitude": 15,
+    "introduction": {
+      "text": "Sweden once shared a union with Denmark and Norway. In 1523 Sweden left the union and elected Gustav Vasa as its king.",
+      "sourceName": "Swedish Parliament",
+      "sourceURL": "https://www.riksdagen.se/en/news/from-royal-power-to-peoples-power---500-years-of-parliament-in-sweden/decisions-that-have-changed-sweden-15232023/"
+    },
+    "population2025": 10656633,
+    "unPopulationLocation": 752
   },
   {
     "id": "CH",
@@ -1341,7 +2510,14 @@
     "capital": "Bern",
     "region": "Western Europe",
     "latitude": 47,
-    "longitude": 8
+    "longitude": 8,
+    "introduction": {
+      "text": "Switzerland traces its beginnings to a pact among three local communities in 1291. Other communities joined over time, and in 1848 a new constitution created a federal government.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sz.html#field-anchor-introduction-background"
+    },
+    "population2025": 8967408,
+    "unPopulationLocation": 756
   },
   {
     "id": "SY",
@@ -1349,7 +2525,14 @@
     "capital": "Damascus",
     "region": "Western Asia",
     "latitude": 35,
-    "longitude": 38
+    "longitude": 38,
+    "introduction": {
+      "text": "Syria was part of the Ottoman Empire before France took control after World War I. The country achieved full independence in 1946.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/sy.html#field-anchor-introduction-background"
+    },
+    "population2025": 25620427,
+    "unPopulationLocation": 760
   },
   {
     "id": "ST",
@@ -1357,7 +2540,14 @@
     "capital": "São Tomé",
     "region": "Middle Africa",
     "latitude": 1,
-    "longitude": 7
+    "longitude": 7,
+    "introduction": {
+      "text": "Portuguese settlers established sugar plantations on São Tomé and Príncipe using enslaved African labor. The islands gained independence from Portugal in 1975.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tp.html#field-anchor-introduction-background"
+    },
+    "population2025": 240254,
+    "unPopulationLocation": 678
   },
   {
     "id": "TJ",
@@ -1365,7 +2555,14 @@
     "capital": "Dushanbe",
     "region": "Central Asia",
     "latitude": 39,
-    "longitude": 71
+    "longitude": 71,
+    "introduction": {
+      "text": "In 1929 Tajikistan became a separate republic within the Soviet Union. It became an independent country in 1991 as the Soviet Union broke apart.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ti.html#field-anchor-introduction-background"
+    },
+    "population2025": 10786734,
+    "unPopulationLocation": 762
   },
   {
     "id": "TZ",
@@ -1373,7 +2570,14 @@
     "capital": "Dodoma",
     "region": "Eastern Africa",
     "latitude": -6,
-    "longitude": 35
+    "longitude": 35,
+    "introduction": {
+      "text": "Tanzania was formed in 1964 by the union of Tanganyika on the mainland and the islands of Zanzibar. Both had recently become independent from Britain.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tz.html#field-anchor-introduction-background"
+    },
+    "population2025": 70545865,
+    "unPopulationLocation": 834
   },
   {
     "id": "TH",
@@ -1381,7 +2585,14 @@
     "capital": "Bangkok",
     "region": "South-Eastern Asia",
     "latitude": 15,
-    "longitude": 100
+    "longitude": 100,
+    "introduction": {
+      "text": "Thailand was long known as Siam. A revolution in 1932 ended the king’s absolute power and established a constitutional monarchy.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/th.html#field-anchor-introduction-background"
+    },
+    "population2025": 71619863,
+    "unPopulationLocation": 764
   },
   {
     "id": "TL",
@@ -1389,7 +2600,14 @@
     "capital": "Dili",
     "region": "South-Eastern Asia",
     "latitude": -8.83333333,
-    "longitude": 125.91666666
+    "longitude": 125.91666666,
+    "introduction": {
+      "text": "Timor-Leste declared independence from Portugal in 1975, but Indonesia invaded days later. After a long occupation and a vote for independence, Timor-Leste became fully independent in 2002.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tt.html#field-anchor-introduction-background"
+    },
+    "population2025": 1418517,
+    "unPopulationLocation": 626
   },
   {
     "id": "TG",
@@ -1397,7 +2615,14 @@
     "capital": "Lomé",
     "region": "Western Africa",
     "latitude": 8,
-    "longitude": 1.16666666
+    "longitude": 1.16666666,
+    "introduction": {
+      "text": "Germany claimed Togoland as a protectorate in 1884. The part later governed by France became the independent country of Togo in 1960.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/to.html#field-anchor-introduction-background"
+    },
+    "population2025": 9721608,
+    "unPopulationLocation": 768
   },
   {
     "id": "TO",
@@ -1405,7 +2630,14 @@
     "capital": "Nuku'alofa",
     "region": "Polynesia",
     "latitude": -20,
-    "longitude": -175
+    "longitude": -175,
+    "introduction": {
+      "text": "King George Tupou I united Tonga’s islands in 1845. In 1875 Tonga adopted a constitution that set out how the monarchy would govern.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/tonga"
+    },
+    "population2025": 103742,
+    "unPopulationLocation": 776
   },
   {
     "id": "TT",
@@ -1413,7 +2645,14 @@
     "capital": "Port of Spain",
     "region": "Caribbean",
     "latitude": 11,
-    "longitude": -61
+    "longitude": -61,
+    "introduction": {
+      "text": "During British rule, workers from India came to Trinidad under labor contracts to work on plantations. Trinidad and Tobago gained independence in 1962.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/td.html#field-anchor-introduction-background"
+    },
+    "population2025": 1511155,
+    "unPopulationLocation": 780
   },
   {
     "id": "TN",
@@ -1421,7 +2660,14 @@
     "capital": "Tunis",
     "region": "Northern Africa",
     "latitude": 34,
-    "longitude": 9
+    "longitude": 9,
+    "introduction": {
+      "text": "Carthaginians, Romans and later the Ottomans all ruled parts of what is now Tunisia. In 1956 Tunisia gained independence from France after decades as a French protectorate.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ts.html#field-anchor-introduction-background"
+    },
+    "population2025": 12348573,
+    "unPopulationLocation": 788
   },
   {
     "id": "TM",
@@ -1429,7 +2675,14 @@
     "capital": "Ashgabat",
     "region": "Central Asia",
     "latitude": 40,
-    "longitude": 60
+    "longitude": 60,
+    "introduction": {
+      "text": "The medieval city of Merv, in what is now Turkmenistan, was a major stop on the Silk Road. Turkmenistan later became a Soviet republic and gained independence in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tx.html#field-anchor-introduction-background"
+    },
+    "population2025": 7618848,
+    "unPopulationLocation": 795
   },
   {
     "id": "TV",
@@ -1437,7 +2690,14 @@
     "capital": "Funafuti",
     "region": "Polynesia",
     "latitude": -8,
-    "longitude": 178
+    "longitude": 178,
+    "introduction": {
+      "text": "In 1974 the people of the Ellice Islands voted to separate from the Gilbert Islands, then part of the same British colony. They became independent as Tuvalu in 1978.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tv.html#field-anchor-introduction-background"
+    },
+    "population2025": 9492,
+    "unPopulationLocation": 798
   },
   {
     "id": "TR",
@@ -1445,7 +2705,14 @@
     "capital": "Ankara",
     "region": "Western Asia",
     "latitude": 39,
-    "longitude": 35
+    "longitude": 35,
+    "introduction": {
+      "text": "The Republic of Türkiye was founded in 1923 after the collapse of the Ottoman Empire. Its founder, Mustafa Kemal, later took the name Atatürk.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/tu.html#field-anchor-introduction-background"
+    },
+    "population2025": 87685426,
+    "unPopulationLocation": 792
   },
   {
     "id": "UG",
@@ -1453,7 +2720,14 @@
     "capital": "Kampala",
     "region": "Eastern Africa",
     "latitude": 1,
-    "longitude": 32
+    "longitude": 32,
+    "introduction": {
+      "text": "Britain grouped communities with different cultures and systems of government into the Uganda Protectorate in 1894. Uganda gained independence in 1962.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ug.html#field-anchor-introduction-background"
+    },
+    "population2025": 51384894,
+    "unPopulationLocation": 800
   },
   {
     "id": "UA",
@@ -1461,7 +2735,14 @@
     "capital": "Kyiv",
     "region": "Eastern Europe",
     "latitude": 49,
-    "longitude": 32
+    "longitude": 32,
+    "introduction": {
+      "text": "Medieval Kyiv was the center of a state known as Kyivan Rus. Centuries later, in 1991, Ukraine declared independence from the Soviet Union.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/up.html#field-anchor-introduction-background"
+    },
+    "population2025": 38980376,
+    "unPopulationLocation": 804
   },
   {
     "id": "AE",
@@ -1469,7 +2750,14 @@
     "capital": "Abu Dhabi",
     "region": "Western Asia",
     "latitude": 24,
-    "longitude": 54
+    "longitude": 54,
+    "introduction": {
+      "text": "In 1971 six Gulf emirates, including Abu Dhabi and Dubai, united to form one country. Ras Al Khaimah joined the following year as the seventh emirate.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/ae.html#field-anchor-introduction-background"
+    },
+    "population2025": 11346000,
+    "unPopulationLocation": 784
   },
   {
     "id": "GB",
@@ -1477,7 +2765,14 @@
     "capital": "London",
     "region": "Northern Europe",
     "latitude": 54,
-    "longitude": -2
+    "longitude": -2,
+    "introduction": {
+      "text": "England and Scotland united in 1707 to form Great Britain. Ireland joined the union in 1801, and most of Ireland left in 1922 while Northern Ireland stayed.",
+      "sourceName": "UK Parliament · House of Commons Library",
+      "sourceURL": "https://commonslibrary.parliament.uk/research-briefings/cbp-10649/"
+    },
+    "population2025": 69551332,
+    "unPopulationLocation": 826
   },
   {
     "id": "US",
@@ -1485,7 +2780,14 @@
     "capital": "Washington D.C.",
     "region": "North America",
     "latitude": 38,
-    "longitude": -97
+    "longitude": -97,
+    "introduction": {
+      "text": "On July 4, 1776, representatives of thirteen North American colonies adopted the Declaration of Independence in Philadelphia. It announced their decision to break away from Britain.",
+      "sourceName": "U.S. National Archives",
+      "sourceURL": "https://www.archives.gov/founding-docs/declaration-history"
+    },
+    "population2025": 347275808,
+    "unPopulationLocation": 840
   },
   {
     "id": "UY",
@@ -1493,7 +2795,14 @@
     "capital": "Montevideo",
     "region": "South America",
     "latitude": -33,
-    "longitude": -56
+    "longitude": -56,
+    "introduction": {
+      "text": "Brazil annexed the territory of present-day Uruguay in 1821. Uruguay declared independence in 1825 and secured it in 1828.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/uy.html#field-anchor-introduction-background"
+    },
+    "population2025": 3384688,
+    "unPopulationLocation": 858
   },
   {
     "id": "UZ",
@@ -1501,7 +2810,14 @@
     "capital": "Tashkent",
     "region": "Central Asia",
     "latitude": 41,
-    "longitude": 64
+    "longitude": 64,
+    "introduction": {
+      "text": "Russia conquered the lands that now make up Uzbekistan in the late 1800s. Uzbekistan later became a Soviet republic and gained independence in 1991.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/uz.html#field-anchor-introduction-background"
+    },
+    "population2025": 37053428,
+    "unPopulationLocation": 860
   },
   {
     "id": "VU",
@@ -1509,7 +2825,14 @@
     "capital": "Port Vila",
     "region": "Melanesia",
     "latitude": -16,
-    "longitude": 167
+    "longitude": 167,
+    "introduction": {
+      "text": "Britain and France jointly governed these Pacific islands, then called the New Hebrides. The islands chose the name Vanuatu when they gained independence in 1980.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/nh.html#field-anchor-introduction-background"
+    },
+    "population2025": 335169,
+    "unPopulationLocation": 548
   },
   {
     "id": "VA",
@@ -1517,7 +2840,14 @@
     "capital": "Vatican City",
     "region": "Southern Europe",
     "latitude": 41.9,
-    "longitude": 12.45
+    "longitude": 12.45,
+    "introduction": {
+      "text": "For centuries the popes ruled lands across central Italy. A treaty with Italy in 1929 established Vatican City as an independent state.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/vt.html#field-anchor-introduction-background"
+    },
+    "population2025": 501,
+    "unPopulationLocation": 336
   },
   {
     "id": "VE",
@@ -1525,7 +2855,14 @@
     "capital": "Caracas",
     "region": "South America",
     "latitude": 8,
-    "longitude": -66
+    "longitude": -66,
+    "introduction": {
+      "text": "Venezuela gained independence from Spain as part of a larger republic that also included present-day Colombia. Venezuela left that union in 1830.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/venezuela"
+    },
+    "population2025": 28516896,
+    "unPopulationLocation": 862
   },
   {
     "id": "VN",
@@ -1533,7 +2870,14 @@
     "capital": "Hanoi",
     "region": "South-Eastern Asia",
     "latitude": 16.16666666,
-    "longitude": 107.83333333
+    "longitude": 107.83333333,
+    "introduction": {
+      "text": "Vietnam declared independence in 1945. After years of division and war, North and South reunited in 1976 as the Socialist Republic of Vietnam.",
+      "sourceName": "Vietnamese Embassy in the United States",
+      "sourceURL": "https://vietnamembassy-usa.org/node/56"
+    },
+    "population2025": 101598527,
+    "unPopulationLocation": 704
   },
   {
     "id": "YE",
@@ -1541,7 +2885,14 @@
     "capital": "Sana'a",
     "region": "Western Asia",
     "latitude": 15,
-    "longitude": 48
+    "longitude": 48,
+    "introduction": {
+      "text": "North Yemen and South Yemen were separate countries for much of the twentieth century. In 1990 they joined to form the Republic of Yemen.",
+      "sourceName": "U.S. Department of State · Office of the Historian",
+      "sourceURL": "https://history.state.gov/countries/yemen"
+    },
+    "population2025": 41773878,
+    "unPopulationLocation": 887
   },
   {
     "id": "ZM",
@@ -1549,7 +2900,14 @@
     "capital": "Lusaka",
     "region": "Eastern Africa",
     "latitude": -15,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "Under British rule, Zambia was known as Northern Rhodesia. It took the name Zambia when it became independent in 1964.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/za.html#field-anchor-introduction-background"
+    },
+    "population2025": 21913874,
+    "unPopulationLocation": 894
   },
   {
     "id": "ZW",
@@ -1557,6 +2915,13 @@
     "capital": "Harare",
     "region": "Eastern Africa",
     "latitude": -20,
-    "longitude": 30
+    "longitude": 30,
+    "introduction": {
+      "text": "The medieval Kingdom of Zimbabwe was one of several trading states in the region. Centuries later, after British colonial rule, the modern country gained independence in 1980.",
+      "sourceName": "The World Factbook · 2020 historical background",
+      "sourceURL": "https://simonw.github.io/cia-world-factbook-2020/geos/zi.html#field-anchor-introduction-background"
+    },
+    "population2025": 16950795,
+    "unPopulationLocation": 716
   }
 ]

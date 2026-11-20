@@ -4,6 +4,74 @@ final class CountryReadingUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     @MainActor
+    func testOverviewHistoricalSourceAndChartAcrossCountries() {
+        let app = launch()
+        let examples = [("Morocco", "Fatima"), ("Japan", "Shirakawa"), ("Peru", "Machu Picchu")]
+        for (index, example) in examples.enumerated() {
+            let (country, topic) = example
+            openCountry(country, in: app, selectAtlas: index == 0)
+            let overview = app.staticTexts["countryOverview"]
+            let title = app.staticTexts["historicalFactTitle"]
+            let body = app.staticTexts["historicalFactBody"]
+            let source = app.descendants(matching: .any)["historicalFactSource"].firstMatch
+            XCTAssertFalse(overview.label.isEmpty)
+            let population = app.descendants(matching: .any)["countryPopulation"].firstMatch
+            XCTAssertNotNil(population.label.range(of: #"\b20\d{2}\b"#, options: .regularExpression))
+            XCTAssertFalse(app.staticTexts["In the conversation"].exists)
+            app.buttons["toggleCountryGlobe"].tap()
+            XCTAssertLessThan(overview.frame.maxY, title.frame.minY)
+            XCTAssertTrue((title.label + " " + body.label).localizedCaseInsensitiveContains(topic))
+            XCTAssertTrue(source.exists)
+            let firstTrack = app.descendants(matching: .any)["musicTrack-0"].firstMatch
+            let fifthTrack = app.descendants(matching: .any)["musicTrack-4"].firstMatch
+            XCTAssertTrue(fifthTrack.exists)
+            XCTAssertLessThan(source.frame.maxY, firstTrack.frame.minY)
+            for _ in 0..<10 where !source.isHittable { readStep(app) }
+            XCTAssertTrue(source.isHittable)
+            capture("\(country) historical fact and source", app)
+            app.navigationBars["A little more local"].buttons["Close"].tap()
+        }
+    }
+
+    @MainActor
+    func testNextFactPersistsAndMatchesTheCompanionSourceWhenMusicIsUnavailable() {
+        let app = launch(mode: "unavailable")
+        openMorocco(app)
+        app.buttons["toggleCountryGlobe"].tap()
+        let title = app.staticTexts["historicalFactTitle"]
+        let original = title.label
+        let next = app.buttons["nextHistoricalFact"]
+        for _ in 0..<12 where !next.isHittable { readStep(app) }
+        XCTAssertTrue(next.isHittable)
+        next.tap()
+        let selected = title.label
+        XCTAssertNotEqual(selected, original)
+        app.buttons["askNiche"].tap()
+        let source = app.descendants(matching: .any)["companionHistoricalSource"].firstMatch
+        XCTAssertTrue(source.waitForExistence(timeout: 5))
+        XCTAssertTrue(source.label.contains(selected), source.label)
+        XCTAssertTrue(app.descendants(matching: .any)["companionPopulationSource"].firstMatch.exists)
+        app.terminate()
+        app.launchArguments = arguments(reset: false, mode: "unavailable")
+        app.launch()
+        openMorocco(app)
+        XCTAssertEqual(title.label, selected)
+    }
+
+    @MainActor
+    func testRadioChartShowsStationSampleAndProviderCredit() {
+        let app = launch(mode: "radio")
+        openCountry("Cuba", in: app)
+        app.buttons["toggleCountryGlobe"].tap()
+        XCTAssertTrue(app.staticTexts["TUNEPING · CUBA"].exists)
+        let track = app.descendants(matching: .any)["musicTrack-0"].firstMatch
+        XCTAssertTrue(track.label.contains("2 plays · 1 station"))
+        let credit = app.descendants(matching: .any)["Data by Tuneping"].firstMatch
+        for _ in 0..<16 where !credit.isHittable { readStep(app) }
+        XCTAssertTrue(credit.isHittable)
+    }
+
+    @MainActor
     func testTakeMeSomewhereRequiresCompletionAndSharesProgressWithAtlas() {
         let app = launch()
         let landing = app.buttons["landingCountry"]
@@ -124,16 +192,17 @@ final class CountryReadingUITests: XCTestCase {
     }
 
     @MainActor
-    func testUnavailableFeedsStillAllowCompletion() {
+    func testUnavailableChartKeepsReadingAndCompletionAvailable() {
         let app = launch(mode: "unavailable")
         openMorocco(app)
         app.buttons["toggleCountryGlobe"].tap()
         readToEnd(app)
         XCTAssertTrue(app.buttons["retryMusic"].exists)
-        XCTAssertTrue(app.buttons["retryNews"].exists)
+        XCTAssertTrue(app.staticTexts["historicalFactBody"].exists)
+        XCTAssertTrue(app.staticTexts["countryOverview"].exists)
         app.buttons["completeCountryExploration"].press(forDuration: 1.2)
         XCTAssertTrue(app.descendants(matching: .any)["countryExplored"].firstMatch.waitForExistence(timeout: 4))
-        capture("Unavailable feeds keep exploration usable", app)
+        capture("Unavailable chart keeps exploration usable", app)
     }
 
     @MainActor
@@ -178,6 +247,9 @@ final class CountryReadingUITests: XCTestCase {
         XCTAssertTrue(search.waitForExistence(timeout: 5), app.debugDescription)
         if search.value as? String != country {
             search.tap()
+            if let value = search.value as? String, !value.isEmpty, value != search.placeholderValue {
+                search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: value.count))
+            }
             search.typeText(country)
         }
         app.buttons.containing(.staticText, identifier: country).firstMatch.tap()

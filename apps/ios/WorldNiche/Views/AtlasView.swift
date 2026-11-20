@@ -70,6 +70,7 @@ struct AtlasView: View {
 }
 
 struct CountryRow: View {
+    @EnvironmentObject private var factCatalog: HistoricalFactCatalog
     let country: Country
     var body: some View {
         HStack(spacing: 16) {
@@ -79,9 +80,9 @@ struct CountryRow: View {
                 Text(country.capital).scaledFont(size: 11).foregroundStyle(Palette.muted)
             }
             Spacer()
-            if !country.insights.isEmpty {
+            if !factCatalog[country.id].isEmpty {
                 Image(systemName: "sparkle").scaledFont(size: 12).foregroundStyle(Palette.clay)
-                    .accessibilityLabel("Includes a researched cultural note")
+                    .accessibilityLabel("Includes a sourced historical fact")
             }
             Image(systemName: "chevron.right").scaledFont(size: 11).foregroundStyle(Palette.muted)
         }.padding(.vertical, 16).contentShape(Rectangle())
@@ -242,15 +243,15 @@ struct AboutView: View {
                     Text("Small discoveries that make the world feel closer. Find a song, learn a local ritual, and have a better question to ask the next person you meet.")
                     Divider()
                     Text("A world of perspectives").scaledFont(size: 24, design: .serif)
-                    Text("The atlas includes 193 UN member states plus Palestine and the Holy See. Borders follow Natural Earth’s cartographic dataset and aren’t a statement of political recognition. Cultural discoveries rotate daily from live sources. Music and headlines refresh throughout the day; coverage varies by provider.")
+                    Text("The atlas includes 193 UN member states plus Palestine and the Holy See. Borders follow Natural Earth’s cartographic dataset and aren’t a statement of political recognition.")
                     Text("Built for curiosity, with privacy").scaledFont(size: 24, design: .serif)
-                    Text("Guest journals stay on this device. With an account, saved countries, private notes and exploration history sync to your account. Friends only see explored countries when sharing is enabled. Sharing starts on for new accounts and can be turned off in Settings. Ask Niche uses Apple Intelligence on supported devices. The app requests public content directly from Apple, Global Voices and Wikimedia. No analytics SDK or location permission. Profile settings include privacy details, export and deletion controls.")
+                    Text("Guest journals stay on this device. With an account, saved countries, private notes and exploration history sync to your account. Friends only see explored countries when sharing is enabled. Sharing starts on for new accounts and can be turned off in Settings. Ask Niche uses Apple Intelligence on supported devices. Apple and Tuneping receive requests for country music charts. No analytics SDK or location permission. Profile settings include privacy details, export and deletion controls.")
                     Text("Sources & credits").scaledFont(size: 24, design: .serif)
                     Link("Natural Earth · public-domain map data", destination: URL(string: "https://www.naturalearthdata.com/about/terms-of-use/")!)
                     Link("Country data · mledoze/countries · ODbL", destination: URL(string: "https://github.com/mledoze/countries")!)
                     Link("Open Database License", destination: URL(string: "https://opendatacommons.org/licenses/odbl/1-0/")!)
-                    Text("Cultural sources are linked on each note. Live cultural reading comes from Wikipedia contributors under CC BY-SA 4.0. Apple Music charts reflect that service’s listeners. English headlines come from Global Voices under CC BY 3.0. TikTok trends aren’t included yet.")
-                    Link("Wikipedia text · CC BY-SA 4.0", destination: URL(string: "https://creativecommons.org/licenses/by-sa/4.0/")!)
+                    Text("Each country opens with a short history and a dated population figure. Its fact changes the next day you visit. Tap Next fact to read another sourced story. Apple Music charts reflect local streams. Where a country has no Apple chart, Tuneping may have a chart of songs played by monitored local radio stations.")
+                    Link("Radio chart data by Tuneping", destination: URL(string: "https://tuneping.com/")!)
                     Text("WorldNiche · 1.0").scaledFont(size: 11, design: .monospaced).tracking(2).padding(.top, 12)
                 }.scaledFont(size: 14).lineSpacing(5).foregroundStyle(Palette.pine).padding(26).frame(maxWidth: 650).frame(maxWidth: .infinity)
             }.background(Palette.paper)
