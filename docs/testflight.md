@@ -1,5 +1,13 @@
 # TestFlight
 
+## November 20, 2026 internal TestFlight
+
+**1.0.2 (14)** is valid and in internal beta testing. App Store Connect confirmed the exact build belongs to **Release Checks**, with one tester, verified What to Test notes and automatic notifications enabled. Open TestFlight, choose WorldNiche and select Update or Install.
+
+The archive and IPA were signed with the replacement Mac’s Apple Distribution identity. Both passed signature, provisioning, entitlements, privacy manifest, production client configuration and bundled catalog checks. The IPA SHA-256 is `146e5d79321debee3d86ef278cfd6e6c0e8c6289edfe0d89a54fbce08c51894e`. Packages and verification records are ignored under `outputs/testflight/1.0.2-14/`.
+
+All 13 focused UI scenarios passed on both the phone and unfolded Duo. The Swift suite and release PR checks passed. The live Apple Music check reached the France chart. The live Cuba radio check encountered a TLS connection error on the release Mac. The deterministic radio tests and UI tests for unavailable music passed. [App Review submission](app-store-readiness.md)
+
 ## Owner acceptance and App Store submission: November 2, 2026
 
 The owner confirmed testing the latest build and authorized App Store submission. **1.0.1 (13)** is now **WAITING_FOR_REVIEW**, with **automatic release after approval**. PR #13 is merged, and build 13's iOS source matches the merged feature commit `c8842bb153575d58ecbceddf28d78a2c461ffe22`, whose five CI jobs all passed. [Submission details](app-store-readiness.md) contain the live record IDs. The distribution evidence below remains the historical upload record. Release Checks still contains build 13; the public beta remains on build 8.

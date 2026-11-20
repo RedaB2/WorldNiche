@@ -1,8 +1,18 @@
 # App Store readiness
 
-The latest submission was verified against live App Store Connect records on November 2, 2026. Earlier checks below retain their original dates. Submission acceptance is not App Store approval.
+## November 20, 2026 submission
 
-## Current submission status: November 2, 2026
+Apple accepted **1.0.2 (14)** at 23:26:08 UTC. The version and submission both returned **WAITING_FOR_REVIEW**, with the verified build attached and manual release selected. App Store Connect matched the [English listing](../metadata/version/1.0.2/en-US.json) and the current reviewer instructions. Submission validation returned zero blocking issues and one keyword overlap warning.
+
+| Record | App Store Connect ID |
+| --- | --- |
+| Version 1.0.2 | `bb4a5f96-cbc9-4ab0-8ac4-a704db2ff806` |
+| Build 14 | `ede52843-8f7c-4feb-bf89-adba8425d9bc` |
+| App Review submission | `b47c84a3-1b35-40d3-ba7f-5959e1127e41` |
+
+The existing private reviewer invitation expires November 29, 2026 at 00:54 UTC. Its value and reviewer contact details are stored in App Store Connect. See the [build verification](testflight.md) and [source release](https://github.com/RedaB2/WorldNiche/releases/tag/v1.0.2).
+
+## November 2, 2026 submission
 
 The owner confirmed TestFlight testing and authorized **1.0.1 (13)** for App Store review and automatic distribution after approval. Apple accepted the submission on November 2 at **23:16:26 UTC / 3:16 p.m. Pacific**. Independent submission and version readbacks show **WAITING_FOR_REVIEW**; release type is **AFTER_APPROVAL**. Version 1.0 (8) remains the live App Store version while review is pending.
 
