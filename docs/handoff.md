@@ -4,11 +4,11 @@
 
 ## Current release
 
-As checked November 2, 2026, WorldNiche **1.0.1 (13)** is **Waiting for Review**. The owner confirmed TestFlight testing and authorized submission plus **automatic release after approval**. Apple accepted the submission at 23:16:26 UTC (3:16 p.m. Pacific). The store continues serving **1.0 (8)** until Apple approves and distributes the update. These are dated snapshots, not a live feed.
+Apple accepted **1.0.2 (14)** for App Review on November 20, 2026 at 3:26 p.m. Pacific. The version and submission both showed **Waiting for Review**. Public release is manual after approval. At submission, the US App Store served 1.0.1 and build 14 was available to the owner in the internal **Release Checks** TestFlight group.
 
-All feature PRs through [PR #13](https://github.com/RedaB2/WorldNiche/pull/13) are merged. Build 13's archive source is `2b04f3f49978c4386e25584d55a2d5979bbb1ab0`; its entire `apps/ios` tree matches merged feature commit `c8842bb153575d58ecbceddf28d78a2c461ffe22`. All five main CI jobs passed, and the final reading scenarios passed 7/7 on phone and 7/7 on unfolded Duo. The release adds globe controls, country-location globes, easier friend invitations, saved reading progress and a simpler Discover screen. See [submission status and IDs](app-store-readiness.md), [TestFlight evidence](testflight.md) and [version metadata](../metadata/version/1.0.1/en-US.json).
+The [v1.0.2 release](https://github.com/RedaB2/WorldNiche/releases/tag/v1.0.2) identifies the archive source at `c6a0f630bb0ee08eddf0ceef0a5273d50aa9106b`. It includes the country readings and radio charts from [PR #15](https://github.com/RedaB2/WorldNiche/pull/15), the onboarding invitation fix from [PR #16](https://github.com/RedaB2/WorldNiche/pull/16) and the version and listing from [PR #17](https://github.com/RedaB2/WorldNiche/pull/17). See the [submission record](app-store-readiness.md), [TestFlight checks](testflight.md) and [version metadata](../metadata/version/1.0.2/en-US.json).
 
-The `v1.0.0` tag remains immutable. The `v1.0.1` GitHub release records the new source and submission, not App Store approval. Build 13 remains in the owner-only **Release Checks** group; the public beta remains on build 8. Personalized website invitation previews still require the separate backend migration and Vercel configuration in the [deployment guide](deployment.md#personalized-friend-previews). A November 2 read-only check confirmed the metadata RPC is absent; native personalized share-sheet titles work independently, with a generic website fallback. The website is hosted on Vercel and publishes automatically from `main`.
+Personalized website invitation previews still require the separate backend migration and Vercel configuration in the [deployment guide](deployment.md#personalized-friend-previews). A November 2 read-only check confirmed the metadata RPC is absent; native personalized share-sheet titles work independently, with a generic website fallback. The website is hosted on Vercel and publishes automatically from `main`.
 
 ## Find the right place
 
@@ -48,7 +48,7 @@ The owner verified the private reviewer invite, five countries and duplicate pre
 
 The reviewer invitation expires **November 29, 2026 at 00:54 UTC**. Its token and reviewer contact phone are only in App Store Connect/private release evidence. Renew the invitation if review lasts that long. Do not publish it in issues or documentation.
 
-The owner monitors `boutayeb.reda@icloud.com` and the private moderation queue. Keep the backend and public support/privacy pages available during review. Version 1.0.1 is authorized to release automatically after approval.
+The owner monitors `boutayeb.reda@icloud.com` and the private moderation queue. Keep the backend and public support/privacy pages available during review.
 
 ## Existing local files
 

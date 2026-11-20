@@ -116,14 +116,14 @@ Archive/export using the owner's Apple Distribution certificate and WorldNiche A
 
 Listing source lives in `metadata/app-info/` and `metadata/version/`. The frozen submitted listing beside the 1.0 media is a readback snapshot. Use the current App Store metadata sync tools to validate and review a future metadata diff before applying it.
 
-Version **1.0.1 (13)** was submitted November 2, 2026 with owner-authorized automatic release after approval. Do not change the submitted build while review is pending. Check its state with:
+Version **1.0.2 (14)** was submitted November 20, 2026 with manual release after approval. Check the submission and attached build with these commands.
 
 ```sh
-asc submit status --id a945db30-b3a0-4199-abf4-8ad73f5c02df
-asc versions view --version-id c5197f2b-7821-4a8c-a76f-186617b2c1c1 --include-build
+asc submit status --id b47c84a3-1b35-40d3-ba7f-5959e1127e41
+asc versions view --version-id bb4a5f96-cbc9-4ab0-8ac4-a704db2ff806 --include-build
 ```
 
-The local `asc` keychain profile is named `Tech Bros Budget`; the verified app/team IDs above determine the target. On another Mac, authenticate with owner-authorized App Store Connect access. Never export a signing private key into Git.
+The replacement Mac uses the `WorldNiche` ASC keychain profile and the `WorldNiche App Store November 2026` provisioning profile. The signing private key was generated in the owner's login keychain. Open the existing checkout and use its ignored export options. Verify the app, bundle and team IDs before distribution.
 
 ## Credential locations
 
@@ -145,3 +145,5 @@ On the existing Mac, an operator-only OpenAI copy is in `/Users/rb/dev/WorldNich
 `v1.0.0` identifies the first submitted app, **1.0 (8)**, plus its website/backend source, media and handoff docs. It is not an App Store approval announcement. Release notes must retain that distinction. Future tags are immutable; use a new version for a new release. Keep public release artifacts limited to source and public marketing media, never signed configured binaries or private review evidence.
 
 `v1.0.1` identifies the source for **1.0.1 (13)** and its submission documentation. The owner authorized automatic App Store release after approval. The tag does not mean Apple has approved the update. See [current submission status](app-store-readiness.md).
+
+`v1.0.2` identifies the source used for **1.0.2 (14)**. [GitHub release](https://github.com/RedaB2/WorldNiche/releases/tag/v1.0.2)
