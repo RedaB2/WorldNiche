@@ -1,5 +1,9 @@
 # App Store readiness
 
+## November 21, 2026 public release
+
+At the owner’s request, build 14 was released from **Pending Developer Release** at 11:50 a.m. Pacific. App Store Connect then returned **READY_FOR_DISTRIBUTION** for iOS version 1.0.2 with build 14 attached. Phased release was off. All 174 enabled territories had availability status `AVAILABLE`. Mainland China was disabled and marked `CANNOT_SELL`. [App Store listing](https://apps.apple.com/app/id6824807927)
+
 ## November 20, 2026 submission
 
 Apple accepted **1.0.2 (14)** at 23:26:08 UTC. The version and submission both returned **WAITING_FOR_REVIEW**, with the verified build attached and manual release selected. App Store Connect matched the [English listing](../metadata/version/1.0.2/en-US.json) and the current reviewer instructions. Submission validation returned zero blocking issues and one keyword overlap warning.
