@@ -4,7 +4,7 @@
 
 ## Current release
 
-Apple accepted **1.0.2 (14)** for App Review on November 20, 2026 at 3:26 p.m. Pacific. The version and submission both showed **Waiting for Review**. Public release is manual after approval. At submission, the US App Store served 1.0.1 and build 14 was available to the owner in the internal **Release Checks** TestFlight group.
+The owner released **1.0.2 (14)** on November 21, 2026 at 11:50 a.m. Pacific after Apple approved it. App Store Connect confirmed **Ready for Distribution** with phased release off. All 174 enabled territories showed available. Apple lists mainland China as ineligible for sale. [WorldNiche on the App Store](https://apps.apple.com/app/id6824807927)
 
 The [v1.0.2 release](https://github.com/RedaB2/WorldNiche/releases/tag/v1.0.2) identifies the archive source at `c6a0f630bb0ee08eddf0ceef0a5273d50aa9106b`. It includes the country readings and radio charts from [PR #15](https://github.com/RedaB2/WorldNiche/pull/15), the onboarding invitation fix from [PR #16](https://github.com/RedaB2/WorldNiche/pull/16) and the version and listing from [PR #17](https://github.com/RedaB2/WorldNiche/pull/17). See the [submission record](app-store-readiness.md), [TestFlight checks](testflight.md) and [version metadata](../metadata/version/1.0.2/en-US.json).
 
