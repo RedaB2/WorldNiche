@@ -1,5 +1,19 @@
 # App Store readiness
 
+## November 24, 2026 submission
+
+Apple accepted **WorldNiche 1.1 (16)** on November 25 at 04:08:59 UTC (November 24 at 8:08 p.m. Pacific). The submission and version both returned `WAITING_FOR_REVIEW`. The production build is attached, release type is `AFTER_APPROVAL`, and phased release is off. [App Store Connect](https://appstoreconnect.apple.com/apps/6824807927/distribution/ios/version/4dbad769-db86-4262-9bdb-474fcc4fe7fc)
+
+| Record | App Store Connect ID |
+| --- | --- |
+| Version 1.1 | `4dbad769-db86-4262-9bdb-474fcc4fe7fc` |
+| Build 16 | `8ffc23a2-0801-430c-9e43-70bfe2c8997b` |
+| App Review submission | `5f12c066-7b50-4b9d-9d9e-37049029d4ea` |
+
+The six English listing fields matched their source. Apple processed seven iPhone, four unfolded Duo and three iPad screenshots, plus the existing iPhone preview. Six new captures show Discover, the daily quiz and weekly friends scores. Validation found zero blocking issues and flagged the product homepage as the marketing URL. App Privacy was published, including Device ID and Product Interaction. Apple also received an App Enhancements featuring nomination for the daily capitals quiz. [English listing](../metadata/version/1.1/en-US.json) · [Media manifest](../marketing/app-store/1.1/manifest.json)
+
+The production quiz matched the signed app’s question for the current UTC day. The minute schedule ran successfully, and the authenticated worker returned HTTP 200 with zero registered devices at verification. Real delivery, opening the quiz, completion suppression and opt-out were verified on the staging simulator. The production rollout and the staging configuration are documented in the [deployment guide](deployment.md#daily-country-quiz-and-apple-push-reminders).
+
 ## November 21, 2026 public release
 
 At the owner’s request, build 14 was released from **Pending Developer Release** at 11:50 a.m. Pacific. App Store Connect then returned **READY_FOR_DISTRIBUTION** for iOS version 1.0.2 with build 14 attached. Phased release was off. All 174 enabled territories had availability status `AVAILABLE`. Mainland China was disabled and marked `CANNOT_SELL`. [App Store listing](https://apps.apple.com/app/id6824807927)

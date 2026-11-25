@@ -4,11 +4,13 @@
 
 ## Current release
 
+**1.1 (16) is submitted for automatic release after approval.** Apple returned **Waiting for Review** on November 24 at 8:08 p.m. Pacific. The daily quiz, reminder worker and scheduler are live on the production backend. [Submission record](app-store-readiness.md#november-24-2026-submission) · [Release source](https://github.com/RedaB2/WorldNiche/releases/tag/v1.1.0)
+
 The owner released **1.0.2 (14)** on November 21, 2026 at 11:50 a.m. Pacific after Apple approved it. App Store Connect confirmed **Ready for Distribution** with phased release off. All 174 enabled territories showed available. Apple lists mainland China as ineligible for sale. [WorldNiche on the App Store](https://apps.apple.com/app/id6824807927)
 
 The [v1.0.2 release](https://github.com/RedaB2/WorldNiche/releases/tag/v1.0.2) identifies the archive source at `c6a0f630bb0ee08eddf0ceef0a5273d50aa9106b`. It includes the country readings and radio charts from [PR #15](https://github.com/RedaB2/WorldNiche/pull/15), the onboarding invitation fix from [PR #16](https://github.com/RedaB2/WorldNiche/pull/16) and the version and listing from [PR #17](https://github.com/RedaB2/WorldNiche/pull/17). See the [submission record](app-store-readiness.md), [TestFlight checks](testflight.md) and [version metadata](../metadata/version/1.0.2/en-US.json).
 
-Personalized website invitation previews still require the separate backend migration and Vercel configuration in the [deployment guide](deployment.md#personalized-friend-previews). A November 2 read-only check confirmed the metadata RPC is absent; native personalized share-sheet titles work independently, with a generic website fallback. The website is hosted on Vercel and publishes automatically from `main`.
+Production includes the invitation metadata RPC. The website uses Vercel runtime configuration for personalized invitation previews and provides a generic fallback. [Deployment guide](deployment.md#personalized-friend-previews)
 
 ## Find the right place
 
@@ -20,7 +22,7 @@ Personalized website invitation previews still require the separate backend migr
 | Landing page, demos, friends animation, public policies | `apps/web/landing-site/` |
 | Friend link fallback and Universal Link routing | `apps/web/invite-site/`, `apps/web/invite-hosting/` |
 | Accounts, friendship access, journal sync, moderation | `backend/supabase/` |
-| App Store screenshots and preview | `marketing/app-store/1.0/` |
+| App Store screenshots and preview | `marketing/app-store/1.1/manifest.json` |
 | App Store title, description, keywords and URLs | `metadata/app-info/`, `metadata/version/` |
 | Logo and onboarding portraits | `apps/ios/WorldNiche/Assets.xcassets/`; website copies in `apps/web/landing-site/assets/` |
 | Deployments, service IDs and current release | `docs/deployment.md`, `ops/` |
@@ -46,7 +48,7 @@ Personalized website invitation previews still require the separate backend migr
 
 The owner verified the private reviewer invite, five countries and duplicate prevention on TestFlight build 7, then completed Apple account deletion. Backend erasure and removal from Apple settings were confirmed. Build 8 changes the shared account-entry button, with 14 focused scenarios passing on each phone and Duo. Daily retention is installed and verified. Details are in [App Store readiness](app-store-readiness.md).
 
-The reviewer invitation expires **November 29, 2026 at 00:54 UTC**. Its token and reviewer contact phone are only in App Store Connect/private release evidence. Renew the invitation if review lasts that long. Do not publish it in issues or documentation.
+The private reviewer invitation for 1.1 expires **December 25, 2026 at 04:05 UTC**. Its token and reviewer contact information belong in App Store Connect and private release evidence.
 
 The owner monitors `boutayeb.reda@icloud.com` and the private moderation queue. Keep the backend and public support/privacy pages available during review.
 
