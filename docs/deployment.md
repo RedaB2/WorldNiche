@@ -104,6 +104,22 @@ Schedules are separate operational SQL, not ordinary migrations:
 
 They were installed and verified before submission. Inspect jobs and recent executions before changing them; do not create duplicates. General retention preserves accounts, journals, active invitations and unresolved reports. Never run `backend/tests/bootstrap.sql` or other fixtures against the hosted database.
 
+## Daily country quiz and Apple push reminders
+
+The first edition assigns 225 shuffled questions to consecutive UTC dates from November 24, 2026 through July 6, 2027. Signed-in attempts are accepted online once per account and date. Any answer maintains the streak, and a correct answer adds one weekly point. Leaderboards use approved profile names and existing friend, block, moderation and exploration-sharing rules.
+
+Extend the calendar with new IDs, prompts and dates in a new migration. Shuffle new questions and their four country choices once before assigning dates. Append the identical rows to the native daily-quiz.json offline edition. The database prevents reusing IDs, dates and prompt text. CI compares every installed row against the native bundle. A weekly GitHub check flags the first missing question in the next 45 UTC days. Old clients can fetch a newly scheduled day from the today_quiz RPC after their bundled edition ends. When no question is published the app shows an unavailable state and the server skips reminders.
+
+For an authorized backend rollout:
+
+1. Apply the daily_country_quiz and quiz_reminders migrations using the backend deployment process above. Verify today_quiz returns the expected UTC day. Both guests and accounts can read it.
+2. Enable Push Notifications for the existing app identifier in Apple Developer and regenerate the app’s signing profiles for the push entitlement. Debug builds target the sandbox and release builds target production. Check the signed archive’s aps-environment before uploading.
+3. Configure the Edge secrets APNS_TEAM_ID, APNS_KEY_ID, APNS_PRIVATE_KEY and QUIZ_WORKER_SECRET. Supply an APNs signing key authorized for the app and intended environment. Use separate sandbox credentials with APNS_SANDBOX_KEY_ID and APNS_SANDBOX_PRIVATE_KEY when the Apple key is environment-scoped. The worker secret must contain at least 32 random characters. Keep the key material in secret storage.
+4. Deploy the quiz-reminders Edge Function. Enable pg_cron, pg_net and Vault. Put its project HTTPS endpoint in Vault as quiz_worker_url and the matching worker secret as quiz_worker_secret. Run backend/supabase/configure_quiz_reminders.sql once for that environment. The named cron job can be updated by rerunning the file. Verify its HTTP responses without logging tokens or credentials.
+5. On an authorized sandbox device and then a TestFlight device, enable the reminder in Profile → Settings, verify an alert opens Discover’s quiz, verify completion suppresses the reminder, then disable it and verify registration removal. CI exercises signing, sandbox and production routing, expiry, retries and cancellation with synthetic inputs. A simulator recording demonstrates the quiz interface.
+
+The worker claims unfinished quizzes around 7 p.m. in the device’s last reported time zone. The delivery lease, daily receipt, APNs collapse ID and UTC expiration bound retries and stale alerts. Apple controls final presentation. Disable the named cron job to pause dispatch.
+
 ## Build and distribute iOS
 
 Open `/Users/rb/dev/WorldNiche/apps/ios/WorldNiche.xcodeproj`, scheme `WorldNiche`, directly from this repo. Editing, signing and release builds use this same checkout. The public configuration intentionally supports guest use without service access.

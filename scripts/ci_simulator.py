@@ -14,7 +14,7 @@ DEVICE = "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max"
 
 def classify(code, summary, log):
     if (code == 0 and summary.get("result") == "Passed"
-            and summary.get("passedTests", 0) >= 14 and summary.get("failedTests") == 0
+            and summary.get("passedTests", 0) >= 16 and summary.get("failedTests") == 0
             and summary.get("skippedTests") == 0 and not summary.get("testFailures")):
         return "passed"
     failures = summary.get("testFailures", [])
@@ -87,6 +87,7 @@ def run_attempt(number):
             "-parallel-testing-enabled", "NO", "-resultBundlePath", str(bundle),
             "-only-testing:WorldNicheUITests/ProfileSetupUITests",
             "-only-testing:WorldNicheUITests/JournalUITests",
+            "-only-testing:WorldNicheUITests/DailyQuizUITests",
             "-only-testing:WorldNicheUITests/CountryReadingUITests/testOverviewHistoricalSourceAndChartAcrossCountries",
             "-only-testing:WorldNicheUITests/CountryReadingUITests/testRadioChartShowsStationSampleAndProviderCredit",
             "-only-testing:WorldNicheUITests/CountryReadingUITests/testNextFactPersistsAndMatchesTheCompanionSourceWhenMusicIsUnavailable",

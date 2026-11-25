@@ -15,6 +15,7 @@ struct WorldGlobeView: UIViewRepresentable {
     var allowsCountrySelection = true
     var mode: Mode = .explore
     var onInteraction: () -> Void = {}
+    var onSpinFinished: () -> Void = {}
     var onSelect: (Country) -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(onSelect: onSelect) }
@@ -41,6 +42,7 @@ struct WorldGlobeView: UIViewRepresentable {
 
     func updateUIView(_ uiView: GlobeSceneView, context: Context) {
         context.coordinator.countries = countries
+        context.coordinator.onSpinFinished = onSpinFinished
         context.coordinator.onSelect = onSelect
         context.coordinator.allowsCountrySelection = allowsCountrySelection
         context.coordinator.mode = mode
@@ -74,6 +76,7 @@ struct WorldGlobeView: UIViewRepresentable {
         var onSelect: (Country) -> Void
         var allowsCountrySelection = true
         var mode: Mode = .explore
+        var onSpinFinished: () -> Void = {}
         var onInteraction: () -> Void = {}
         private var hasInteracted = false
         private weak var view: SCNView?
@@ -206,6 +209,7 @@ struct WorldGlobeView: UIViewRepresentable {
                 viewport = GlobeViewport()
                 worldNode.simdOrientation = orientation.quaternion
                 updateViewport()
+                if spinning { Task { @MainActor in onSpinFinished() } }
                 return
             }
             animation = NavigationAnimation(started: CACurrentMediaTime(), duration: spinning ? 1.8 : 0.55,
@@ -232,7 +236,10 @@ struct WorldGlobeView: UIViewRepresentable {
             viewport = animation.viewport.interpolated(to: animation.destinationViewport, fraction: eased)
             worldNode.simdOrientation = orientation.quaternion
             updateViewport()
-            if t == 1 { stopAnimation() }
+            if t == 1 {
+                stopAnimation()
+                if animation.extraTurn != 0 { onSpinFinished() }
+            }
         }
 
         func stopAnimation() {

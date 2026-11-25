@@ -5,3 +5,4 @@
 
 // No additional release-specific overrides needed
 // All release settings use Xcode project defaults
+WORLDNICHE_PUSH_ENVIRONMENT = production

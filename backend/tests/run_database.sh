@@ -44,3 +44,11 @@ PGUSER=wn_test python3 "$project_root/tests/automatic_check_race.py" --psql "$pg
 "$pg_bin/psql" -h "$scratch" -p 55433 -U wn_test -d postgres -v ON_ERROR_STOP=1 -q \
   -f "$project_root/supabase/migrations/202611010009_invitation_link_metadata.sql" \
   -f "$project_root/tests/invitation_link_metadata.sql"
+
+"$pg_bin/psql" -h "$scratch" -p 55433 -U wn_test -d postgres -v ON_ERROR_STOP=1 -q \
+  -f "$project_root/supabase/migrations/20261125011359_daily_country_quiz.sql" \
+  -f "$project_root/supabase/migrations/20261125011621_quiz_reminders.sql" \
+  -f "$project_root/tests/daily_quiz.sql"
+"$pg_bin/psql" -h "$scratch" -p 55433 -U wn_test -d postgres -Atc \
+  'select jsonb_agg(to_jsonb(q) order by day) from wn_private.quiz_schedule q' \
+  | python3 "$project_root/tests/quiz_catalog.py"

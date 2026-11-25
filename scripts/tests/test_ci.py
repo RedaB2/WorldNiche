@@ -84,7 +84,7 @@ class SimulatorVerdictTests(unittest.TestCase):
                                "WorldNiche-Runner at -[XCTWaiter(StallHandling) handleStalledWait:])",
             }],
         }
-        self.passed = {"result": "Passed", "passedTests": 14, "failedTests": 0,
+        self.passed = {"result": "Passed", "passedTests": 16, "failedTests": 0,
                        "skippedTests": 0, "totalTestCount": 12, "testFailures": []}
 
     def test_recorded_pre_test_runner_crash_is_retryable(self):

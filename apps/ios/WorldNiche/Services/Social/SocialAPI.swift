@@ -222,6 +222,34 @@ actor SocialAPI {
 
     func friends() async throws -> [ExplorerFriend] { try await rpc("list_friends", body: [:]) }
 
+    func quizStandings(owner: UUID) async throws -> QuizStandings {
+        guard session?.user.id == owner else { throw SocialError.signInRequired }
+        return try await rpc("quiz_standings", body: [:])
+    }
+
+    func submitQuiz(owner: UUID, day: String, choice: String) async throws -> QuizAttempt {
+        try await rpc("submit_quiz", body: ["p_owner": owner.uuidString, "p_day": day, "p_choice": choice])
+    }
+
+    func publishedQuiz() async throws -> QuizQuestion? {
+        let data = try await request(path: "rest/v1/rpc/today_quiz", body: [:], token: nil)
+        return try Self.decoder().decode(QuizQuestion?.self, from: data)
+    }
+
+    func setQuizReminder(installation: UUID, token: String?, sandbox: Bool, zone: String,
+                         enabled: Bool, completed: String?, owner: UUID?) async throws {
+        let body: [String: Any] = ["p_installation": installation.uuidString, "p_token": token as Any? ?? NSNull(),
+            "p_sandbox": sandbox, "p_zone": zone, "p_enabled": enabled,
+            "p_completed": completed as Any? ?? NSNull(), "p_owner": owner?.uuidString as Any? ?? NSNull()]
+        let path = "rest/v1/rpc/set_quiz_reminder"
+        if let owner {
+            guard session?.user.id == owner else { throw SocialError.signInRequired }
+            _ = try await authenticated(path: path, body: body)
+        } else {
+            _ = try await request(path: path, body: body, token: nil)
+        }
+    }
+
     struct CreatedInvite: Decodable, Sendable { let token: String; let expiresAt: String }
     func createInvite() async throws -> CreatedInvite { try await rpc("create_invite", body: [:]) }
 

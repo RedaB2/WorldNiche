@@ -34,3 +34,7 @@ verify_jwt = false
 [functions.moderate-profile]
 # The handler verifies a live user session or the scoped scheduled-worker secret.
 verify_jwt = false
+
+[functions.quiz-reminders]
+# Scheduled invocations authenticate with the scoped quiz worker secret.
+verify_jwt = false

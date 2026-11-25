@@ -410,6 +410,7 @@ private struct ProfileEditorView: View {
                 } header: { Text("Profile photo") } footer: {
                     Text("Optional. Your initials look good here too.")
                 }
+                QuizReminderSettings()
                 Section {
                     Toggle("Share explored countries with friends", isOn: $sharing)
                         .accessibilityIdentifier("profileSharingToggle")
@@ -571,6 +572,7 @@ struct ProfileSettingsView: View {
                 } header: { Text("Account") } footer: {
                     Text("An account is optional. Discover, Atlas and your journal work without one.")
                 }
+                QuizReminderSettings()
                 Section {
                     Toggle("Share explored countries with friends", isOn: Binding(
                         get: { social.profile?.shareExploration ?? false },
@@ -599,7 +601,7 @@ struct ProfileSettingsView: View {
                         ))
                         .disabled(social.isBusy || social.deletionPending)
                         .accessibilityIdentifier("automaticProfileChecks")
-                    } header: { Text("Profile safety") } footer: {
+                    } header: { Text("Sharing also includes your weekly quiz score on friends’ leaderboards. Profile safety") } footer: {
                         Text("Allow OpenAI to check your name and photo before sharing. This choice applies to future edits. If you turn it off, updates may take longer to appear to friends.")
                     }
                 }
@@ -1039,7 +1041,7 @@ private struct ProfilePrivacyView: View {
             }
             Section("When you connect") {
                 Text("An optional account uses Sign in with Apple. Apple can keep your personal email hidden. Your chosen name, optional photo, friends, invitations and sharing preference are stored online. With your permission, submitted names and photos are sent to OpenAI for safety checks; otherwise our team reviews them. You can change this choice in Settings. Only approved updates appear to friends. Photos are saved without their original camera or location metadata. Your email isn’t shown to friends.")
-                Text("New accounts start with exploration sharing on, with a switch during profile setup and in Settings. After signing in, saved countries, private notes and first and recent exploration dates sync to your account, even with sharing off. Friends can only see explored countries while sharing is on. Existing accounts keep their saved preference. Guest exploration isn’t imported. This is app activity, not a record of travel. Bookmarks and notes stay private and are never sent for AI moderation.")
+                Text("Quiz participation maintains your streak. Friends who share exploration can compare weekly correct-answer counts. New accounts start with exploration sharing on, with a switch during profile setup and in Settings. After signing in, saved countries, private notes and first and recent exploration dates sync to your account, even with sharing off. Friends can only see explored countries while sharing is on. Existing accounts keep their saved preference. Guest exploration isn’t imported. This is app activity, not a record of travel. Bookmarks and notes stay private and are never sent for AI moderation.")
                 Text("The account service also stores invitation links, blocks and reports used to protect the community. A first name or nickname is enough; you don’t need to share your real name.")
             }
             Section("Content and conversations") {

@@ -3,8 +3,9 @@ set -euo pipefail
 project_dir="$(cd "$(dirname "$0")/.." && pwd)"
 check_dir="$(mktemp -d "${TMPDIR:-/tmp}/worldniche-social-checks.XXXXXX")"
 trap 'rm -rf "$check_dir"' EXIT
-cp "$project_dir"/WorldNiche/Resources/countries.json "$check_dir/"
+cp "$project_dir"/WorldNiche/Resources/{countries,daily-quiz}.json "$check_dir/"
 swiftc -swift-version 6 \
+  "$project_dir/WorldNiche/Models/DailyQuiz.swift" \
   "$project_dir/WorldNiche/Models/Country.swift" \
   "$project_dir/WorldNiche/Models/CountryReadingProgress.swift" \
   "$project_dir/WorldNiche/Models/DiscoveryJournal.swift" \

@@ -24,9 +24,11 @@ final class SocialStore {
     private(set) var appleRevocationNeedsManualAction = false
     var presentsInvitation = false
     private let configuration: SocialConfiguration?
-    private let api: SocialAPI?
+    let quiz: DailyQuizStore
+    let api: SocialAPI?
     private let defaults: UserDefaults
     private let photoDirectory: URL?
+    private let onLocalErase: () -> Void
     private let journal: DiscoveryJournal
     private let appleCredentialIsAuthorized: @Sendable (String) async -> Bool?
     private var pendingToken: String?
@@ -98,7 +100,10 @@ final class SocialStore {
 
     init(journal: DiscoveryJournal, defaults: UserDefaults = .standard, photoDirectory: URL? = nil,
          configuration: SocialConfiguration? = .load(), api: SocialAPI? = nil,
+         quizClock: @escaping () -> Date = Date.init, onLocalErase: @escaping () -> Void = {},
          appleCredentialIsAuthorized: @escaping @Sendable (String) async -> Bool? = { _ in nil }) {
+        self.onLocalErase = onLocalErase
+        self.quiz = DailyQuizStore(defaults: defaults, clock: quizClock)
         self.journal = journal
         self.defaults = defaults
         self.photoDirectory = photoDirectory
@@ -111,6 +116,7 @@ final class SocialStore {
             profile = try? JSONDecoder().decode(ExplorerProfile.self, from: data)
         }
         localOwnerID = defaults.string(forKey: "niche.localOwnerID").flatMap(UUID.init(uuidString:)) ?? profile?.id
+        if quiz.owner != localOwnerID { quiz.activate(localOwnerID) }
         pendingProfileSetup = localOwnerID.map { defaults.bool(forKey: "niche.profileSetupPending.\($0.uuidString)") } ?? false
         deletionTargetID = defaults.string(forKey: "niche.deletionTargetID").flatMap(UUID.init(uuidString:))
         if deletionPending, deletionTargetID == nil { deletionTargetID = localOwnerID }
@@ -853,12 +859,14 @@ final class SocialStore {
                 let profile: ExplorerProfile?
                 let exploredCountryIDs: [String]
                 let savedCountryIDs: [String]
+                let dailyQuiz: [String: QuizAttempt]
                 let journalEntries: [JournalEntry]
                 let readingProgress: [String: CountryReadingProgress]?
                 let factRotations: [String: FactRotation]?
             }
             let local = LocalExport(profile: profile, exploredCountryIDs: journal.visitedIDs,
                                     savedCountryIDs: journal.savedIDs.sorted(),
+                                    dailyQuiz: quiz.attempts,
                                     journalEntries: journal.snapshot.entries.values.sorted { $0.countryId < $1.countryId },
                                     readingProgress: journal.snapshot.readingProgress,
                                     factRotations: journal.snapshot.factRotations)
@@ -919,6 +927,7 @@ final class SocialStore {
         let previous = LocalWorkspace(profile: profile, explored: journal.visitedIDs, saved: journal.savedIDs.sorted(), journalSnapshot: journal.snapshot)
         defaults.set(try? JSONEncoder().encode(previous), forKey: workspaceKey(localOwnerID))
         localOwnerID = owner
+        quiz.activate(owner)
         hasLoadedProfile = false
         pendingProfileSetup = owner.map { defaults.bool(forKey: profileSetupKey($0)) } ?? false
         defaults.set(owner?.uuidString, forKey: "niche.localOwnerID")
@@ -975,11 +984,13 @@ final class SocialStore {
         defaults.removeObject(forKey: "niche.localOwnerID")
         // Older releases stored the country articles and their reading histories on this device.
         for key in defaults.dictionaryRepresentation().keys where key.hasPrefix("niche.workspace.")
-            || key.hasPrefix("worldniche.culture.history.") || key.hasPrefix("worldniche.culture.reading.")
+            || key.hasPrefix("niche.quiz.") || key.hasPrefix("worldniche.culture.history.") || key.hasPrefix("worldniche.culture.reading.")
             || key.hasPrefix("niche.pendingAppleName.") || key.hasPrefix("niche.pendingAppleAuthorizationName.")
             || key.hasPrefix("niche.pendingProfileSharing.") || key.hasPrefix("niche.profileSetupPending.") {
             defaults.removeObject(forKey: key)
         }
+        quiz.activate(nil)
+        onLocalErase()
         journal.clear()
         AvatarPhotoFiles.removeAll(directory: photoDirectory)
         URLCache.shared.removeAllCachedResponses()

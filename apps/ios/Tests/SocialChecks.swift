@@ -356,6 +356,30 @@ private final class CheckSuite {
         check(configuration.invitationURL(token: "bad") == nil, "Cannot generate invitation from malformed token")
     }
 
+    func quizHistory() async {
+        let defaults = isolatedDefaults()
+        let day = Date(timeIntervalSince1970: 1795608000)
+        let quiz = DailyQuizStore(defaults: defaults, clock: { day })
+        guard let q = quiz.question else { check(false, "Bundled quiz missing"); return }
+        check(Set(q.options).count == 4 && q.valid, "A daily quiz offers four distinct destinations")
+        let attempt = await quiz.answer(q.options.first { $0 != q.answer }!, question: q, api: nil)
+        check(attempt?.correct == false && quiz.streak == 1, "A wrong guest answer still counts as participation")
+        let retry = await quiz.answer(q.answer, question: q, api: nil)
+        check(retry == nil, "A completed quiz cannot be played twice")
+        check(DailyQuizStore(defaults: defaults, clock: { day }).today?.choice == attempt?.choice, "Guest completion survives relaunch")
+        quiz.activate(UUID())
+        check(quiz.attempts.isEmpty, "Account leaderboard never imports guest attempts")
+        quiz.activate(nil)
+        check(quiz.streak == 1, "Returning to guest restores that workspace")
+        let days: Set<String> = ["2026-11-24", "2026-11-25"]
+        check(QuizClock.streak(days: days, on: day.addingTimeInterval(86400)) == 2, "Streak remains active while today's quiz is open")
+        check(QuizClock.streak(days: days, on: day.addingTimeInterval(172800)) == 0, "Missing a full day breaks the streak")
+        check(QuizClock.key(QuizClock.week(day)[0]) == "2026-11-23", "Leaderboard week begins on Monday UTC")
+        let midnight = QuizClock.calendar.startOfDay(for: day)
+        check(QuizClock.key(midnight.addingTimeInterval(-1)) == "2026-11-24" && QuizClock.key(midnight) == q.day,
+              "Everyone changes to the next question at midnight UTC")
+    }
+
     func localData() async {
         let defaults = isolatedDefaults()
         defaults.set(["Azonto"], forKey: "worldniche.culture.history.GH")
@@ -2134,6 +2158,7 @@ private final class CheckSuite {
     @MainActor static func main() async {
         let suite = CheckSuite()
         suite.links()
+        await suite.quizHistory()
         await suite.localData()
         await suite.authentication()
         await suite.tokenRefresh()
