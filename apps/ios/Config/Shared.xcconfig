@@ -8,10 +8,12 @@
 PRODUCT_NAME = WorldNiche
 PRODUCT_DISPLAY_NAME = WorldNiche
 PRODUCT_BUNDLE_IDENTIFIER = io.worldniche.app
-MARKETING_VERSION = 1.0.2
-CURRENT_PROJECT_VERSION = 14
+MARKETING_VERSION = 1.1
+CURRENT_PROJECT_VERSION = 16
 DEVELOPMENT_TEAM =
 CODE_SIGN_STYLE = Automatic
+EXCLUDED_SOURCE_FILE_NAMES = SocialConfiguration.staging.local.json
+WORLDNICHE_INVITE_SCHEME = worldniche
 
 // ==========================================
 // Platform Configuration
