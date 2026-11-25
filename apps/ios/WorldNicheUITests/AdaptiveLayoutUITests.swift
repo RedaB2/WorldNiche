@@ -13,6 +13,49 @@ final class AdaptiveLayoutUITests: XCTestCase {
     }
 
     @MainActor
+    func testDiscoverStaysInPlaceWhenItFits() {
+        XCUIDevice.shared.orientation = .portrait
+        let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro"]
+        app.launch()
+        let headline = app.staticTexts["discoverHeadline"]
+        waitUntilHittable(headline)
+        if ProcessInfo.processInfo.environment["WORLDNICHE_UI_TEST_DISPLAY_ID"] == "3" {
+            XCTAssertGreaterThan(min(app.frame.width, app.frame.height), 600, "Use the Duo’s inner display.")
+        }
+        let footer = app.staticTexts["195 countries. Endless ways to connect."]
+        let spin = app.buttons["spinButton"]
+        XCTAssertTrue(footer.isHittable)
+        XCTAssertTrue(spin.isHittable)
+        let headlineY = headline.frame.minY
+        let footerY = footer.frame.maxY
+        capture("Discover before vertical drag", app: app)
+        let start = headline.coordinate(withNormalizedOffset: CGVector(dx: 0.1, dy: 0.9))
+        start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -120)))
+        XCTAssertEqual(headline.frame.minY, headlineY, accuracy: 1)
+        XCTAssertEqual(footer.frame.maxY, footerY, accuracy: 1)
+        XCTAssertTrue(app.buttons["landingCountry"].isHittable)
+        capture("Discover after vertical drag", app: app)
+    }
+
+    @MainActor
+    func testAboutShowsAppVersionBelowCredits() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro"]
+        app.launch()
+        app.buttons["About WorldNiche"].tap()
+        let version = app.staticTexts["appVersion"]
+        let credit = app.links["Radio chart data by Tuneping"]
+        let scroll = app.scrollViews.containing(.staticText, identifier: "appVersion").firstMatch
+        for _ in 0..<8 where !version.isHittable { scroll.swipeUp() }
+        XCTAssertTrue(version.isHittable)
+        let expected = try XCTUnwrap(Bundle(for: Self.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String)
+        XCTAssertEqual(version.label, "WorldNiche · \(expected)")
+        XCTAssertLessThan(credit.frame.maxY, version.frame.minY)
+        capture("About version footer", app: app)
+    }
+
+    @MainActor
     func testCountryDetailPreservesSelectionAndBookmarkThroughRotation() throws {
         XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()

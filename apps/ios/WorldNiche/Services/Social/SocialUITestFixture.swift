@@ -155,6 +155,11 @@ private final class SocialUIResponses: @unchecked Sendable {
             var friend: [String: Any] = ["id": "33333333-3333-4333-8333-333333333333", "display_name": updated ? "Jun Updated" : "Jun",
                                          "avatar": updated ? "leaf" : "wave", "share_exploration": false, "country_ids": [], "explored_count": 0]
             if mode == "photo" { friend["avatar_path"] = photoPath }
+            if mode == "marketing" {
+                friend["share_exploration"] = true
+                friend["country_ids"] = ["MA"]
+                friend["explored_count"] = 1
+            }
             value = mode.hasPrefix("signup") ? [] : [friend]
         case "/storage/v1/object/authenticated/profile-photos/\(photoPath)":
             photoReadCount += 1

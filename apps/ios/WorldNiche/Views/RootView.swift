@@ -59,6 +59,7 @@ struct RootView: View {
 }
 
 struct ExploreView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selected = CountryRepository.country(id: "MA") ?? CountryRepository.countries[0]
     @State private var spinToken = 0
@@ -76,6 +77,7 @@ struct ExploreView: View {
                         masthead
                         Text("The world is full\nof little wonders.")
                             .scaledFont(size: 39, weight: .regular, design: .serif)
+                            .fixedSize(horizontal: false, vertical: true)
                             .tracking(-1.5)
                             .lineSpacing(-2)
                             .multilineTextAlignment(.center)
@@ -92,10 +94,12 @@ struct ExploreView: View {
                         }
                         .scaledFont(size: 11)
                         .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
                         .foregroundStyle(Palette.muted)
                         .padding(.top, 12)
 
-                        globe(height: max(200, min(geometry.size.width - 30, 355)))
+                        globe(preferredHeight: max(200, min(geometry.size.width - 30, 355)))
+                            .layoutPriority(-1)
                             .padding(.horizontal, -26)
                             .padding(.top, 2)
 
@@ -116,6 +120,7 @@ struct ExploreView: View {
                             .background(Palette.forest, in: Capsule())
                         }
                         .buttonStyle(.plain)
+                        .fixedSize(horizontal: false, vertical: true)
                         .disabled(isSpinning)
                         .accessibilityIdentifier("spinButton")
                         .sensoryFeedback(.impact(weight: .light), trigger: spinToken)
@@ -128,13 +133,16 @@ struct ExploreView: View {
                         Text("195 countries. Endless ways to connect.")
                             .scaledFont(size: 11)
                             .foregroundStyle(Palette.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                             .padding(.top, 13)
                             .padding(.bottom, 28)
                     }
+                    .frame(idealHeight: dynamicTypeSize.isAccessibilitySize ? nil : geometry.size.height)
                     .padding(.horizontal, 26)
                     .frame(maxWidth: 620)
                     .frame(maxWidth: .infinity)
                 }
+                .scrollBounceBehavior(.basedOnSize, axes: .vertical)
                 .scrollIndicators(.hidden)
             }
             .background(Palette.paper)
@@ -165,7 +173,7 @@ struct ExploreView: View {
         .padding(.top, 12)
     }
 
-    private func globe(height: CGFloat) -> some View {
+    private func globe(preferredHeight: CGFloat) -> some View {
         ZStack(alignment: .bottom) {
             WorldGlobeView(countries: CountryRepository.countries, selectedCountry: selected,
                            spinToken: spinToken, resetToken: globeResetToken,
@@ -174,7 +182,7 @@ struct ExploreView: View {
             }
             .accessibilityLabel("Interactive world globe")
             .accessibilityIdentifier("interactiveGlobe")
-            .frame(height: height)
+            .frame(minHeight: 200, idealHeight: preferredHeight, maxHeight: preferredHeight)
 
             Button { detail = selected } label: {
                 HStack(spacing: 12) {

@@ -34,6 +34,27 @@ final class CountryReadingUITests: XCTestCase {
     }
 
     @MainActor
+    func testSharedExplorationFollowsChartAndShowsFriend() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-worldniche-skip-intro", "-worldniche-social-fixture", "marketing",
+                               "-worldniche-reading-fixture", "ready"]
+        app.launch()
+        app.buttons["landingCountry"].tap()
+        app.buttons["toggleCountryGlobe"].tap()
+        let friends = app.buttons["Friends"]
+        let name = app.staticTexts["Jun"]
+        for _ in 0..<32 where !name.isHittable { readStep(app) }
+        XCTAssertTrue(name.isHittable, app.debugDescription)
+        XCTAssertTrue(friends.isHittable)
+        let track = app.descendants(matching: .any)["musicTrack-4"].firstMatch
+        XCTAssertLessThan(track.frame.maxY, friends.frame.minY)
+        let disclaimers = app.staticTexts.matching(NSPredicate(
+            format: "label CONTAINS[c] %@ OR label CONTAINS[c] %@", "physical visit", "a country contains many cultures"))
+        XCTAssertEqual(disclaimers.count, 0)
+        capture("Morocco chart and explored together", app)
+    }
+
+    @MainActor
     func testNextFactPersistsAndMatchesTheCompanionSourceWhenMusicIsUnavailable() {
         let app = launch(mode: "unavailable")
         openMorocco(app)
