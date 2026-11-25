@@ -28,9 +28,6 @@ struct CountryDetailView: View {
                     countryHeader
                     historicalFactSection
                     musicSection
-                    Text("A country contains many cultures. Use these discoveries as invitations to ask, never assumptions about a person.")
-                        .scaledFont(size: 12).lineSpacing(4).foregroundStyle(Palette.muted)
-                        .padding(.horizontal, 4)
                     CountryFriendsView(country: country)
                     CountryExplorationFinish(country: country, ready: readingProgress.isReady,
                         explored: isExplored, pulling: bottomPull && scrollPhase == .interacting,
