@@ -111,7 +111,7 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath outputs/ci/DerivedData \
             CODE_SIGNING_ALLOWED=NO 2>&1 | tee outputs/ci/build.log
-      - name: Run profile, journal and country-reading tests on a ready simulator
+      - name: Run profile, journal, country-reading and daily quiz UI tests
         run: python3 scripts/ci_simulator.py
       - name: Preserve simulator results
         if: always()

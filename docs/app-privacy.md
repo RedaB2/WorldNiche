@@ -14,8 +14,8 @@ All twelve categories use **App Functionality**, are **linked to the user**, and
 | Customer Support | Help requests, reports and related correspondence |
 | Other User Content | Private journal notes and optional report details |
 | User ID | Authentication, profile and social account identifiers |
-| Device ID | Journal sync identifier used to reconcile edits across devices |
-| Product Interaction | Explored countries, bookmarks, exploration dates and service activity |
+| Device ID | Journal sync identifier and optional quiz reminder installation and APNs token |
+| Product Interaction | Explored countries, bookmarks, exploration dates, quiz answers and reminder delivery status |
 | Performance Data | Infrastructure request duration and operational performance records |
 | Other Diagnostic Data | Authentication/API errors and related service diagnostics |
 

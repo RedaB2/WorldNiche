@@ -1,0 +1,31 @@
+name: Daily quiz editorial calendar
+
+on:
+  schedule:
+    - cron: '20 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Check the next 45 UTC days have questions
+        run: |
+          python3 - <<'PY'
+          import datetime
+          import json
+          from pathlib import Path
+          catalog = Path("apps/ios/WorldNiche/Resources/daily-quiz.json")
+          days = {row["day"] for row in json.loads(catalog.read_text())}
+          today = datetime.datetime.now(datetime.timezone.utc).date()
+          for offset in range(45):
+              day = today + datetime.timedelta(days=offset)
+              if day.isoformat() not in days:
+                  raise SystemExit(f"Extend the daily quiz edition. The first uncovered UTC date is {day}.")
+          PY

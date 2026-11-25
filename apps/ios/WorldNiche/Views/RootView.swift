@@ -7,6 +7,8 @@ struct RootView: View {
     @State private var introResolved = false
     @State private var presentsIntro = false
     @State private var presentsIntroSignIn = false
+    @State private var notificationQuiz = false
+    @State private var notificationNavigationID = 0
     private let introProgress = IntroProgress.appProgress()
 
     var body: some View {
@@ -21,12 +23,23 @@ struct RootView: View {
                 })
             } else {
                 TabView(selection: $selectedTab) {
-                    Tab("Discover", systemImage: "globe.europe.africa", value: RootTab.discover) { ExploreView() }
+                    Tab("Discover", systemImage: "globe.europe.africa", value: RootTab.discover) { ExploreView(showQuiz: $notificationQuiz) }
                     Tab("Atlas", systemImage: "square.grid.2x2", value: RootTab.atlas) { AtlasView() }
                     Tab("Journal", systemImage: "bookmark", value: RootTab.journal) { JournalView() }
                     Tab("Profile", systemImage: "person.crop.circle", value: RootTab.profile) { ProfileView() }
                 }
                 .tabBarMinimizeBehavior(.onScrollDown)
+                .id(notificationNavigationID)
+            }
+        }
+        .onChange(of: QuizNotifications.shared.openQuiz, initial: true) { _, request in
+            if request != nil {
+                finishIntro()
+                presentsIntroSignIn = false
+                notificationNavigationID += 1
+                selectedTab = .discover
+                notificationQuiz = true
+                QuizNotifications.shared.openQuiz = nil
             }
         }
         .sheet(isPresented: $presentsIntroSignIn) { ProfileSignInView() }
@@ -60,6 +73,10 @@ struct RootView: View {
 
 struct ExploreView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(SocialStore.self) private var social
+    @Binding var showQuiz: Bool
+    @State private var showStreak = false
+    @State private var nextCountry: Country?
     @State private var selected = CountryRepository.country(id: "MA") ?? CountryRepository.countries[0]
     @State private var spinToken = 0
     @State private var globeResetToken = 0
@@ -83,7 +100,21 @@ struct ExploreView: View {
                             .accessibilityAddTraits(.isHeader)
                             .accessibilityIdentifier("discoverHeadline")
                             .frame(maxWidth: .infinity)
-                            .padding(.top, 30)
+                            .padding(.top, 12)
+
+                        if social.quiz.today == nil {
+                            Button {
+                                showQuiz = true
+                            } label: {
+                                Label("Play today’s quiz", systemImage: "questionmark.circle")
+                                    .scaledFont(size: 15, weight: .semibold)
+                                    .padding(.horizontal, 16).frame(minHeight: 44)
+                                    .background(Palette.pine.opacity(0.08), in: Capsule())
+                            }
+                            .buttonStyle(.plain).foregroundStyle(Palette.pine)
+                            .accessibilityIdentifier("dailyQuiz")
+                            .padding(.top, 10)
+                        }
 
                         HStack(spacing: 6) {
                             Image(systemName: "hand.draw").accessibilityHidden(true)
@@ -140,26 +171,44 @@ struct ExploreView: View {
             .background(Palette.paper)
             .toolbar(.hidden, for: .navigationBar)
             .sheet(item: $detail) { CountryDetailView(country: $0) }
+            .sheet(isPresented: $showQuiz, onDismiss: {
+                if let country = nextCountry { selected = country; detail = country; nextCountry = nil }
+            }) {
+                DailyQuizView { country in nextCountry = country; showQuiz = false }
+                    .id(social.quiz.owner)
+                    .id(social.quiz.day)
+            }
+            .sheet(isPresented: $showStreak) { QuizStreakView() }
             .sheet(isPresented: $showAbout) { AboutView() }
         }
     }
 
     private var masthead: some View {
-        HStack(alignment: .center) {
+        ZStack {
             Image("AppLogo")
                 .renderingMode(.template)
                 .resizable().scaledToFit()
                 .frame(width: 52, height: 52)
                 .accessibilityLabel("WorldNiche")
-            Spacer()
-            Button { showAbout = true } label: {
-                Image(systemName: "info")
-                    .scaledFont(size: 14, weight: .medium)
-                    .frame(width: 38, height: 38)
+            HStack {
+                Button { showStreak = true } label: {
+                    Label("\(social.quiz.streak)", systemImage: "flame.fill")
+                        .font(.headline.monospacedDigit()).foregroundStyle(Palette.clay)
+                        .padding(.horizontal, 10).frame(minHeight: 44)
+                }
+                .buttonStyle(.glass)
+                .accessibilityLabel("\(social.quiz.streak)-day streak")
+                .accessibilityIdentifier("quizStreak")
+                Spacer()
+                Button { showAbout = true } label: {
+                    Image(systemName: "info")
+                        .scaledFont(size: 14, weight: .medium)
+                        .frame(width: 38, height: 38)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                .accessibilityLabel("About WorldNiche")
             }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
-            .accessibilityLabel("About WorldNiche")
         }
         .foregroundStyle(Palette.pine)
         .padding(.top, 12)

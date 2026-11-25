@@ -22,12 +22,13 @@ enum SocialUITestFixture {
             return (journal, SocialStore(journal: journal, defaults: defaults, configuration: nil))
         }
         guard let index = arguments.firstIndex(of: "-worldniche-social-fixture"), arguments.indices.contains(index + 1),
-              ["approval", "retry", "manual", "friend", "photo", "signup", "signup-photo-failure", "existing-private", "marketing"].contains(arguments[index + 1]) else { return nil }
+              ["approval", "retry", "manual", "friend", "photo", "signup", "signup-photo-failure", "existing-private", "marketing", "quiz"].contains(arguments[index + 1]) else { return nil }
         let mode = arguments[index + 1]
         let suite = "io.worldniche.app.simulator-ui-fixture"
         guard let defaults = UserDefaults(suiteName: suite) else { return nil }
         defaults.removePersistentDomain(forName: suite)
         let journal = DiscoveryJournal(defaults: defaults)
+        if mode == "quiz" { defaults.set(SocialUIResponses.owner.uuidString, forKey: "niche.localOwnerID") }
         if mode == "marketing" {
             defaults.set(SocialUIResponses.owner.uuidString, forKey: "niche.localOwnerID")
             seedMarketingJournal(journal)
@@ -40,7 +41,8 @@ enum SocialUITestFixture {
         transport.urlCache = nil
         SocialUIResponses.shared.reset(mode: mode)
         let api = SocialAPI(configuration: configuration, transport: URLSession(configuration: transport), vault: SocialUIVault())
-        return (journal, SocialStore(journal: journal, defaults: defaults, configuration: configuration, api: api))
+        return (journal, SocialStore(journal: journal, defaults: defaults, configuration: configuration, api: api,
+                                     quizClock: { mode == "quiz" ? Date(timeIntervalSince1970: 1795608000) : Date() }))
     }
 
     private static func seedMarketingJournal(_ journal: DiscoveryJournal) {
@@ -95,6 +97,7 @@ private final class SocialUIResponses: @unchecked Sendable {
     private var rejectedPhoto = false
     private var automaticApprovalAt = Date.distantFuture
     private var consent: Bool?
+    private var quizGuess: String?
     private var checkCount = 0
     private var friendUpdateAt = Date.distantFuture
     private var retrying = false
@@ -105,10 +108,11 @@ private final class SocialUIResponses: @unchecked Sendable {
     func reset(mode: String) {
         lock.lock(); defer { lock.unlock() }
         self.mode = mode
+        quizGuess = nil
         hasProfile = !mode.hasPrefix("signup")
         name = hasProfile ? "Mira" : "Explorer"
         pendingName = nil; consent = hasProfile ? (mode != "manual" && mode != "existing-private") : nil
-        sharing = false; ownerPhotoPath = nil; pendingOwnerPhotoPath = nil; rejectedPhoto = false; automaticApprovalAt = .distantFuture
+        sharing = mode == "quiz"; ownerPhotoPath = nil; pendingOwnerPhotoPath = nil; rejectedPhoto = false; automaticApprovalAt = .distantFuture
         checkCount = 0; friendUpdateAt = Date().addingTimeInterval(15); retrying = false
         photoReadCount = 0
         photo = UIGraphicsImageRenderer(size: CGSize(width: 44, height: 44)).image { context in
@@ -150,10 +154,21 @@ private final class SocialUIResponses: @unchecked Sendable {
                 pendingOwnerPhotoPath = nil; retrying = false; automaticApprovalAt = .distantFuture
             }
             value = hasProfile ? profile() : NSNull()
+        case "/rest/v1/rpc/submit_quiz":
+            quizGuess = quizGuess ?? body["p_choice"] as? String
+            value = ["day": "2026-11-25", "choice": quizGuess ?? "", "correct": quizGuess == "AT"] as [String: Any]
+        case "/rest/v1/rpc/quiz_standings":
+            var attempts: [[String: Any]] = [
+                ["day": "2026-11-24", "choice": "TO", "correct": true]]
+            if let quizGuess { attempts.append(["day": "2026-11-25", "choice": quizGuess, "correct": quizGuess == "AT"]) }
+            let board: [[String: Any]] = [
+                ["id": Self.owner.uuidString, "name": "You", "score": quizGuess == "AT" ? 2 : 1],
+                ["id": "33333333-3333-3333-3333-333333333333", "name": "Jun", "score": 1]]
+            value = ["attempts": mode == "quiz" ? attempts : [], "board": mode == "quiz" ? board : []]
         case "/rest/v1/rpc/list_friends":
             let updated = mode == "friend" && Date() >= friendUpdateAt
             var friend: [String: Any] = ["id": "33333333-3333-4333-8333-333333333333", "display_name": updated ? "Jun Updated" : "Jun",
-                                         "avatar": updated ? "leaf" : "wave", "share_exploration": false, "country_ids": [], "explored_count": 0]
+                                         "avatar": updated ? "leaf" : "wave", "share_exploration": mode == "quiz", "country_ids": [], "explored_count": 0]
             if mode == "photo" { friend["avatar_path"] = photoPath }
             value = mode.hasPrefix("signup") ? [] : [friend]
         case "/storage/v1/object/authenticated/profile-photos/\(photoPath)":

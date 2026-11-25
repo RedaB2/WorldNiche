@@ -3,6 +3,7 @@ import AuthenticationServices
 
 @main
 struct WorldNicheApp: App {
+    @UIApplicationDelegateAdaptor(QuizAppDelegate.self) private var quizDelegate
     @State private var journal: DiscoveryJournal
     @State private var social: SocialStore
     @StateObject private var factCatalog = HistoricalFactCatalog.shared
@@ -19,7 +20,7 @@ struct WorldNicheApp: App {
         #endif
         let journal = DiscoveryJournal()
         _journal = State(initialValue: journal)
-        _social = State(initialValue: SocialStore(journal: journal, appleCredentialIsAuthorized: { userID in
+        _social = State(initialValue: SocialStore(journal: journal, onLocalErase: { QuizNotifications.shared.clearPreference() }, appleCredentialIsAuthorized: { userID in
             guard let state = try? await AppleSignInCoordinator.credentialState(forUserID: userID) else { return nil }
             if state == .revoked || state == .notFound { return false }
             return state == .authorized ? true : nil
@@ -36,12 +37,28 @@ struct WorldNicheApp: App {
                 .refreshLiveContent { catalogRefreshID += 1 }
                 .tint(Palette.pine)
                 .task { await restoreSession() }
+                .task(id: social.quiz.owner) {
+                    await social.quiz.refresh(api: social.api)
+                    await QuizNotifications.shared.refresh(social)
+                }
+                .task(id: social.quiz.today?.day) { await QuizNotifications.shared.synchronize() }
+                .task {
+                    while !Task.isCancelled {
+                        let tomorrow = QuizClock.calendar.startOfDay(for: Date()).addingTimeInterval(86400)
+                        do { try await Task.sleep(for: .seconds(max(1, tomorrow.timeIntervalSinceNow))) } catch { return }
+                        await social.quiz.refresh(api: social.api)
+                    }
+                }
                 .task(id: journal.revision) {
                     try? await Task.sleep(for: .milliseconds(750))
                     if !Task.isCancelled { await social.synchronizeExploration() }
                 }
                 .onChange(of: scenePhase) { _, phase in
-                    if phase == .active { Task { await restoreSession() } }
+                    if phase == .active { Task {
+                        await restoreSession()
+                        await social.quiz.refresh(api: social.api)
+                        await QuizNotifications.shared.refresh(social)
+                    } }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: ASAuthorizationAppleIDProvider.credentialRevokedNotification)) { _ in
                     Task { await checkAppleAuthorization() }

@@ -4,6 +4,7 @@ project_dir="$(cd "$(dirname "$0")/.." && pwd)"
 check_dir="$(mktemp -d "${TMPDIR:-/tmp}/worldniche-avatar-checks.XXXXXX")"
 trap 'rm -rf "$check_dir"' EXIT
 swiftc -swift-version 6 \
+  "$project_dir/WorldNiche/Models/DailyQuiz.swift" \
   "$project_dir/WorldNiche/Models/Country.swift" \
   "$project_dir/WorldNiche/Models/DiscoveryJournal.swift" \
   "$project_dir/WorldNiche/Models/CountryReadingProgress.swift" \
