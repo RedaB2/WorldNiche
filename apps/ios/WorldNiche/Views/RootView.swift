@@ -8,6 +8,7 @@ struct RootView: View {
     @State private var presentsIntro = false
     @State private var presentsIntroSignIn = false
     @State private var notificationQuiz = false
+    @State private var notificationNavigationID = 0
     private let introProgress = IntroProgress.appProgress()
 
     var body: some View {
@@ -28,11 +29,14 @@ struct RootView: View {
                     Tab("Profile", systemImage: "person.crop.circle", value: RootTab.profile) { ProfileView() }
                 }
                 .tabBarMinimizeBehavior(.onScrollDown)
+                .id(notificationNavigationID)
             }
         }
         .onChange(of: QuizNotifications.shared.openQuiz, initial: true) { _, request in
             if request != nil {
                 finishIntro()
+                presentsIntroSignIn = false
+                notificationNavigationID += 1
                 selectedTab = .discover
                 notificationQuiz = true
                 QuizNotifications.shared.openQuiz = nil
@@ -171,6 +175,7 @@ struct ExploreView: View {
             }) {
                 DailyQuizView { country in nextCountry = country; showQuiz = false }
                     .id(social.quiz.owner)
+                    .id(social.quiz.day)
             }
             .sheet(isPresented: $showStreak) { QuizStreakView() }
             .sheet(isPresented: $showAbout) { AboutView() }

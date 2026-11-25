@@ -20,6 +20,7 @@ for (const [reply, expected] of [[200, "sent"], [410, "invalid"], [400, "invalid
     const completed = [];
     const handler = createHandler(config, async (url, init) => {
       if (url.endsWith("/claim_quiz_reminders")) return Response.json([job, { ...job, sandbox: false }]);
+      if (url.endsWith("/quiz_reminder_is_due")) return Response.json(true);
       if (url.includes("push.apple.com")) {
         assert.ok(["https://api.push.apple.com/3/device/" + job.token, "https://api.sandbox.push.apple.com/3/device/" + job.token].includes(url));
         assert.equal(init.headers["apns-push-type"], "alert");
@@ -59,4 +60,13 @@ test("signing environments and scheduled worker routing agree with the native co
   assert.match(await source("../../apps/ios/Config/Debug.xcconfig"), /WORLDNICHE_PUSH_ENVIRONMENT = development/);
   assert.match(await source("../../apps/ios/Config/Release.xcconfig"), /WORLDNICHE_PUSH_ENVIRONMENT = production/);
   assert.match(await source("../supabase/configure_quiz_reminders.sql"), /'x-quiz-worker',s.decrypted_secret/);
+});
+
+test("opt-out after batch claim suppresses the Apple request", async () => {
+  const handler = createHandler(config, async url => {
+    if (url.endsWith("/claim_quiz_reminders")) return Response.json([job]);
+    assert.ok(url.endsWith("/quiz_reminder_is_due"));
+    return Response.json(false);
+  });
+  assert.deepEqual(await (await handler(request())).json(), { accepted: 0, failed: 0 });
 });

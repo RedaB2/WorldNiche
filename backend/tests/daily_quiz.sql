@@ -61,11 +61,14 @@ do $$ declare j jsonb; i uuid:=current_setting('test.install')::uuid; today date
 begin
   j:=public.claim_quiz_reminders()->0;
   assert j->>'installation'=i::text;
+  assert public.quiz_reminder_is_due(i,(j->>'lease')::uuid,today);
+  assert not public.quiz_reminder_is_due(i,gen_random_uuid(),today);
   assert public.claim_quiz_reminders()='[]','Active lease prevents duplicate dispatch';
   perform public.finish_quiz_reminder(i,(j->>'lease')::uuid,today,'sent',null);
   update wn_private.quiz_devices set next_due=now();
   assert public.claim_quiz_reminders()='[]','Cannot send a second reminder for the same UTC day';
   perform public.set_quiz_reminder(i,null,true,'UTC',false,null,null);
+  assert not public.quiz_reminder_is_due(i,(j->>'lease')::uuid,today);
   assert not exists(select from wn_private.quiz_devices where installation=i),'Opt-out removes token';
 end $$;
 rollback;

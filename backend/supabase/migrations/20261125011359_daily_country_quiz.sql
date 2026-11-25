@@ -18,6 +18,17 @@ alter table wn_private.quiz_schedule enable row level security;
 alter table wn_private.quiz_attempts enable row level security;
 revoke all on wn_private.quiz_schedule, wn_private.quiz_attempts from public, anon, authenticated;
 
+create function wn_private.check_quiz_options() returns trigger language plpgsql set search_path='' as $$
+begin
+  if (select count(*) from public.wn_countries where id=any(new.options))<>4 then
+    raise exception 'A quiz needs four distinct catalog countries';
+  end if;
+  return new;
+end $$;
+revoke all on function wn_private.check_quiz_options() from public,anon,authenticated;
+create trigger check_quiz_options before insert on wn_private.quiz_schedule
+for each row execute function wn_private.check_quiz_options();
+
 -- Keep published slots immutable when extending the calendar.
 create function wn_private.keep_quiz_slot() returns trigger language plpgsql set search_path='' as $$
 begin raise exception 'Published quiz slots are immutable'; end $$;

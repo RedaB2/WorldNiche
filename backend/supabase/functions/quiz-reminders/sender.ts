@@ -37,6 +37,10 @@ export function createHandler(config: Config, send: Fetch = fetch) {
     return response;
   }
   async function deliver(job: Job, bearer: string) {
+    const current = await rpc("quiz_reminder_is_due", {
+      p_installation: job.installation, p_lease: job.lease, p_day: job.day,
+    });
+    if (await current.json() !== true) return "skipped";
     const host = job.sandbox ? "api.sandbox.push.apple.com" : "api.push.apple.com";
     const expires = Date.parse(job.day + "T00:00:00Z") / 1000 + 86400;
     let status = "retry";

@@ -99,6 +99,17 @@ begin
   select coalesce(jsonb_agg(to_jsonb(c)),'[]') into batch from claimed c where lease is not null;
   return batch;
 end $$;
+-- Recheck close to dispatch. A device can opt out, rotate tokens or finish
+-- the quiz while other jobs in the same batch are being delivered.
+create function public.quiz_reminder_is_due(p_installation uuid,p_lease uuid,p_day date) returns boolean
+language sql stable security definer set search_path='' as $$
+  select p_day=(now() at time zone 'UTC')::date and exists(
+    select from wn_private.quiz_devices d where d.installation=p_installation and d.lease=p_lease
+      and d.last_day is distinct from p_day and d.completed_day is distinct from p_day
+      and not exists(select from wn_private.quiz_attempts a where a.user_id=d.user_id and a.day=p_day))
+$$;
+revoke all on function public.quiz_reminder_is_due(uuid,uuid,date) from public,anon,authenticated;
+grant execute on function public.quiz_reminder_is_due(uuid,uuid,date) to service_role;
 create function wn_private.finish_quiz_reminder(p_installation uuid,p_lease uuid,p_day date,p_status text,p_invalid_at timestamptz)
 returns void language plpgsql security definer set search_path='' as $$
 begin

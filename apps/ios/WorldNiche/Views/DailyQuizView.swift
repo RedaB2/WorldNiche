@@ -39,7 +39,7 @@ struct DailyQuizView: View {
                             } else {
                                 Text(q.prompt).font(.body)
                                 Button("Explore \(country.name)") { openCountry(country) }
-                                    .buttonStyle(.borderedProminent)
+                                    .buttonStyle(.borderedProminent).tint(Palette.forest).foregroundStyle(.white)
                             }
                             Label("Today counts toward your streak.", systemImage: "flame.fill").foregroundStyle(Palette.clay)
                         } else {
