@@ -29,7 +29,7 @@ final class DailyQuizUITests: XCTestCase {
         XCTAssertTrue(title.waitForExistence(timeout: 12))
         XCTAssertEqual(title.label, "Austria")
         try await holdForRecording()
-        app.navigationBars["A little more local"].buttons["Close"].tap()
+        app.buttons["Close"].tap()
         XCTAssertFalse(play.exists)
         try await holdForRecording()
         let streak = app.buttons["quizStreak"]
@@ -55,7 +55,7 @@ final class DailyQuizUITests: XCTestCase {
         app.buttons["quizChoice-HU"].tap()
         XCTAssertTrue(app.staticTexts["countryTitle"].waitForExistence(timeout: 12))
         XCTAssertEqual(app.staticTexts["countryTitle"].label, "Austria")
-        app.navigationBars["A little more local"].buttons["Close"].tap()
+        app.buttons["Close"].tap()
         XCTAssertEqual(app.buttons["quizStreak"].label, "2-day streak")
         XCTAssertFalse(app.buttons["dailyQuiz"].exists)
     }

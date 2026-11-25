@@ -12,6 +12,8 @@ MARKETING_VERSION = 1.1
 CURRENT_PROJECT_VERSION = 15
 DEVELOPMENT_TEAM =
 CODE_SIGN_STYLE = Automatic
+EXCLUDED_SOURCE_FILE_NAMES = SocialConfiguration.staging.local.json
+WORLDNICHE_INVITE_SCHEME = worldniche
 
 // ==========================================
 // Platform Configuration
