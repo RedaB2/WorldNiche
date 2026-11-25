@@ -43,8 +43,11 @@ final class CountryReadingUITests: XCTestCase {
         app.buttons["toggleCountryGlobe"].tap()
         let friends = app.buttons["Friends"]
         let name = app.staticTexts["Jun"]
-        for _ in 0..<32 where !name.isHittable { readStep(app) }
-        XCTAssertTrue(name.isHittable, app.debugDescription)
+        XCTAssertTrue(name.waitForExistence(timeout: 8))
+        let visibleBottom = app.buttons["askNiche"].frame.minY
+        for _ in 0..<32 where name.frame.maxY + 16 > visibleBottom { readStep(app) }
+        XCTAssertLessThan(name.frame.maxY, visibleBottom)
+        XCTAssertGreaterThan(friends.frame.minY, app.scrollViews["countryReadingScroll"].frame.minY)
         XCTAssertTrue(friends.isHittable)
         let track = app.descendants(matching: .any)["musicTrack-4"].firstMatch
         XCTAssertLessThan(track.frame.maxY, friends.frame.minY)
