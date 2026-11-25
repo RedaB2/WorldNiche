@@ -5,7 +5,7 @@ import { createHandler } from "../supabase/functions/quiz-reminders/sender.ts";
 
 const key = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
 const pem = Buffer.from(await crypto.subtle.exportKey("pkcs8", key.privateKey)).toString("base64");
-const config = { url: "https://database.example.test", service: "fixture", secret: "fixture-worker", team: "TEST", keyId: "TEST", pem };
+const config = { url: "https://database.example.test", service: "fixture", secret: "fixture-worker", team: "TEST", topic: "io.worldniche.app.staging", keyId: "TEST", pem };
 const job = { installation: crypto.randomUUID(), lease: crypto.randomUUID(), day: "2026-11-25", token: "ab".repeat(32), sandbox: true };
 const request = () => new Request("https://example.test", { method: "POST", headers: { "x-quiz-worker": config.secret } });
 
@@ -13,6 +13,11 @@ test("worker rejects missing scoped authorization before touching any provider",
   const handler = createHandler(config, () => assert.fail("unexpected network call"));
   assert.equal((await handler(new Request("https://example.test", { method: "POST" }))).status, 401);
   assert.equal((await handler(new Request("https://example.test"))).status, 405);
+});
+
+test("missing app topic stops the worker before claiming a batch", async () => {
+  const handler = createHandler({ ...config, topic: undefined }, () => assert.fail("unexpected request"));
+  assert.equal((await handler(request())).status, 503);
 });
 
 for (const [reply, expected] of [[200, "sent"], [410, "invalid"], [400, "invalid"], [403, "retry"], [429, "retry"], [503, "retry"]]) {
@@ -24,7 +29,7 @@ for (const [reply, expected] of [[200, "sent"], [410, "invalid"], [400, "invalid
       if (url.includes("push.apple.com")) {
         assert.ok(["https://api.push.apple.com/3/device/" + job.token, "https://api.sandbox.push.apple.com/3/device/" + job.token].includes(url));
         assert.equal(init.headers["apns-push-type"], "alert");
-        assert.equal(init.headers["apns-topic"], "io.worldniche.app");
+        assert.equal(init.headers["apns-topic"], config.topic);
         assert.equal(init.headers["apns-expiration"], String(Date.parse("2026-11-26T00:00:00Z") / 1000));
         assert.equal(JSON.parse(init.body).quizDay, job.day);
         const [head, claims, sig] = init.headers.authorization.slice(7).split(".");

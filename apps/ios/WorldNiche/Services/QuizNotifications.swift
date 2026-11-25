@@ -143,8 +143,13 @@ final class QuizAppDelegate: NSObject, UIApplicationDelegate, UNUserNotification
         QuizNotifications.shared.registrationFailed()
     }
 
-    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        guard response.notification.request.content.userInfo["quizDay"] != nil else { return }
-        await MainActor.run { QuizNotifications.shared.openQuiz = UUID() }
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+                                            withCompletionHandler completionHandler: @escaping @Sendable () -> Void) {
+        let opensQuiz = response.notification.request.content.userInfo["quizDay"] != nil
+        Task { @MainActor in
+            if opensQuiz { QuizNotifications.shared.openQuiz = UUID() }
+            // UIKit updates its scene snapshot from this completion handler.
+            completionHandler()
+        }
     }
 }

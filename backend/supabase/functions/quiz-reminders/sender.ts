@@ -1,4 +1,4 @@
-type Config = Partial<Record<"url" | "service" | "secret" | "team" | "keyId" | "pem" | "sandboxKeyId" | "sandboxPem", string>>;
+type Config = Partial<Record<"url" | "service" | "secret" | "team" | "topic" | "keyId" | "pem" | "sandboxKeyId" | "sandboxPem", string>>;
 type Job = { installation: string; lease: string; day: string; token: string; sandbox: boolean };
 type Fetch = (url: string, init: RequestInit) => Promise<Response>;
 
@@ -47,7 +47,7 @@ export function createHandler(config: Config, send: Fetch = fetch) {
     let invalidAt: string | null = null;
     try {
       const result = await send("https://" + host + "/3/device/" + job.token, {
-        method: "POST", headers: { authorization: "bearer " + bearer, "apns-topic": "io.worldniche.app",
+        method: "POST", headers: { authorization: "bearer " + bearer, "apns-topic": config.topic!,
           "apns-push-type": "alert", "apns-priority": "10", "apns-expiration": String(expires),
           "apns-collapse-id": "worldniche-daily-quiz" },
         body: JSON.stringify({ aps: { alert: { title: "Daily country quiz", body: "One clue, four countries. Make today’s guess." },
@@ -72,7 +72,7 @@ export function createHandler(config: Config, send: Fetch = fetch) {
   return async (request: Request) => {
     if (request.method !== "POST") return new Response(null, { status: 405 });
     if (!config.secret || request.headers.get("x-quiz-worker") !== config.secret) return new Response(null, { status: 401 });
-    if (!config.url || !config.service || !config.team || !config.keyId || !config.pem) return new Response(null, { status: 503 });
+    if (!config.url || !config.service || !config.team || !config.topic || !config.keyId || !config.pem) return new Response(null, { status: 503 });
     try {
       const jobs: Job[] = await (await rpc("claim_quiz_reminders", {})).json();
       if (!jobs.length) return Response.json({ accepted: 0 });
