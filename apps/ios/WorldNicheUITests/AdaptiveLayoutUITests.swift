@@ -29,13 +29,14 @@ final class AdaptiveLayoutUITests: XCTestCase {
         XCTAssertTrue(spin.isHittable)
         let headlineY = headline.frame.minY
         let footerY = footer.frame.maxY
-        capture("Discover before vertical drag", app: app)
+        let page = app.scrollViews.containing(.staticText, identifier: "discoverHeadline").firstMatch
+        capture("Discover before vertical drag", in: page)
         let start = headline.coordinate(withNormalizedOffset: CGVector(dx: 0.1, dy: 0.9))
         start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -120)))
         XCTAssertEqual(headline.frame.minY, headlineY, accuracy: 1)
         XCTAssertEqual(footer.frame.maxY, footerY, accuracy: 1)
         XCTAssertTrue(app.buttons["landingCountry"].isHittable)
-        capture("Discover after vertical drag", app: app)
+        capture("Discover after vertical drag", in: page)
     }
 
     @MainActor
@@ -52,7 +53,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
         let expected = try XCTUnwrap(Bundle(for: Self.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String)
         XCTAssertEqual(version.label, "WorldNiche · \(expected)")
         XCTAssertLessThan(credit.frame.maxY, version.frame.minY)
-        capture("About version footer", app: app)
+        capture("About version footer", in: scroll)
     }
 
     @MainActor
@@ -84,11 +85,11 @@ final class AdaptiveLayoutUITests: XCTestCase {
 
         rotate(.landscapeLeft, app: app)
         assertCountryRemainsOpen("Morocco", bookmark: changedLabel, app: app)
-        capture("Country and bookmark after landscape rotation", app: app)
+        capture("Country and bookmark after landscape rotation", in: app)
 
         rotate(.portrait, app: app)
         assertCountryRemainsOpen("Morocco", bookmark: changedLabel, app: app)
-        capture("Country and bookmark restored to portrait", app: app)
+        capture("Country and bookmark restored to portrait", in: app)
         save.tap()
         waitForLabel(originalLabel, on: save)
         app.navigationBars["A little more local"].buttons["Close"].tap()
@@ -117,7 +118,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
         XCTAssertTrue(japan.waitForExistence(timeout: 8))
         for _ in 0..<5 where !japan.isHittable { app.swipeUp() }
         waitUntilHittable(japan)
-        capture("Atlas capital search in landscape with large text", app: app)
+        capture("Atlas capital search in landscape with large text", in: app)
         japan.tap()
 
         let title = app.staticTexts["countryTitle"]
@@ -131,7 +132,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
         let close = app.navigationBars["A little more local"].buttons["Close"]
         waitUntilHittable(close)
         waitUntilHittable(app.buttons["saveCountry"])
-        capture("Country presentation in landscape with large text", app: app)
+        capture("Country presentation in landscape with large text", in: app)
         close.tap()
 
         XCTAssertTrue(app.navigationBars["Atlas"].waitForExistence(timeout: 5))
@@ -162,7 +163,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
         waitForValue("400% zoom", on: globe)
         globe.pinch(withScale: 1.3, velocity: 1)
         XCTAssertEqual(globe.value as? String, "400% zoom")
-        capture("Globe at maximum zoom", app: app)
+        capture("Globe at maximum zoom", in: app)
 
         // Tap the rendered surface, rather than the overlaid country button,
         // to exercise SceneKit hit testing after the camera has zoomed.
@@ -181,7 +182,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
         globe.pinch(withScale: 0.4, velocity: -1)
         globe.pinch(withScale: 0.4, velocity: -1)
         waitForValue("72% zoom", on: globe)
-        capture("Globe retains its original zoom-out limit", app: app)
+        capture("Globe retains its original zoom-out limit", in: app)
     }
 
     @MainActor
@@ -231,8 +232,8 @@ final class AdaptiveLayoutUITests: XCTestCase {
     }
 
     @MainActor
-    private func capture(_ name: String, app: XCUIApplication) {
-        let attachment = XCTAttachment(screenshot: app.screenshot())
+    private func capture(_ name: String, in element: XCUIElement) {
+        let attachment = XCTAttachment(screenshot: element.screenshot())
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
