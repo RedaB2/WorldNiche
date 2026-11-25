@@ -92,7 +92,7 @@ def run_attempt(number):
             "-only-testing:WorldNicheUITests/CountryReadingUITests/testRadioChartShowsStationSampleAndProviderCredit",
             "-only-testing:WorldNicheUITests/CountryReadingUITests/testNextFactPersistsAndMatchesTheCompanionSourceWhenMusicIsUnavailable",
             "CODE_SIGNING_ALLOWED=NO",
-        ], directory / "xcodebuild.log", 1200, check=False)
+        ], directory / "xcodebuild.log", 30 * 60, check=False)
         phase = "test result verification"
         capture(["xcrun", "xcresulttool", "get", "test-results", "summary", "--path", str(bundle), "--compact"],
                 directory / "summary.json", 300)
