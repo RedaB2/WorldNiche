@@ -17,31 +17,35 @@ struct DailyQuizView: View {
                     Eyebrow(text: quiz.now.formatted(Date.FormatStyle(timeZone: .gmt).month(.wide).day()) + "  ·  Daily quiz")
                     if let q = quiz.question {
                         if let attempt = quiz.today, let country = CountryRepository.country(id: q.answer) {
-                            Label(attempt.correct ? "You got it!" : "Today’s answer", systemImage: attempt.correct ? "checkmark.circle.fill" : "globe")
-                                .foregroundStyle(Palette.clay)
-                            Text(country.name).scaledFont(size: 38, design: .serif)
-                            if reveal != nil {
-                                WorldGlobeView(countries: CountryRepository.countries, selectedCountry: target, spinToken: spin,
-                                               allowsCountrySelection: false, onSpinFinished: { landed = true }, onSelect: { _ in })
-                                    .allowsHitTesting(false)
-                                    .frame(maxWidth: .infinity).frame(height: 270)
-                                    .accessibilityLabel("Globe turning to \(country.name)")
-                                    .task {
-                                        do { try await Task.sleep(for: .milliseconds(300)) } catch { return }
-                                        target = country
-                                        spin += 1
-                                    }
-                                    .task(id: landed) {
-                                        guard landed else { return }
-                                        do { try await Task.sleep(for: .milliseconds(450)) } catch { return }
-                                        openCountry(country)
-                                    }
-                            } else {
-                                Text(q.prompt).font(.body)
-                                Button("Explore \(country.name)") { openCountry(country) }
-                                    .buttonStyle(.borderedProminent).tint(Palette.forest).foregroundStyle(.white)
+                            VStack(spacing: 20) {
+                                Label(attempt.correct ? "You got it!" : "Today’s answer", systemImage: attempt.correct ? "checkmark.circle.fill" : "globe")
+                                    .foregroundStyle(Palette.clay)
+                                Text(country.name).scaledFont(size: 38, design: .serif)
+                                if reveal != nil {
+                                    WorldGlobeView(countries: CountryRepository.countries, selectedCountry: target, spinToken: spin,
+                                                   allowsCountrySelection: false, onSpinFinished: { landed = true }, onSelect: { _ in })
+                                        .allowsHitTesting(false)
+                                        .frame(maxWidth: .infinity).frame(height: 270)
+                                        .accessibilityLabel("Globe turning to \(country.name)")
+                                        .task {
+                                            do { try await Task.sleep(for: .milliseconds(300)) } catch { return }
+                                            target = country
+                                            spin += 1
+                                        }
+                                        .task(id: landed) {
+                                            guard landed else { return }
+                                            do { try await Task.sleep(for: .milliseconds(450)) } catch { return }
+                                            openCountry(country)
+                                        }
+                                } else {
+                                    Text(q.prompt).font(.body)
+                                    Button("Explore \(country.name)") { openCountry(country) }
+                                        .buttonStyle(.borderedProminent).tint(Palette.forest).foregroundStyle(.white)
+                                }
+                                Label("Today counts toward your streak.", systemImage: "flame.fill").foregroundStyle(Palette.clay)
                             }
-                            Label("Today counts toward your streak.", systemImage: "flame.fill").foregroundStyle(Palette.clay)
+                            .frame(maxWidth: .infinity)
+                            .multilineTextAlignment(.center)
                         } else {
                             Text(q.prompt).scaledFont(size: 30, design: .serif)
                                 .fixedSize(horizontal: false, vertical: true)

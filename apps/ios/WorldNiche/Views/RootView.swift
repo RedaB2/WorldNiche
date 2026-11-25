@@ -102,18 +102,19 @@ struct ExploreView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.top, 12)
 
-                        Button {
-                            showQuiz = true
-                        } label: {
-                            Label(social.quiz.today == nil ? "Play today’s quiz" : "Today’s quiz · Completed",
-                                  systemImage: social.quiz.today == nil ? "questionmark.circle" : "checkmark.circle.fill")
-                                .scaledFont(size: 15, weight: .semibold)
-                                .padding(.horizontal, 16).frame(minHeight: 44)
-                                .background(Palette.pine.opacity(0.08), in: Capsule())
+                        if social.quiz.today == nil {
+                            Button {
+                                showQuiz = true
+                            } label: {
+                                Label("Play today’s quiz", systemImage: "questionmark.circle")
+                                    .scaledFont(size: 15, weight: .semibold)
+                                    .padding(.horizontal, 16).frame(minHeight: 44)
+                                    .background(Palette.pine.opacity(0.08), in: Capsule())
+                            }
+                            .buttonStyle(.plain).foregroundStyle(Palette.pine)
+                            .accessibilityIdentifier("dailyQuiz")
+                            .padding(.top, 10)
                         }
-                        .buttonStyle(.plain).foregroundStyle(Palette.pine)
-                        .accessibilityIdentifier("dailyQuiz")
-                        .padding(.top, 10)
 
                         HStack(spacing: 6) {
                             Image(systemName: "hand.draw").accessibilityHidden(true)

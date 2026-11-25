@@ -106,9 +106,9 @@ They were installed and verified before submission. Inspect jobs and recent exec
 
 ## Daily country quiz and Apple push reminders
 
-The first edition assigns 225 shuffled questions to consecutive UTC dates from November 24, 2026 through July 6, 2027. Signed-in attempts are accepted online once per account and date. Any answer maintains the streak, and a correct answer adds one weekly point. Leaderboards use approved profile names and existing friend, block, moderation and exploration-sharing rules.
+The first edition assigns 195 shuffled capital questions, one per catalog country, to consecutive UTC dates from November 24, 2026 through June 6, 2027. Signed-in attempts are accepted online once per account and date. Any answer maintains the streak, and a correct answer adds one weekly point. Leaderboards use approved profile names and existing friend, block, moderation and exploration-sharing rules.
 
-Extend the calendar with new IDs, prompts and dates in a new migration. Shuffle new questions and their four country choices once before assigning dates. Append the identical rows to the native daily-quiz.json offline edition. The database prevents reusing IDs, dates and prompt text. CI compares every installed row against the native bundle. A weekly GitHub check flags the first missing question in the next 45 UTC days. Old clients can fetch a newly scheduled day from the today_quiz RPC after their bundled edition ends. When no question is published the app shows an unavailable state and the server skips reminders.
+Extend the calendar with new capital clues, such as a country’s former capital, in a new migration with fresh IDs, prompts and dates. Shuffle new questions and their four country choices once before assigning dates. Append the identical rows to the native daily-quiz.json offline edition. The database prevents reusing IDs, dates and prompt text. CI compares every installed row against the native bundle. A weekly GitHub check flags the first missing question in the next 45 UTC days. Old clients can fetch a newly scheduled day from the today_quiz RPC after their bundled edition ends. When no question is published the app shows an unavailable state and the server skips reminders.
 
 For an authorized backend rollout:
 

@@ -359,7 +359,8 @@ private final class CheckSuite {
     func quizHistory() async {
         let defaults = isolatedDefaults()
         let day = Date(timeIntervalSince1970: 1795608000)
-        let quiz = DailyQuizStore(defaults: defaults, clock: { day })
+        var now = day
+        let quiz = DailyQuizStore(defaults: defaults, clock: { now })
         guard let q = quiz.question else { check(false, "Bundled quiz missing"); return }
         check(Set(q.options).count == 4 && q.valid, "A daily quiz offers four distinct destinations")
         let attempt = await quiz.answer(q.options.first { $0 != q.answer }!, question: q, api: nil)
@@ -371,6 +372,11 @@ private final class CheckSuite {
         check(quiz.attempts.isEmpty, "Account leaderboard never imports guest attempts")
         quiz.activate(nil)
         check(quiz.streak == 1, "Returning to guest restores that workspace")
+        now = QuizClock.calendar.startOfDay(for: day).addingTimeInterval(86400)
+        quiz.tick()
+        check(quiz.today == nil && quiz.question?.day == "2026-11-26" && quiz.question?.id != q.id,
+              "The next quiz becomes playable at midnight UTC")
+        check(quiz.attempts[q.day]?.choice == attempt?.choice && quiz.streak == 1, "Rollover keeps yesterday’s attempt")
         let days: Set<String> = ["2026-11-24", "2026-11-25"]
         check(QuizClock.streak(days: days, on: day.addingTimeInterval(86400)) == 2, "Streak remains active while today's quiz is open")
         check(QuizClock.streak(days: days, on: day.addingTimeInterval(172800)) == 0, "Missing a full day breaks the streak")
