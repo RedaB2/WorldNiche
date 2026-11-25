@@ -96,8 +96,6 @@ struct CountryFriendsView: View {
                         Text(explorers.prefix(3).map { ProfileIdentity.displayName(for: $0.displayName) }.joined(separator: ", ") + (explorers.count > 3 ? " and \(explorers.count - 3) more" : ""))
                             .font(.subheadline).lineLimit(2)
                     }
-                    Text("Opened \(country.name) in WorldNiche. This doesn’t indicate a physical visit.")
-                        .font(.caption).foregroundStyle(Palette.muted)
                 }
             }.foregroundStyle(Palette.pine).editorialCard()
                 .accessibilityIdentifier("countryFriends")

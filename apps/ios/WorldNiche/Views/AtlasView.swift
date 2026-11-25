@@ -252,7 +252,11 @@ struct AboutView: View {
                     Link("Open Database License", destination: URL(string: "https://opendatacommons.org/licenses/odbl/1-0/")!)
                     Text("Each country opens with a short history and a dated population figure. Its fact changes the next day you visit. Tap Next fact to read another sourced story. Apple Music charts reflect local streams. Where a country has no Apple chart, Tuneping may have a chart of songs played by monitored local radio stations.")
                     Link("Radio chart data by Tuneping", destination: URL(string: "https://tuneping.com/")!)
-                    Text("WorldNiche · 1.0").scaledFont(size: 11, design: .monospaced).tracking(2).padding(.top, 12)
+                    if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
+                        Text("WorldNiche · \(version)")
+                            .scaledFont(size: 11, design: .monospaced).tracking(2).padding(.top, 12)
+                            .accessibilityIdentifier("appVersion")
+                    }
                 }.scaledFont(size: 14).lineSpacing(5).foregroundStyle(Palette.pine).padding(26).frame(maxWidth: 650).frame(maxWidth: .infinity)
             }.background(Palette.paper)
                 .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
