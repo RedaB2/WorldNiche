@@ -88,9 +88,13 @@ Regression checks for change routing and retry boundaries run with `bash scripts
 
 ## Deploy the backend
 
+The internal TestFlight app uses the [isolated staging project and signing configuration](../apps/ios/Staging/README.md).
+
 Use the Supabase dashboard or an authenticated Supabase CLI for the project above. Verify the selected project before any write. Add a new migration for a database change; do not rewrite applied migrations. Run `bash scripts/check.sh backend` first. The test runner creates an isolated local PostgreSQL cluster and does not accept a production URL.
 
 Link the CLI to the project, inspect remote migration history, then review `supabase db push --dry-run` before applying. Some original migrations were applied through the dashboard, so reconcile the ledger against the actual schema before the first CLI push. Never blindly replay the entire migration directory on production.
+
+The November 24 preflight found an empty production migration ledger. Production already has the original social, moderation and journal schema, while the invitation metadata and both quiz migrations are pending. Before rollout, compare all seven historical migrations with the live schema and grants. Record only confirmed versions as applied. Repeat the dry run and verify that it lists exactly the pending changes.
 
 Deploy functions from `backend/` with `supabase functions deploy delete-account` or `supabase functions deploy moderate-profile`. Both have gateway JWT verification disabled in `config.toml`; their handlers verify the caller themselves. Keep that authentication intact. Local `[auth]` defaults and legacy email templates are not an authoritative snapshot of hosted Auth settings; do not push project-wide Auth configuration as part of a function deploy.
 
@@ -128,7 +132,7 @@ For a configured build, put the owner's app configuration in ignored `apps/ios/W
 
 Run the Swift suites and affected UI suites on phone and Duo, then live discovery, real Apple sign-in, friend access and account deletion checks when those paths change. Use a disposable account with the owner's authorization for deletion. Inspect the final bundle, privacy manifest, entitlements, source credits and release configuration with `apps/ios/Scripts/check_release_readiness.py` plus the release checklist.
 
-Archive/export using the owner's Apple Distribution certificate and WorldNiche App Store profile. The owner's export settings are in ignored `.local/ExportOptions.local.plist`; they export a local IPA rather than uploading automatically. Put archives, IPAs and validation evidence in `outputs/`. Upload via App Store Connect only for an authorized release, wait for processing and verify the exact build's public beta group assignment. New uploads need a new build number in `apps/ios/Config/Shared.xcconfig`. Credentials and configured IPAs remain private. GitHub does not currently hold signing or App Store upload credentials, so iOS distribution is an operator-run release step.
+Archive/export using the owner's Apple Distribution certificate and WorldNiche App Store profile. The owner's export settings are in ignored `.local/ExportOptions.local.plist`; they export a local IPA rather than uploading automatically. Put archives, IPAs and validation evidence in `outputs/`. Upload via App Store Connect only for an authorized release, wait for processing and verify the exact build and intended TestFlight group. New uploads need a new build number in `apps/ios/Config/Shared.xcconfig`. Credentials and configured IPAs remain private. GitHub does not currently hold signing or App Store upload credentials, so iOS distribution is an operator-run release step.
 
 Listing source lives in `metadata/app-info/` and `metadata/version/`. The frozen submitted listing beside the 1.0 media is a readback snapshot. Use the current App Store metadata sync tools to validate and review a future metadata diff before applying it.
 
@@ -139,7 +143,7 @@ asc submit status --id b47c84a3-1b35-40d3-ba7f-5959e1127e41
 asc versions view --version-id bb4a5f96-cbc9-4ab0-8ac4-a704db2ff806 --include-build
 ```
 
-The replacement Mac uses the `WorldNiche` ASC keychain profile and the `WorldNiche App Store November 2026` provisioning profile. The signing private key was generated in the owner's login keychain. Open the existing checkout and use its ignored export options. Verify the app, bundle and team IDs before distribution.
+The replacement Mac uses the `WorldNiche` ASC keychain profile with the `WorldNiche Push App Store November 2026` distribution profile for quiz releases. The signing private key was generated in the owner's login keychain. Open the existing checkout and use its ignored export options. Verify the app, bundle and team IDs before distribution.
 
 ## Credential locations
 
