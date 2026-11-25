@@ -1,5 +1,13 @@
 # App Store media
 
+## Version 1.1
+
+The regular iPhone and unfolded Duo listings open with Discover, the daily capitals quiz and the friends leaderboard. These six posters use fresh English (U.S.) captures from 1.1 (16) with the app’s synthetic quiz fixture. The Duo captures show its active inner display at 2853 × 2007.
+
+Apple processed seven iPhone screenshots, four Duo screenshots, three iPad screenshots and the Morocco preview. The [1.1 manifest](1.1/manifest.json) records the screenshot order within each display size, file dimensions and SHA-256 digests. Files carried forward from 1.0 use their original paths. Run `swift marketing/app-store/render.swift 1.1` from the repository root to regenerate the six new posters from [their captures](1.1/source).
+
+## Version 1.0
+
 The first listing, with Morocco as the demo destination. Captured from WorldNiche in the simulator on October 29, 2026, then framed with the app's logo, serif type and pine, cream and sage palette.
 
 ## Assets

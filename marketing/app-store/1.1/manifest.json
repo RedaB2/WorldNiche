@@ -1,0 +1,141 @@
+{
+  "version": "1.1",
+  "capturedOn": "2026-11-24",
+  "locale": "en-US",
+  "assets": [
+    {
+      "file": "1.1/en-US/iphone/screenshots/01-discover.png",
+      "displayType": "APP_IPHONE_67",
+      "order": 1,
+      "width": 1320,
+      "height": 2868,
+      "sha256": "072fb136153abdd3607b2ba4deb3aa83ae8b2bb2ee7125a6f398effb854c5868",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.1/en-US/iphone/screenshots/02-quiz.png",
+      "displayType": "APP_IPHONE_67",
+      "order": 2,
+      "width": 1320,
+      "height": 2868,
+      "sha256": "14e110cb1014a7f32bf5350f48d968acb5b2da97cb74b463c55d74729964d6a9",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.1/en-US/iphone/screenshots/03-streak.png",
+      "displayType": "APP_IPHONE_67",
+      "order": 3,
+      "width": 1320,
+      "height": 2868,
+      "sha256": "52b8ddcac98a800e42f1eb80b7127dbcd11a20cc92c4e84816416eea8834a217",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/screenshots/02-local-lens.png",
+      "displayType": "APP_IPHONE_67",
+      "order": 4,
+      "width": 1320,
+      "height": 2868,
+      "sha256": "00b191b5ff457bbe3901b5632fd94dfd11a1bdbfa67e1df627756d2345548552",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/screenshots/03-atlas.png",
+      "displayType": "APP_IPHONE_67",
+      "order": 5,
+      "width": 1320,
+      "height": 2868,
+      "sha256": "929a496f1dbb5e0b869fe4c35e472274c969a1c30a113454928bfb2951018cfd",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/screenshots/04-journal.png",
+      "displayType": "APP_IPHONE_67",
+      "order": 6,
+      "width": 1320,
+      "height": 2868,
+      "sha256": "3faad9ef638ae00a1ead868a8da04b4cdf89a6e1db314d09f733963ada17e11f",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/screenshots/05-friends.png",
+      "displayType": "APP_IPHONE_67",
+      "order": 7,
+      "width": 1320,
+      "height": 2868,
+      "sha256": "cc500664dfd539bbbae0a8a5fb6cccabf76d18aa813ec144918db1dc43ca6414",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/ipad/screenshots/01-globe.png",
+      "displayType": "APP_IPAD_PRO_3GEN_129",
+      "order": 1,
+      "width": 2064,
+      "height": 2752,
+      "sha256": "d7e2081851100cad06c8edd3655a6eb4f048d2386d2bd20902494cb7090372b2",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/ipad/screenshots/03-atlas.png",
+      "displayType": "APP_IPAD_PRO_3GEN_129",
+      "order": 2,
+      "width": 2064,
+      "height": 2752,
+      "sha256": "8e564d43b8235600596672eba8d0f9a544b9840ebee5138d123fa790bc96d852",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/ipad/screenshots/04-journal.png",
+      "displayType": "APP_IPAD_PRO_3GEN_129",
+      "order": 3,
+      "width": 2064,
+      "height": 2752,
+      "sha256": "90c23527084c5d6178fe5362f7434dcfe46aee90213378a6e1daf0b2a9114b93",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.1/en-US/duo/screenshots/01-discover.png",
+      "displayType": "APP_IPHONE_DUO",
+      "order": 1,
+      "width": 2034,
+      "height": 1398,
+      "sha256": "b27de15150ac1617b3419204041f123f23ae835a5658c7a08639c5058f0275ee",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.1/en-US/duo/screenshots/02-quiz.png",
+      "displayType": "APP_IPHONE_DUO",
+      "order": 2,
+      "width": 2034,
+      "height": 1398,
+      "sha256": "9e50faa3275ce98ef70cff57fb6c06e8a81b7f34f42b74e3b9540a1bb953bfc3",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.1/en-US/duo/screenshots/03-streak.png",
+      "displayType": "APP_IPHONE_DUO",
+      "order": 3,
+      "width": 2034,
+      "height": 1398,
+      "sha256": "0fa0cc0821419f11dafc5c60e4b42b6ebdcfbebcc3b211581b9f3e401faa6222",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/duo/screenshots/03-atlas.png",
+      "displayType": "APP_IPHONE_DUO",
+      "order": 4,
+      "width": 2034,
+      "height": 1398,
+      "sha256": "de1829d708409f94559d52976a78577a6cfa8855927a47d9ac70246c9a156602",
+      "deliveryState": "COMPLETE"
+    },
+    {
+      "file": "1.0/en-US/iphone/previews/01-morocco.mp4",
+      "durationSeconds": 20,
+      "width": 886,
+      "height": 1920,
+      "sha256": "51584a672a18d8a25c799393e987c9af74cc3a6cf610f1cdd37bd55a88c08029",
+      "deliveryState": "COMPLETE"
+    }
+  ]
+}
