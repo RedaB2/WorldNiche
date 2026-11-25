@@ -94,7 +94,7 @@ Use the Supabase dashboard or an authenticated Supabase CLI for the project abov
 
 Link the CLI to the project, inspect remote migration history, then review `supabase db push --dry-run` before applying. Some original migrations were applied through the dashboard, so reconcile the ledger against the actual schema before the first CLI push. Never blindly replay the entire migration directory on production.
 
-The November 24 preflight found an empty production migration ledger. Production already has the original social, moderation and journal schema, while the invitation metadata and both quiz migrations are pending. Before rollout, compare all seven historical migrations with the live schema and grants. Record only confirmed versions as applied. Repeat the dry run and verify that it lists exactly the pending changes.
+The November 24 production rollout compared the live schema and grants against the historical migrations, recorded the seven matching versions as applied, then installed the invitation metadata and two quiz migrations. Future dry runs should start from this ten-migration baseline.
 
 Deploy functions from `backend/` with `supabase functions deploy delete-account` or `supabase functions deploy moderate-profile`. Both have gateway JWT verification disabled in `config.toml`; their handlers verify the caller themselves. Keep that authentication intact. Local `[auth]` defaults and legacy email templates are not an authoritative snapshot of hosted Auth settings; do not push project-wide Auth configuration as part of a function deploy.
 
@@ -136,11 +136,11 @@ Archive/export using the owner's Apple Distribution certificate and WorldNiche A
 
 Listing source lives in `metadata/app-info/` and `metadata/version/`. The frozen submitted listing beside the 1.0 media is a readback snapshot. Use the current App Store metadata sync tools to validate and review a future metadata diff before applying it.
 
-Version **1.0.2 (14)** was submitted November 20, 2026 with manual release after approval. Check the submission and attached build with these commands.
+Version **1.1 (16)** was submitted November 24, 2026 with automatic release after approval. Check the submission and attached build with these commands.
 
 ```sh
-asc submit status --id b47c84a3-1b35-40d3-ba7f-5959e1127e41
-asc versions view --version-id bb4a5f96-cbc9-4ab0-8ac4-a704db2ff806 --include-build
+asc --profile WorldNiche submit status --id 5f12c066-7b50-4b9d-9d9e-37049029d4ea
+asc --profile WorldNiche versions view --version-id 4dbad769-db86-4262-9bdb-474fcc4fe7fc --include-build
 ```
 
 The replacement Mac uses the `WorldNiche` ASC keychain profile with the `WorldNiche Push App Store November 2026` distribution profile for quiz releases. The signing private key was generated in the owner's login keychain. Open the existing checkout and use its ignored export options. Verify the app, bundle and team IDs before distribution.
@@ -167,3 +167,5 @@ On the existing Mac, an operator-only OpenAI copy is in `/Users/rb/dev/WorldNich
 `v1.0.1` identifies the source for **1.0.1 (13)** and its submission documentation. The owner authorized automatic App Store release after approval. The tag does not mean Apple has approved the update. See [current submission status](app-store-readiness.md).
 
 `v1.0.2` identifies the source used for **1.0.2 (14)**. [GitHub release](https://github.com/RedaB2/WorldNiche/releases/tag/v1.0.2)
+
+`v1.1.0` identifies the submission source for **1.1 (16)** and its updated store listing and media. [GitHub release](https://github.com/RedaB2/WorldNiche/releases/tag/v1.1.0)
