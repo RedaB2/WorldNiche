@@ -59,6 +59,7 @@ struct RootView: View {
 }
 
 struct ExploreView: View {
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selected = CountryRepository.country(id: "MA") ?? CountryRepository.countries[0]
@@ -69,11 +70,13 @@ struct ExploreView: View {
     @State private var detail: Country?
     @State private var showAbout = false
 
+    private var usesColumns: Bool { verticalSizeClass == .compact && !dynamicTypeSize.isAccessibilitySize }
+
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
                 ScrollView {
-                    VStack(spacing: 0) {
+                    sections {
                         masthead
                         Text("The world is full\nof little wonders.")
                             .scaledFont(size: 39, weight: .regular, design: .serif)
@@ -97,10 +100,10 @@ struct ExploreView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .foregroundStyle(Palette.muted)
                         .padding(.top, 12)
-
+                    } destination: {
                         globe(preferredHeight: max(200, min(geometry.size.width - 30, 355)))
                             .layoutPriority(-1)
-                            .padding(.horizontal, -26)
+                            .padding(.horizontal, usesColumns ? 0 : -26)
                             .padding(.top, 2)
 
                         Button {
@@ -135,11 +138,11 @@ struct ExploreView: View {
                             .foregroundStyle(Palette.muted)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.top, 13)
-                            .padding(.bottom, 28)
+                            .padding(.bottom, usesColumns ? 8 : 28)
                     }
                     .frame(idealHeight: dynamicTypeSize.isAccessibilitySize ? nil : geometry.size.height)
                     .padding(.horizontal, 26)
-                    .frame(maxWidth: 620)
+                    .frame(maxWidth: usesColumns ? .infinity : 620)
                     .frame(maxWidth: .infinity)
                 }
                 .scrollBounceBehavior(.basedOnSize, axes: .vertical)
@@ -149,6 +152,19 @@ struct ExploreView: View {
             .toolbar(.hidden, for: .navigationBar)
             .sheet(item: $detail) { CountryDetailView(country: $0) }
             .sheet(isPresented: $showAbout) { AboutView() }
+        }
+    }
+
+    private func sections<Heading: View, Destination: View>(
+        @ViewBuilder heading: () -> Heading, @ViewBuilder destination: () -> Destination
+    ) -> some View {
+        let layout = usesColumns ? AnyLayout(HStackLayout(spacing: 24)) : AnyLayout(VStackLayout(spacing: 0))
+        return layout {
+            VStack(spacing: 0, content: heading)
+                .frame(maxWidth: .infinity)
+                .fixedSize(horizontal: false, vertical: true)
+            VStack(spacing: 0, content: destination)
+                .frame(maxWidth: .infinity)
         }
     }
 
@@ -182,7 +198,7 @@ struct ExploreView: View {
             }
             .accessibilityLabel("Interactive world globe")
             .accessibilityIdentifier("interactiveGlobe")
-            .frame(minHeight: 200, idealHeight: preferredHeight, maxHeight: preferredHeight)
+            .frame(minHeight: 160, idealHeight: preferredHeight, maxHeight: preferredHeight)
 
             Button { detail = selected } label: {
                 HStack(spacing: 12) {

@@ -18,11 +18,20 @@ final class AdaptiveLayoutUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-worldniche-skip-intro"]
         app.launch()
-        let headline = app.staticTexts["discoverHeadline"]
-        waitUntilHittable(headline)
+        waitUntilHittable(app.staticTexts["discoverHeadline"])
         if ProcessInfo.processInfo.environment["WORLDNICHE_UI_TEST_DISPLAY_ID"] == "3" {
             XCTAssertGreaterThan(min(app.frame.width, app.frame.height), 600, "Use the Duo’s inner display.")
         }
+        assertDiscoverStaysInPlace(app, pose: "initial")
+        if app.frame.width < app.frame.height && app.frame.width < 600 {
+            rotate(.landscapeLeft, app: app)
+            assertDiscoverStaysInPlace(app, pose: "landscape")
+        }
+    }
+
+    @MainActor
+    private func assertDiscoverStaysInPlace(_ app: XCUIApplication, pose: String) {
+        let headline = app.staticTexts["discoverHeadline"]
         let footer = app.staticTexts["195 countries. Endless ways to connect."]
         let spin = app.buttons["spinButton"]
         XCTAssertTrue(footer.isHittable)
@@ -30,13 +39,13 @@ final class AdaptiveLayoutUITests: XCTestCase {
         let headlineY = headline.frame.minY
         let footerY = footer.frame.maxY
         let page = app.scrollViews.containing(.staticText, identifier: "discoverHeadline").firstMatch
-        capture("Discover before vertical drag", in: page)
+        capture("Discover \(pose) before vertical drag", in: page)
         let start = headline.coordinate(withNormalizedOffset: CGVector(dx: 0.1, dy: 0.9))
         start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -120)))
         XCTAssertEqual(headline.frame.minY, headlineY, accuracy: 1)
         XCTAssertEqual(footer.frame.maxY, footerY, accuracy: 1)
         XCTAssertTrue(app.buttons["landingCountry"].isHittable)
-        capture("Discover after vertical drag", in: page)
+        capture("Discover \(pose) after vertical drag", in: page)
     }
 
     @MainActor
