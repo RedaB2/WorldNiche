@@ -23,7 +23,9 @@ final class AdaptiveLayoutUITests: XCTestCase {
             XCTAssertGreaterThan(min(app.frame.width, app.frame.height), 600, "Use the Duo’s inner display.")
         }
         assertDiscoverStaysInPlace(app, pose: "initial")
-        if app.frame.width < app.frame.height && app.frame.width < 600 {
+        // Phones with bottom tabs also exercise the short landscape layout.
+        // On the folded Duo, the system puts the tabs along the side.
+        if app.frame.width < app.frame.height && app.frame.width < 600 && app.tabBars.buttons["Discover"].exists {
             rotate(.landscapeLeft, app: app)
             assertDiscoverStaysInPlace(app, pose: "landscape")
         }
