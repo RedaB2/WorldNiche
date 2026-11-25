@@ -7,9 +7,12 @@ import re
 import struct
 
 root = Path(__file__).resolve().parents[1]
-manifest = json.loads((root / 'marketing/app-store/1.0/manifest.json').read_text())
-for asset in manifest['assets']:
-    path = root / 'marketing/app-store' / asset['file']
+media = root / 'marketing/app-store'
+manifests = sorted(media.glob('*/manifest.json'))
+assert manifests, 'Missing App Store listing manifests'
+assets = [asset for manifest in manifests for asset in json.loads(manifest.read_text())['assets']]
+for asset in assets:
+    path = media / asset['file']
     data = path.read_bytes()
     assert hashlib.sha256(data).hexdigest() == asset['sha256'], f'Changed listing asset: {path}'
     if path.suffix == '.png':
@@ -17,4 +20,4 @@ for asset in manifest['assets']:
         assert struct.unpack('>II', data[16:24]) == (asset['width'], asset['height']), path
 for source in re.findall(r'<img[^>]+src="([^"]+)"', (root / 'README.md').read_text()):
     assert (root / source).is_file(), f'Missing README image: {source}'
-print(f"PASS: {len(manifest['assets'])} App Store assets match the manifest; README images exist.")
+print(f"PASS: {len(assets)} App Store asset entries match their manifests; README images exist.")
