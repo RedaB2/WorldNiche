@@ -123,16 +123,13 @@ struct SocialConfiguration: Sendable {
             let supportURL: String
             let appleSignInEnabled: Bool?
         }
-        let staging = bundle.bundleIdentifier == "io.worldniche.app.staging"
-        let resource = staging ? "SocialConfiguration.staging.local" : "SocialConfiguration.local"
-        let path = bundle.url(forResource: resource, withExtension: "json")
+        let path = bundle.url(forResource: "SocialConfiguration.local", withExtension: "json")
             ?? bundle.url(forResource: "SocialConfiguration", withExtension: "json")
         guard let path,
               let data = try? Data(contentsOf: path),
               let settings = try? JSONDecoder().decode(Settings.self, from: data),
               let url = URL(string: settings.serviceURL), url.scheme == "https",
               url.host != nil, url.user == nil, url.password == nil,
-              !staging || url.host == "uprskkelpwqrhorwdudp.supabase.co",
               isPublicAPIKey(settings.publicAPIKey),
               !settings.invitationHost.isEmpty,
               settings.invitationHost.range(of: #"^[a-z0-9]+([.-][a-z0-9]+)*\.[a-z]{2,}$"#, options: .regularExpression) != nil else { return nil }
@@ -148,9 +145,6 @@ struct SocialConfiguration: Sendable {
 
     func invitationURL(token: String) -> URL? {
         guard InvitationLink.isValidToken(token) else { return nil }
-        if InvitationLink.scheme == "worldniche-staging" {
-            return URL(string: "\(InvitationLink.scheme)://invite/\(token)")
-        }
         return URL(string: "https://\(invitationHost)/invite/\(token)")
     }
 
@@ -168,10 +162,6 @@ struct SocialConfiguration: Sendable {
 }
 
 enum InvitationLink {
-    static var scheme: String {
-        Bundle.main.bundleIdentifier == "io.worldniche.app.staging" ? "worldniche-staging" : "worldniche"
-    }
-
     static func isValidToken(_ token: String) -> Bool {
         token.utf8.count == 64 && token.allSatisfy { $0.isASCII && ("0123456789abcdef".contains($0)) }
     }
@@ -184,10 +174,10 @@ enum InvitationLink {
         if url.scheme == "https", let allowedHost, url.host == allowedHost,
            parts.count == 2, parts[0] == "invite" {
             token = parts[1]
-        } else if url.scheme == scheme, url.host == "invite", parts.count == 1 {
+        } else if url.scheme == "worldniche", url.host == "invite", parts.count == 1 {
             token = parts[0]
         } else { return nil }
-        let expected = url.scheme == "https" ? "https://\(allowedHost ?? "")/invite/\(token)" : "\(scheme)://invite/\(token)"
+        let expected = url.scheme == "https" ? "https://\(allowedHost ?? "")/invite/\(token)" : "worldniche://invite/\(token)"
         guard isValidToken(token), url.absoluteString == expected else { return nil }
         return token
     }

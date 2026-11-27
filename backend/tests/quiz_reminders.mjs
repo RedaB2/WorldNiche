@@ -5,7 +5,7 @@ import { createHandler } from "../supabase/functions/quiz-reminders/sender.ts";
 
 const key = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
 const pem = Buffer.from(await crypto.subtle.exportKey("pkcs8", key.privateKey)).toString("base64");
-const config = { url: "https://database.example.test", service: "fixture", secret: "fixture-worker", team: "TEST", topic: "io.worldniche.app.staging", keyId: "TEST", pem };
+const config = { url: "https://database.example.test", service: "fixture", secret: "fixture-worker", team: "TEST", topic: "test.example.quiz", keyId: "TEST", pem };
 const job = { installation: crypto.randomUUID(), lease: crypto.randomUUID(), day: "2026-11-25", token: "ab".repeat(32), sandbox: true };
 const request = () => new Request("https://example.test", { method: "POST", headers: { "x-quiz-worker": config.secret } });
 
