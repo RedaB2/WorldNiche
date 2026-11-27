@@ -12,7 +12,7 @@ Apple accepted **WorldNiche 1.1 (16)** on November 25 at 04:08:59 UTC (November 
 
 The six English listing fields matched their source. Apple processed seven iPhone, four unfolded Duo and three iPad screenshots, plus the existing iPhone preview. Six new captures show Discover, the daily quiz and weekly friends scores. Validation found zero blocking issues and flagged the product homepage as the marketing URL. App Privacy was published, including Device ID and Product Interaction. Apple also received an App Enhancements featuring nomination for the daily capitals quiz. [English listing](../metadata/version/1.1/en-US.json) · [Media manifest](../marketing/app-store/1.1/manifest.json)
 
-The production quiz matched the signed app’s question for the current UTC day. The minute schedule ran successfully, and the authenticated worker returned HTTP 200 with zero registered devices at verification. Real delivery, opening the quiz, completion suppression and opt-out were verified on the staging simulator. The production rollout and the staging configuration are documented in the [deployment guide](deployment.md#daily-country-quiz-and-apple-push-reminders).
+The production quiz matched the signed app’s question for the current UTC day. The minute schedule ran successfully, and the authenticated worker returned HTTP 200 with zero registered devices at verification. The team verified reminder delivery, opening the quiz, suppression after completion and opt-out on the staging simulator used for this submission. See the [production rollout instructions](deployment.md#daily-country-quiz-and-apple-push-reminders).
 
 ## November 21, 2026 public release
 

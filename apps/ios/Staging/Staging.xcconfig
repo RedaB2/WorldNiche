@@ -1,6 +1,0 @@
-// Pass with -xcconfig for the internal staging app.
-PRODUCT_BUNDLE_IDENTIFIER = io.worldniche.app.staging
-PRODUCT_DISPLAY_NAME = WorldNiche Staging
-WORLDNICHE_INVITE_SCHEME = worldniche-staging
-EXCLUDED_SOURCE_FILE_NAMES = SocialConfiguration.local.json
-CODE_SIGN_ENTITLEMENTS = Staging/WorldNiche.entitlements

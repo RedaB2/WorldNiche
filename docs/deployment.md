@@ -88,8 +88,6 @@ Regression checks for change routing and retry boundaries run with `bash scripts
 
 ## Deploy the backend
 
-The internal TestFlight app uses the [isolated staging project and signing configuration](../apps/ios/Staging/README.md).
-
 Use the Supabase dashboard or an authenticated Supabase CLI for the project above. Verify the selected project before any write. Add a new migration for a database change; do not rewrite applied migrations. Run `bash scripts/check.sh backend` first. The test runner creates an isolated local PostgreSQL cluster and does not accept a production URL.
 
 Link the CLI to the project, inspect remote migration history, then review `supabase db push --dry-run` before applying. Some original migrations were applied through the dashboard, so reconcile the ledger against the actual schema before the first CLI push. Never blindly replay the entire migration directory on production.
