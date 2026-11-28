@@ -48,8 +48,11 @@ final class DailyQuizUITests: XCTestCase {
         let saved = openReminderSettings(app)
         XCTAssertEqual(saved.value as? String, allow ? "1" : "0")
         if allow {
-            saved.tap()
-            XCTAssertEqual(saved.value as? String, "0")
+            let control = saved.switches.firstMatch
+            XCTAssertTrue(control.isHittable)
+            control.tap()
+            let turnedOff = expectation(for: NSPredicate(format: "value == %@", "0"), evaluatedWith: saved)
+            wait(for: [turnedOff], timeout: 5)
             app.terminate()
             launchReminderFixture(app, choice: "resume")
             XCTAssertEqual(openReminderSettings(app).value as? String, "0")
