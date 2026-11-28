@@ -37,9 +37,12 @@ struct WorldNicheApp: App {
                 .refreshLiveContent { catalogRefreshID += 1 }
                 .tint(Palette.pine)
                 .task { await restoreSession() }
+                .task(id: scenePhase) {
+                    if scenePhase == .active { await QuizNotifications.shared.refresh(social) }
+                }
                 .task(id: social.quiz.owner) {
                     await social.quiz.refresh(api: social.api)
-                    await QuizNotifications.shared.refresh(social)
+                    await QuizNotifications.shared.synchronize()
                 }
                 .task(id: social.quiz.today?.day) { await QuizNotifications.shared.synchronize() }
                 .task {
@@ -57,7 +60,6 @@ struct WorldNicheApp: App {
                     if phase == .active { Task {
                         await restoreSession()
                         await social.quiz.refresh(api: social.api)
-                        await QuizNotifications.shared.refresh(social)
                     } }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: ASAuthorizationAppleIDProvider.credentialRevokedNotification)) { _ in

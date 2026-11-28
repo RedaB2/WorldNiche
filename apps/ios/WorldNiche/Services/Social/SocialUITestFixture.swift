@@ -6,6 +6,27 @@ import UIKit
 /// This file is excluded from device and release builds.
 @MainActor
 enum SocialUITestFixture {
+    static var reminderDefaults: UserDefaults? {
+        let arguments = ProcessInfo.processInfo.arguments
+        let flag = "-worldniche-reminder-fixture"
+        if let index = arguments.firstIndex(of: flag), arguments.indices.contains(index + 1) {
+            let suite = "io.worldniche.app.reminder-ui-fixture"
+            guard let defaults = UserDefaults(suiteName: suite) else { return nil }
+            switch arguments[index + 1] {
+            case "fresh": defaults.removePersistentDomain(forName: suite)
+            case "off": defaults.set(false, forKey: "niche.reminder.enabled")
+            case "resume": break
+            default: preconditionFailure("Unknown reminder fixture")
+            }
+            return defaults
+        }
+        guard arguments.contains("-worldniche-skip-intro") || arguments.contains("-worldniche-intro-fixture")
+                || arguments.contains("-worldniche-social-fixture") || arguments.contains("-worldniche-journal-fixture"),
+              let defaults = UserDefaults(suiteName: "io.worldniche.app.other-ui-fixtures.reminders") else { return nil }
+        defaults.set(false, forKey: "niche.reminder.enabled")
+        return defaults
+    }
+
     static func make() -> (journal: DiscoveryJournal, social: SocialStore)? {
         let arguments = ProcessInfo.processInfo.arguments
         if let index = arguments.firstIndex(of: "-worldniche-journal-fixture"), arguments.indices.contains(index + 1),
@@ -137,8 +158,9 @@ private final class SocialUIResponses: @unchecked Sendable {
 
     func response(_ request: URLRequest) -> (Int, Data, TimeInterval) {
         lock.lock(); defer { lock.unlock() }
-        guard request.url?.host == "social-ui.example.test",
-              request.value(forHTTPHeaderField: "Authorization") == "Bearer ui-test-token-never-real" else {
+        guard request.url?.host == "social-ui.example.test" else { return (404, Data(), 0) }
+        if request.url?.path == "/rest/v1/rpc/set_quiz_reminder" { return (200, Data("null".utf8), 0) }
+        guard request.value(forHTTPHeaderField: "Authorization") == "Bearer ui-test-token-never-real" else {
             return (401, Data("{}".utf8), 0)
         }
         let body = Self.body(request)
