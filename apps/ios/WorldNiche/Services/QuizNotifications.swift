@@ -5,11 +5,14 @@ import Observation
 @MainActor @Observable
 final class QuizNotifications {
     static let shared = QuizNotifications()
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
     private let center = UNUserNotificationCenter.current()
-    private(set) var enabled: Bool
+    private var preference: Bool?
+    var enabled: Bool { preference == true }
+    var presentsReminderOffer = false
     private(set) var blocked = false
-    private(set) var working = false
+    private var permissionRequest: UUID?
+    var working: Bool { permissionRequest != nil }
     private(set) var message: String?
     var openQuiz: UUID?
     private var token: String?
@@ -25,53 +28,69 @@ final class QuizNotifications {
     }
 
     private init() {
-        enabled = defaults.bool(forKey: "niche.reminder.enabled")
+        #if DEBUG && targetEnvironment(simulator)
+        defaults = SocialUITestFixture.reminderDefaults ?? .standard
+        #else
+        defaults = .standard
+        #endif
+        // Version 1.1 left this key absent until the person chose a preference.
+        preference = defaults.object(forKey: "niche.reminder.enabled") as? Bool
     }
 
     func refresh(_ social: SocialStore) async {
         self.social = social
+        guard social.api != nil else { return }
         let settings = await center.notificationSettings()
+        guard !Task.isCancelled, !working else { return }
         blocked = settings.authorizationStatus == .denied
-        if enabled && [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus) {
+        if blocked {
+            setPreference(false)
+        } else if enabled && !social.deletionPending && [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus) {
             UIApplication.shared.registerForRemoteNotifications()
         }
-        if enabled && blocked { setPreference(false) }
+        let needsPermission = settings.authorizationStatus == .notDetermined && preference != false
+        presentsReminderOffer = !social.deletionPending && (preference == nil || needsPermission)
         await synchronize()
     }
 
     func setEnabled(_ value: Bool, social: SocialStore) async {
-        guard !working else { return }
-        working = true
-        defer { working = false }
         self.social = social
         message = nil
-        if value {
-            do {
-                guard try await center.requestAuthorization(options: [.alert, .sound]) else {
-                    blocked = true
-                    return
-                }
-                blocked = false
-                setPreference(true)
-                UIApplication.shared.registerForRemoteNotifications()
-            } catch { message = "Couldn’t request notification permission. Please try again." }
-        } else {
-            setPreference(false)
-            center.removeAllDeliveredNotifications()
-            UIApplication.shared.unregisterForRemoteNotifications()
+        if !value {
+            clearPreference()
+            return
+        }
+        guard !working, social.api != nil, !social.deletionPending else { return }
+        presentsReminderOffer = false
+        let request = UUID()
+        permissionRequest = request
+        defer { if permissionRequest == request { permissionRequest = nil } }
+        do {
+            let granted = try await center.requestAuthorization(options: [.alert, .sound])
+            guard permissionRequest == request, !social.deletionPending else { return }
+            blocked = !granted
+            setPreference(granted)
+            if granted { UIApplication.shared.registerForRemoteNotifications() }
+        } catch {
+            if permissionRequest == request { message = "Couldn’t request notification permission. Please try again." }
+            return
         }
         await synchronize()
     }
 
     private func setPreference(_ value: Bool) {
-        enabled = value
+        guard preference != value else { return }
+        revision += 1
+        if enabled != value { defaults.set(true, forKey: "niche.reminder.needsSync") }
+        preference = value
         defaults.set(value, forKey: "niche.reminder.enabled")
-        defaults.set(true, forKey: "niche.reminder.needsSync")
     }
 
     func clearPreference() {
-        if enabled || defaults.bool(forKey: "niche.reminder.needsSync") {
-            setPreference(false)
+        permissionRequest = nil
+        presentsReminderOffer = false
+        setPreference(false)
+        if defaults.bool(forKey: "niche.reminder.needsSync") {
             center.removeAllDeliveredNotifications()
             UIApplication.shared.unregisterForRemoteNotifications()
             Task { await synchronize() }

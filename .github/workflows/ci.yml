@@ -112,6 +112,8 @@ jobs:
             -derivedDataPath outputs/ci/DerivedData \
             CODE_SIGNING_ALLOWED=NO 2>&1 | tee outputs/ci/build.log
       - name: Run profile, journal, country-reading and daily quiz UI tests
+        env:
+          TEST_RUNNER_WORLDNICHE_REMINDER_PERMISSION: allow
         run: python3 scripts/ci_simulator.py
       - name: Preserve simulator results
         if: always()
