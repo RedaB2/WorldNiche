@@ -37,9 +37,6 @@ struct WorldNicheApp: App {
                 .refreshLiveContent { catalogRefreshID += 1 }
                 .tint(Palette.pine)
                 .task { await restoreSession() }
-                .task(id: scenePhase) {
-                    if scenePhase == .active { await QuizNotifications.shared.refresh(social) }
-                }
                 .task(id: social.quiz.owner) {
                     await social.quiz.refresh(api: social.api)
                     await QuizNotifications.shared.synchronize()

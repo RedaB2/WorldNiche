@@ -77,10 +77,10 @@ struct CountryDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Close", systemImage: "xmark") { dismiss() }.labelStyle(.iconOnly)
+                    Button.haptic("Close", systemImage: "xmark") { dismiss() }.labelStyle(.iconOnly)
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button(journal.savedIDs.contains(country.id) ? "Unsave country" : "Save country", systemImage: journal.savedIDs.contains(country.id) ? "bookmark.fill" : "bookmark") {
+                    Button.haptic(journal.savedIDs.contains(country.id) ? "Unsave country" : "Save country", systemImage: journal.savedIDs.contains(country.id) ? "bookmark.fill" : "bookmark") {
                         journal.toggleSaved(country)
                     }.labelStyle(.iconOnly).accessibilityIdentifier("saveCountry")
                     ShareLink(item: shareText) {
@@ -89,7 +89,7 @@ struct CountryDetailView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                Button { showCompanion = true } label: {
+                Button.haptic { showCompanion = true } label: {
                     HStack {
                         Image(systemName: "sparkle")
                         Text("Curious? Ask Niche").fontWeight(.medium)
@@ -183,7 +183,7 @@ struct CountryDetailView: View {
                             .scaledFont(size: 12).foregroundStyle(Palette.muted)
                             .accessibilityIdentifier("historicalFactPosition")
                         Spacer()
-                        Button("Next fact", systemImage: "arrow.right") {
+                        Button.haptic("Next fact", systemImage: "arrow.right") {
                             journal.selectFact(for: country, from: facts, advance: true)
                         }
                         .scaledFont(size: 13, weight: .medium)
@@ -259,7 +259,7 @@ struct CountryDetailView: View {
     private var countryLocation: some View {
         VStack(spacing: 0) {
             HStack {
-                Button {
+                Button.haptic {
                     withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
                         showsGlobe.toggle()
                     }
@@ -273,7 +273,7 @@ struct CountryDetailView: View {
                 .accessibilityValue(showsGlobe ? "Expanded" : "Collapsed")
                 Spacer()
                 if showsGlobe {
-                    Button { globeResetToken += 1 } label: {
+                    Button.haptic { globeResetToken += 1 } label: {
                         Image(systemName: "location")
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
@@ -367,7 +367,7 @@ struct CountryDetailView: View {
     private func unavailable(_ message: String, retryID: String, retry: @escaping () -> Void) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(message).scaledFont(size: 13).foregroundStyle(Palette.muted)
-            Button("Try again", action: retry).scaledFont(size: 12, weight: .semibold)
+            Button.haptic("Try again", action: retry).scaledFont(size: 12, weight: .semibold)
                 .accessibilityIdentifier(retryID)
         }.frame(maxWidth: .infinity, alignment: .leading).editorialCard()
     }

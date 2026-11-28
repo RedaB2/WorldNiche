@@ -360,10 +360,10 @@ final class WorldNicheUITests: XCTestCase {
     @MainActor
     func testAtlasRegionFiltersAndLargeText() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-worldniche-skip-intro"]
         app.launchArguments = ["-worldniche-skip-intro", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXL"]
         app.launch()
-        app.tabBars.buttons["Atlas"].tap()
+        let atlas = app.tabBars.buttons["Atlas"]
+        (atlas.exists ? atlas : app.buttons["Atlas"].firstMatch).tap()
         let america = app.buttons["Americas"]
         if !america.isHittable { app.scrollViews.firstMatch.swipeLeft() }
         america.tap()

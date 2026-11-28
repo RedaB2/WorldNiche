@@ -34,7 +34,7 @@ struct AtlasView: View {
                     ScrollView(.horizontal) {
                         HStack(spacing: 8) {
                             ForEach(regions, id: \.self) { item in
-                                Button { region = item } label: {
+                                Button.haptic { region = item } label: {
                                     Text(item).scaledFont(size: 12, weight: .medium)
                                         .padding(.horizontal, 16).padding(.vertical, 10)
                                         .frame(minHeight: 44)
@@ -49,7 +49,7 @@ struct AtlasView: View {
                     } else {
                         LazyVStack(spacing: 0) {
                             ForEach(countries) { country in
-                                Button {
+                                Button.haptic {
                                     searchFocused = false
                                     detail = country
                                 } label: { CountryRow(country: country) }.buttonStyle(.plain)
@@ -115,7 +115,7 @@ struct JournalView: View {
                     ProgressView(value: Double(journal.visitedIDs.count), total: 195).tint(Palette.clay)
                     if social.isSignedIn {
                         if social.journalSyncFailed {
-                            Button("Your changes are saved on this device. Retry sync") { Task { await social.synchronizeExploration() } }
+                            Button.haptic("Your changes are saved on this device. Retry sync") { Task { await social.synchronizeExploration() } }
                                 .font(.footnote).accessibilityIdentifier("retryJournalSync")
                         } else {
                             Text(social.isSyncingJournal || journal.hasPendingChanges ? "Saved on this device. Syncing your journal…" : "Your journal is synced. Notes are just for you.")
@@ -142,9 +142,9 @@ struct JournalView: View {
                         LazyVStack(spacing: 0) {
                             ForEach(countries) { country in
                                 VStack(spacing: 0) {
-                                    Button { detail = country } label: { CountryRow(country: country) }.buttonStyle(.plain)
+                                    Button.haptic { detail = country } label: { CountryRow(country: country) }.buttonStyle(.plain)
                                     if showSaved || !journal.note(for: country.id).isEmpty {
-                                        Button { noteCountry = country } label: {
+                                        Button.haptic { noteCountry = country } label: {
                                             HStack(alignment: .top, spacing: 10) {
                                                 Image(systemName: "square.and.pencil")
                                                 VStack(alignment: .leading, spacing: 5) {
@@ -199,7 +199,7 @@ struct JournalNoteView: View {
                     Label("Only you can see this", systemImage: "lock")
                         .font(.caption).foregroundStyle(Palette.muted)
                     HStack {
-                        Button("Clear note", role: .destructive) { draft = ""; focused = false }
+                        Button.haptic("Clear note", role: .destructive) { draft = ""; focused = false }
                             .disabled(draft.isEmpty).frame(minHeight: 44)
                             .accessibilityIdentifier("clearJournalNote")
                         Spacer()
@@ -212,12 +212,12 @@ struct JournalNoteView: View {
             .background(Palette.paper)
             .navigationTitle(country.name).navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.accessibilityIdentifier("cancelJournalNote") }
+                ToolbarItem(placement: .cancellationAction) { Button.haptic("Cancel") { dismiss() }.accessibilityIdentifier("cancelJournalNote") }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { journal.saveNote(draft, for: country); dismiss() }
+                    Button.haptic("Save") { journal.saveNote(draft, for: country); dismiss() }
                         .accessibilityIdentifier("saveJournalNote")
                 }
-                ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("Done") { focused = false } }
+                ToolbarItemGroup(placement: .keyboard) { Spacer(); Button.haptic("Done") { focused = false } }
             }
             .onAppear {
                 guard !loaded else { return }
@@ -259,7 +259,7 @@ struct AboutView: View {
                     }
                 }.scaledFont(size: 14).lineSpacing(5).foregroundStyle(Palette.pine).padding(26).frame(maxWidth: 650).frame(maxWidth: .infinity)
             }.background(Palette.paper)
-                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button.haptic("Done") { dismiss() } } }
         }
     }
 }
