@@ -10,6 +10,7 @@ struct RootView: View {
     @State private var notificationQuiz = false
     @State private var notificationNavigationID = 0
     private let introProgress = IntroProgress.appProgress()
+    private let notifications = QuizNotifications.shared
 
     var body: some View {
         Group {
@@ -32,14 +33,23 @@ struct RootView: View {
                 .id(notificationNavigationID)
             }
         }
-        .onChange(of: QuizNotifications.shared.openQuiz, initial: true) { _, request in
+        .alert("Daily quiz reminder?", isPresented: Binding(
+            get: { notifications.presentsReminderOffer && !social.presentsInvitation && !presentsIntroSignIn },
+            set: { notifications.presentsReminderOffer = $0 }
+        )) {
+            Button("Remind me") { Task { await notifications.setEnabled(true, social: social) } }
+            Button("No thanks", role: .cancel) { notifications.clearPreference() }
+        } message: {
+            Text("Get a notification around 7 p.m. on days you haven’t answered the quiz. You can turn this off in Profile settings.")
+        }
+        .onChange(of: notifications.openQuiz, initial: true) { _, request in
             if request != nil {
                 finishIntro()
                 presentsIntroSignIn = false
                 notificationNavigationID += 1
                 selectedTab = .discover
                 notificationQuiz = true
-                QuizNotifications.shared.openQuiz = nil
+                notifications.openQuiz = nil
             }
         }
         .sheet(isPresented: $presentsIntroSignIn) { ProfileSignInView() }
