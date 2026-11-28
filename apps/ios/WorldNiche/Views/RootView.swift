@@ -1,19 +1,25 @@
 import SwiftUI
 
 struct RootView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(SocialStore.self) private var social
     @Environment(DiscoveryJournal.self) private var journal
     @State private var selectedTab = RootTab.discover
     @State private var introResolved = false
     @State private var presentsIntro = false
     @State private var presentsIntroSignIn = false
+    @State private var showReminderOffer = false
     @State private var notificationQuiz = false
     @State private var notificationNavigationID = 0
     private let introProgress = IntroProgress.appProgress()
     private let notifications = QuizNotifications.shared
 
+    private var shouldPresentReminderOffer: Bool {
+        introResolved && notifications.presentsReminderOffer && !social.presentsInvitation && !presentsIntroSignIn
+    }
+
     var body: some View {
-        Group {
+        ZStack {
             if !introResolved {
                 Palette.paper.ignoresSafeArea()
             } else if presentsIntro {
@@ -33,10 +39,13 @@ struct RootView: View {
                 .id(notificationNavigationID)
             }
         }
-        .alert("Daily quiz reminder?", isPresented: Binding(
-            get: { notifications.presentsReminderOffer && !social.presentsInvitation && !presentsIntroSignIn },
-            set: { notifications.presentsReminderOffer = $0 }
-        )) {
+        .task(id: scenePhase) {
+            if scenePhase == .active { await notifications.refresh(social) }
+        }
+        .onChange(of: shouldPresentReminderOffer, initial: true) { _, shouldPresent in
+            showReminderOffer = shouldPresent
+        }
+        .alert("Daily quiz reminder?", isPresented: $showReminderOffer) {
             Button("Remind me") { Task { await notifications.setEnabled(true, social: social) } }
             Button("No thanks", role: .cancel) { notifications.clearPreference() }
         } message: {
