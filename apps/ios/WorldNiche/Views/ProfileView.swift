@@ -59,7 +59,7 @@ struct ProfileView: View {
                         Text("Let’s reconnect.").scaledFont(size: 30, design: .serif)
                         Text("We couldn’t load your profile. Your saved choices haven’t changed.")
                             .multilineTextAlignment(.center).foregroundStyle(Palette.muted)
-                        Button("Try again") { Task { await social.refresh() } }
+                        Button.haptic("Try again") { Task { await social.refresh() } }
                             .buttonStyle(.glassProminent).tint(Palette.forest)
                             .accessibilityIdentifier("retryLoadProfile")
                     }
@@ -69,7 +69,7 @@ struct ProfileView: View {
                 .navigationTitle("Profile").navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button("Settings", systemImage: "gearshape") { showSettings = true }
+                        Button.haptic("Settings", systemImage: "gearshape") { showSettings = true }
                     }
                 }
                 .sheet(isPresented: $showSettings) { ProfileSettingsView() }
@@ -115,7 +115,7 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Settings", systemImage: "gearshape") { showSettings = true }
+                    Button.haptic("Settings", systemImage: "gearshape") { showSettings = true }
                         .accessibilityIdentifier("profileSettings")
                 }
             }
@@ -138,7 +138,7 @@ struct ProfileView: View {
                     .scaledFont(size: 31, design: .serif)
                     .foregroundStyle(Palette.pine)
                     .accessibilityIdentifier("profileName")
-                Button("Edit profile") { showEditor = true }
+                Button.haptic("Edit profile") { showEditor = true }
                     .font(.subheadline)
                     .frame(minHeight: 44, alignment: .leading)
                     .disabled(social.deletionPending)
@@ -186,7 +186,7 @@ struct ProfileView: View {
                 .foregroundStyle(Palette.pine)
             Text("Make discoveries together. Choose your name, add a photo if you like, and invite your friends.")
                 .font(.subheadline).foregroundStyle(Palette.muted)
-            Button("Continue with Apple") { showSignIn = true }
+            Button.haptic("Continue with Apple") { showSignIn = true }
                 .buttonStyle(.glassProminent).tint(Palette.forest)
                 .controlSize(.large)
                 .disabled(social.deletionPending)
@@ -207,17 +207,17 @@ struct ProfileView: View {
                     .font(.subheadline).foregroundStyle(Palette.muted)
                 Text("Your profile, journal and saved countries still work on this device.")
                     .font(.footnote).foregroundStyle(Palette.muted)
-                Button("Sign-in options", systemImage: "person.crop.circle") { showSignIn = true }
+                Button.haptic("Sign-in options", systemImage: "person.crop.circle") { showSignIn = true }
                     .buttonStyle(.glass).controlSize(.large)
                     .accessibilityIdentifier("signInForFriends")
             } else if !social.isSignedIn {
                 Text("Sign in to add friends and see the places they’ve explored. You choose which discoveries your friends can see.")
                     .font(.subheadline).foregroundStyle(Palette.muted)
-                Button("Continue with Apple") { showSignIn = true }
+                Button.haptic("Continue with Apple") { showSignIn = true }
                     .buttonStyle(.glass).controlSize(.large)
                     .accessibilityIdentifier("profileAccountEntry")
             } else {
-                Button {
+                Button.haptic {
                     Task {
                         if let url = await social.createInvitation() {
                             sharedItem = ProfileSharedItem(url: url, invitationTitle: social.profile?.invitationTitle ?? "Share cultures with me")
@@ -244,7 +244,7 @@ struct ProfileView: View {
                 } else {
                     LazyVStack(spacing: 0) {
                         ForEach(social.friends, id: \.id) { friend in
-                            Button { selectedFriend = friend } label: {
+                            Button.haptic { selectedFriend = friend } label: {
                                 HStack(spacing: 13) {
                                     ProfilePhotoAvatar(symbol: friend.avatar, displayName: friend.displayName, path: friend.avatarPath, size: 44)
                                     VStack(alignment: .leading, spacing: 4) {
@@ -398,7 +398,7 @@ private struct ProfileEditorView: View {
                     .disabled(photoLoading || social.isBusy)
                     .accessibilityIdentifier("chooseProfilePhoto")
                     if hasPhoto {
-                        Button("Use my initials", role: .destructive) {
+                        Button.haptic("Use my initials", role: .destructive) {
                             selectedPhoto = nil
                             selectedPhotoData = nil
                             removePhoto = true
@@ -432,7 +432,7 @@ private struct ProfileEditorView: View {
                                 .font(.footnote).foregroundStyle(Palette.muted)
                                 .accessibilityIdentifier("signupProfileConsent")
                         }
-                        Button(submitting ? "Saving…" : social.profile?.profileCheckConsentRecorded == true ? "Continue" : "Agree and continue") {
+                        Button.haptic(submitting ? "Saving…" : social.profile?.profileCheckConsentRecorded == true ? "Continue" : "Agree and continue") {
                             if social.profile?.profileCheckConsentRecorded != true { automaticChecks = true }
                             save()
                         }
@@ -441,7 +441,7 @@ private struct ProfileEditorView: View {
                         .disabled(!validName || social.isBusy || social.deletionPending || photoLoading)
                         .accessibilityIdentifier("completeProfileSetup")
                         if social.profile?.profileCheckConsentRecorded != true {
-                            Button("Continue without automatic checks") {
+                            Button.haptic("Continue without automatic checks") {
                                 automaticChecks = false
                                 save()
                             }
@@ -465,18 +465,18 @@ private struct ProfileEditorView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     if isSetup {
                         if let onCancel {
-                            Button("Not now", action: onCancel).disabled(social.isBusy)
+                            Button.haptic("Not now", action: onCancel).disabled(social.isBusy)
                         } else {
-                            Button("Settings", systemImage: "gearshape") { showSettings = true }
+                            Button.haptic("Settings", systemImage: "gearshape") { showSettings = true }
                                 .accessibilityIdentifier("setupSettings")
                         }
                     } else {
-                        Button("Cancel") { dismiss() }.disabled(social.isBusy)
+                        Button.haptic("Cancel") { dismiss() }.disabled(social.isBusy)
                     }
                 }
                 if !isSetup {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Save") { save() }
+                        Button.haptic("Save") { save() }
                             .disabled(!validName || social.isBusy || social.deletionPending || photoLoading)
                             .accessibilityIdentifier("saveProfile")
                     }
@@ -553,16 +553,16 @@ struct ProfileSettingsView: View {
                     if social.isSignedIn {
                         Label("Signed in", systemImage: "checkmark.circle")
                         if !social.requiresAppleAuthorizationForDeletion, social.isAppleSignInAvailable {
-                            Button("Connect Sign in with Apple") { connectApple() }
+                            Button.haptic("Connect Sign in with Apple") { connectApple() }
                                 .disabled(social.isBusy || social.deletionPending)
                                 .accessibilityIdentifier("connectAppleIdentity")
                             Text("Keep this profile and friends, and use Apple to sign in next time.")
                                 .font(.footnote).foregroundStyle(Palette.muted)
                         }
-                        Button("Sign out") { Task { await social.signOut() } }
+                        Button.haptic("Sign out") { Task { await social.signOut() } }
                             .disabled(social.isBusy || social.deletionPending)
                     } else {
-                        Button("Sign in") { showSignIn = true }
+                        Button.haptic("Sign in") { showSignIn = true }
                             .disabled(social.isBusy)
                             .accessibilityIdentifier("settingsSignIn")
                         if !social.isConfigured {
@@ -584,7 +584,7 @@ struct ProfileSettingsView: View {
                     .disabled(!social.isSignedIn || social.profile == nil || social.isBusy || social.deletionPending || social.profile?.communityRestricted == true)
                     .accessibilityIdentifier("settingsSharingToggle")
                     if social.isSignedIn {
-                        Button("Revoke invitation links") { showRevokeConfirmation = true }
+                        Button.haptic("Revoke invitation links") { showRevokeConfirmation = true }
                             .disabled(social.isBusy)
                     }
                 } header: { Text("Sharing") } footer: {
@@ -614,7 +614,7 @@ struct ProfileSettingsView: View {
                         Link("Contact support", destination: url)
                     }
                     Link("Community guidelines", destination: social.communityURL)
-                    Button("Export my data", systemImage: "square.and.arrow.up") {
+                    Button.haptic("Export my data", systemImage: "square.and.arrow.up") {
                         Task {
                             if let url = await social.exportData() { sharedItem = ProfileSharedItem(url: url) }
                         }
@@ -623,11 +623,11 @@ struct ProfileSettingsView: View {
                     .accessibilityIdentifier("exportMyData")
                 } header: { Text("Privacy") }
                 Section {
-                    Button("Clear data on this device", role: .destructive) { showClearConfirmation = true }
+                    Button.haptic("Clear data on this device", role: .destructive) { showClearConfirmation = true }
                         .disabled(social.isBusy || social.deletionPending)
                         .accessibilityIdentifier("clearLocalData")
                     if social.isSignedIn || social.deletionPending {
-                        Button(social.deletionPending ? "Finish deleting account and data" : "Delete account and all data", role: .destructive) {
+                        Button.haptic(social.deletionPending ? "Finish deleting account and data" : "Delete account and all data", role: .destructive) {
                             showDeleteConfirmation = true
                         }
                         .disabled(social.isBusy)
@@ -647,7 +647,7 @@ struct ProfileSettingsView: View {
                 }
                 if (showDeletionAlternatives || social.deletionPending) && social.requiresAppleAuthorizationForDeletion {
                     Section {
-                        Button("Delete without Apple authorization…", role: .destructive) {
+                        Button.haptic("Delete without Apple authorization…", role: .destructive) {
                             showManualRevocationConfirmation = true
                         }
                         .disabled(social.isBusy || authorizingApple)
@@ -661,7 +661,7 @@ struct ProfileSettingsView: View {
                         Text("Your WorldNiche account and data have been deleted. Open the Settings app, tap your name, then Sign in with Apple. Select WorldNiche and choose Delete to stop using Apple sign-in for this app.")
                             .font(.subheadline)
                         Link("Apple’s instructions", destination: URL(string: "https://support.apple.com/102571")!)
-                        Button("I’ve finished this step") { social.dismissAppleRevocationNotice() }
+                        Button.haptic("I’ve finished this step") { social.dismissAppleRevocationNotice() }
                             .accessibilityIdentifier("dismissAppleRevocationNotice")
                     }
                     .accessibilityIdentifier("manualAppleRevocationInstructions")
@@ -676,7 +676,7 @@ struct ProfileSettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .disabled(authorizingApple)
             .interactiveDismissDisabled(authorizingApple || social.isBusy)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.disabled(authorizingApple || social.isBusy) } }
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button.haptic("Done") { dismiss() }.disabled(authorizingApple || social.isBusy) } }
             .sheet(isPresented: $showSignIn) { ProfileSignInView() }
             .sheet(item: $sharedItem) { item in ProfileShareSheet(url: item.url) }
             .confirmationDialog("Check your profile before sharing?", isPresented: $showCheckConsent, titleVisibility: .visible) {
@@ -826,7 +826,7 @@ struct ProfileSignInView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }.disabled(working)
+                    Button.haptic("Cancel") { dismiss() }.disabled(working)
                 }
             }
             .interactiveDismissDisabled(working)
@@ -919,7 +919,7 @@ private struct ProfileFriendView: View {
                             .font(.subheadline).foregroundStyle(Palette.muted)
                         LazyVStack(spacing: 0) {
                             ForEach(countries) { country in
-                                Button { selectedCountry = country } label: { CountryRow(country: country) }
+                                Button.haptic { selectedCountry = country } label: { CountryRow(country: country) }
                                     .buttonStyle(.plain)
                                 Divider()
                             }
@@ -937,7 +937,7 @@ private struct ProfileFriendView: View {
             .refreshSocialProfiles(enabled: !showReport && selectedCountry == nil)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button.haptic("Done") { dismiss() } }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu("Friend options", systemImage: "ellipsis") {
                         Button("Report profile", systemImage: "flag") { showReport = true }
@@ -1011,9 +1011,9 @@ private struct ProfileReportView: View {
             .navigationTitle("Report profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(social.isBusy) }
+                ToolbarItem(placement: .cancellationAction) { Button.haptic("Cancel") { dismiss() }.disabled(social.isBusy) }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Submit") {
+                    Button.haptic("Submit") {
                         Task {
                             await social.reportFriend(id: friend.id, reason: reason.rawValue, details: details)
                             if social.errorMessage == nil { submitted = true }

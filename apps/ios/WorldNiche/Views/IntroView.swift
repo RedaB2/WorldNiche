@@ -21,7 +21,7 @@ struct IntroView: View {
         VStack(spacing: 0) {
             HStack {
                 if page > 0 {
-                    Button("Back", systemImage: "chevron.left") { move(to: page - 1) }
+                    Button.haptic("Back", systemImage: "chevron.left") { move(to: page - 1) }
                         .labelStyle(.iconOnly)
                         .frame(width: 44, height: 44)
                         .accessibilityIdentifier("introBack")
@@ -29,7 +29,7 @@ struct IntroView: View {
                     Color.clear.frame(width: 44, height: 44).accessibilityHidden(true)
                 }
                 Spacer()
-                Button("Skip", action: explore)
+                Button.haptic("Skip", action: explore)
                     .font(.subheadline.weight(.medium))
                     .frame(minWidth: 44, minHeight: 44)
                     .accessibilityIdentifier("introSkip")
@@ -70,16 +70,16 @@ struct IntroView: View {
             .accessibilityIdentifier("introProgress")
 
             if page == 2 {
-                Button("Continue with Apple", action: createProfile)
+                Button.haptic("Continue with Apple", action: createProfile)
                     .buttonStyle(.glassProminent).tint(Palette.forest)
                     .controlSize(.large)
                     .accessibilityIdentifier("introAccountEntry")
-                Button("Continue exploring", action: explore)
+                Button.haptic("Continue exploring", action: explore)
                     .font(.subheadline)
                     .frame(minHeight: 44)
                     .accessibilityIdentifier("introContinueExploring")
             } else {
-                Button("Continue") { move(to: page + 1) }
+                Button.haptic("Continue") { move(to: page + 1) }
                     .buttonStyle(.glassProminent).tint(Palette.forest)
                     .controlSize(.large)
                     .accessibilityIdentifier("introContinue")
@@ -230,7 +230,7 @@ struct IntroView: View {
     private func discoverySection(_ category: IntroPreviewCategory, title: String, symbol: String) -> some View {
         let expanded = previews.expanded == category
         return VStack(spacing: 0) {
-            Button {
+            Button.haptic {
                 withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.25)) {
                     previews.toggle(category)
                 }
@@ -352,7 +352,7 @@ struct IntroView: View {
                         .foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true)
                     Link(fact.sourceName, destination: fact.sourceURL).font(.caption.weight(.medium))
                     if facts.count > 1 {
-                        Button("Next fact", systemImage: "arrow.right") {
+                        Button.haptic("Next fact", systemImage: "arrow.right") {
                             journal.selectFact(for: country, from: facts, advance: true)
                         }
                         .font(.subheadline.weight(.medium))
@@ -378,7 +378,7 @@ struct IntroView: View {
     private func previewRetry(_ message: String, id: String, action: @escaping () -> Void) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(message).font(.subheadline).foregroundStyle(Palette.muted)
-            Button("Try again", action: action)
+            Button.haptic("Try again", action: action)
                 .font(.subheadline.weight(.semibold))
                 .frame(minHeight: 44)
                 .accessibilityIdentifier(id)

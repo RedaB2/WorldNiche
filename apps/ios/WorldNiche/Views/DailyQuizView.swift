@@ -39,7 +39,7 @@ struct DailyQuizView: View {
                                         }
                                 } else {
                                     Text(q.prompt).font(.body)
-                                    Button("Explore \(country.name)") { openCountry(country) }
+                                    Button.haptic("Explore \(country.name)") { openCountry(country) }
                                         .buttonStyle(.borderedProminent).tint(Palette.forest).foregroundStyle(.white)
                                 }
                                 Label("Today counts toward your streak.", systemImage: "flame.fill").foregroundStyle(Palette.clay)
@@ -52,7 +52,7 @@ struct DailyQuizView: View {
                                 .accessibilityIdentifier("quizQuestion")
                             ForEach(Array(q.options.enumerated()), id: \.element) { index, code in
                                 if let country = CountryRepository.country(id: code) {
-                                    Button {
+                                    Button.haptic {
                                         Task {
                                             if await quiz.answer(code, question: q, api: social.api) != nil {
                                                 reveal = CountryRepository.country(id: q.answer)
@@ -80,13 +80,13 @@ struct DailyQuizView: View {
                         }
                     } else {
                         Text("Today’s question is unavailable.").font(.headline)
-                        Button("Try again") { Task { await quiz.refresh(api: social.api) } }
+                        Button.haptic("Try again") { Task { await quiz.refresh(api: social.api) } }
                     }
                 }.padding(24).frame(maxWidth: 560).frame(maxWidth: .infinity)
             }
             .background(Palette.paper).foregroundStyle(Palette.pine)
             .navigationTitle("Daily country quiz").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button.haptic("Close") { dismiss() } } }
         }
     }
 }
@@ -125,7 +125,7 @@ struct QuizStreakView: View {
                     } else if social.profile?.shareExploration != true || social.profile?.communityRestricted == true {
                         Text("Your score is private. Eligible friends appear when exploration sharing is on in Settings.")
                     } else if quiz.standingsUnavailable {
-                        Button("Couldn’t load scores. Try again") { Task { await quiz.refresh(api: social.api) } }
+                        Button.haptic("Couldn’t load scores. Try again") { Task { await quiz.refresh(api: social.api) } }
                     } else {
                         ForEach(quiz.board) { row in
                             HStack {
@@ -141,7 +141,7 @@ struct QuizStreakView: View {
             }
             .background(Palette.paper).foregroundStyle(Palette.pine)
             .navigationTitle("Your streak").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button.haptic("Done") { dismiss() } } }
             .task { await quiz.refresh(api: social.api) }
             .refreshable { await quiz.refresh(api: social.api) }
         }
@@ -158,7 +158,7 @@ struct QuizReminderSettings: View {
                 Task { await notifications.setEnabled(value, social: social) }
             })).disabled(notifications.working || social.api == nil)
             if notifications.blocked {
-                Button("Open notification settings") {
+                Button.haptic("Open notification settings") {
                     if let url = URL(string: UIApplication.openNotificationSettingsURLString) { openURL(url) }
                 }
             }

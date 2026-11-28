@@ -15,7 +15,7 @@ struct FriendInvitationView: View {
                         .scaledFont(size: 32, design: .serif).multilineTextAlignment(.center)
                     Text("Explore the world together. You can change what you share in Settings.")
                         .font(.body).foregroundStyle(Palette.muted).multilineTextAlignment(.center)
-                    Button("Done") { social.dismissInvitation() }
+                    Button.haptic("Done") { social.dismissInvitation() }
                         .buttonStyle(.glassProminent).tint(Palette.forest)
                         .accessibilityIdentifier("friendInvitationDone")
                 } else if !social.isConfigured {
@@ -27,7 +27,7 @@ struct FriendInvitationView: View {
                     Text("A friend invited you").scaledFont(size: 32, design: .serif)
                     Text("Sign in, set up your profile, and you’ll be connected automatically. You choose what to share.")
                         .foregroundStyle(Palette.muted).multilineTextAlignment(.center)
-                    Button("Sign in to connect") { showSignIn = true }
+                    Button.haptic("Sign in to connect") { showSignIn = true }
                         .buttonStyle(.glassProminent).tint(Palette.forest)
                         .accessibilityIdentifier("signInForInvitation")
                 } else if social.isSignedIn && !social.hasLoadedProfile && social.hasPendingInvitation {
@@ -36,7 +36,7 @@ struct FriendInvitationView: View {
                     } else {
                         Text("We couldn’t load your profile yet.")
                             .foregroundStyle(Palette.muted).multilineTextAlignment(.center)
-                        Button("Try again") { Task { await social.refresh() } }
+                        Button.haptic("Try again") { Task { await social.refresh() } }
                             .buttonStyle(.glassProminent).tint(Palette.forest)
                             .accessibilityIdentifier("retryInvitationProfile")
                     }
@@ -45,7 +45,7 @@ struct FriendInvitationView: View {
                         .scaledFont(size: 32, design: .serif).multilineTextAlignment(.center)
                     Text("Choose your name and an optional photo to connect.")
                         .foregroundStyle(Palette.muted).multilineTextAlignment(.center)
-                    Button("Finish your profile") { showSignIn = true }
+                    Button.haptic("Finish your profile") { showSignIn = true }
                         .buttonStyle(.glassProminent).tint(Palette.forest)
                         .accessibilityIdentifier("finishProfileForInvitation")
                 } else if social.isConnectingInvitation || (social.hasPendingInvitation && social.invitationMessage == nil) {
@@ -55,7 +55,7 @@ struct FriendInvitationView: View {
                     Text(message).font(.callout).foregroundStyle(Palette.muted).multilineTextAlignment(.center)
                         .accessibilityIdentifier("invitationError")
                     if social.canRetryInvitation {
-                        Button("Try again") { Task { await social.acceptInvitation() } }
+                        Button.haptic("Try again") { Task { await social.acceptInvitation() } }
                             .buttonStyle(.glassProminent).tint(Palette.forest)
                             .disabled(social.isBusy)
                             .accessibilityIdentifier("retryFriendInvitation")
@@ -65,7 +65,7 @@ struct FriendInvitationView: View {
             }.padding(28).foregroundStyle(Palette.pine).frame(maxWidth: .infinity)
                 .background(Palette.paper)
                 .navigationTitle("Friend invitation").navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { social.dismissInvitation(); dismiss() } } }
+                .toolbar { ToolbarItem(placement: .cancellationAction) { Button.haptic("Close") { social.dismissInvitation(); dismiss() } } }
                 .sheet(isPresented: $showSignIn) { ProfileSignInView() }
         }
     }
@@ -84,7 +84,7 @@ struct CountryFriendsView: View {
                 HStack {
                     Text("Explored together").scaledFont(size: 22, design: .serif)
                     Spacer()
-                    Button("Friends") { showProfile = true }.font(.footnote).frame(minHeight: 44)
+                    Button.haptic("Friends") { showProfile = true }.font(.footnote).frame(minHeight: 44)
                 }
                 if explorers.isEmpty {
                     Text("No shared explorations here yet.").font(.footnote).foregroundStyle(Palette.muted)

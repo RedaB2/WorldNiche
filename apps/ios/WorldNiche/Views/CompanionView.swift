@@ -39,7 +39,7 @@ struct CompanionView: View {
                                     .font(.footnote)
                                 if companion.availability.isAvailable,
                                    let previousQuestion = companion.messages.last(where: { $0.isUser })?.text {
-                                    Button("Try again") { send(previousQuestion) }
+                                    Button.haptic("Try again") { send(previousQuestion) }
                                         .font(.footnote.weight(.semibold))
                                         .disabled(companion.isGenerating)
                                 }
@@ -76,7 +76,7 @@ struct CompanionView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done", systemImage: "xmark") { dismiss() }
+                    Button.haptic("Done", systemImage: "xmark") { dismiss() }
                         .labelStyle(.iconOnly)
                         .accessibilityLabel("Close companion")
                 }
@@ -132,7 +132,7 @@ struct CompanionView: View {
                 .tracking(1.5)
                 .foregroundStyle(pine.opacity(0.55))
             ForEach(suggestedQuestions, id: \.self) { suggestion in
-                Button {
+                Button.haptic {
                     send(suggestion)
                 } label: {
                     HStack(alignment: .firstTextBaseline, spacing: 14) {
@@ -167,7 +167,7 @@ struct CompanionView: View {
     }
 
     private var unavailableActions: some View {
-        Button {
+        Button.haptic {
             companion.refreshAvailability()
         } label: {
             Label("Check again", systemImage: "arrow.clockwise")
@@ -231,7 +231,7 @@ struct CompanionView: View {
                     .onSubmit { send(question) }
                     .disabled(companion.isGenerating)
                 if companion.isGenerating {
-                    Button {
+                    Button.haptic {
                         companion.cancel()
                     } label: {
                         Image(systemName: "stop.fill")
@@ -239,7 +239,7 @@ struct CompanionView: View {
                     }
                     .accessibilityLabel("Stop response")
                 } else {
-                    Button {
+                    Button.haptic {
                         send(question)
                     } label: {
                         Image(systemName: "arrow.up")

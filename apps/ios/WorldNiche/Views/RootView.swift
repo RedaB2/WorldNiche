@@ -108,7 +108,7 @@ struct ExploreView: View {
                             .padding(.top, 12)
 
                         if social.quiz.today == nil {
-                            Button {
+                            Button.haptic {
                                 showQuiz = true
                             } label: {
                                 Label("Play today’s quiz", systemImage: "questionmark.circle")
@@ -215,7 +215,7 @@ struct ExploreView: View {
                 .frame(width: 52, height: 52)
                 .accessibilityLabel("WorldNiche")
             HStack {
-                Button { showStreak = true } label: {
+                Button.haptic { showStreak = true } label: {
                     Label("\(social.quiz.streak)", systemImage: "flame.fill")
                         .font(.headline.monospacedDigit()).foregroundStyle(Palette.clay)
                         .padding(.horizontal, 10).frame(minHeight: 44)
@@ -224,7 +224,7 @@ struct ExploreView: View {
                 .accessibilityLabel("\(social.quiz.streak)-day streak")
                 .accessibilityIdentifier("quizStreak")
                 Spacer()
-                Button { showAbout = true } label: {
+                Button.haptic { showAbout = true } label: {
                     Image(systemName: "info")
                         .scaledFont(size: 14, weight: .medium)
                         .frame(width: 38, height: 38)
@@ -249,7 +249,7 @@ struct ExploreView: View {
             .accessibilityIdentifier("interactiveGlobe")
             .frame(minHeight: 160, idealHeight: preferredHeight, maxHeight: preferredHeight)
 
-            Button { detail = selected } label: {
+            Button.haptic { detail = selected } label: {
                 HStack(spacing: 12) {
                     Text(selected.flag).scaledFont(size: 26)
                     VStack(alignment: .leading, spacing: 3) {
@@ -280,7 +280,7 @@ struct ExploreView: View {
         }
         .overlay(alignment: .topTrailing) {
             if hasTouchedGlobe {
-                Button {
+                Button.haptic {
                     hasTouchedGlobe = false
                     globeResetToken += 1
                 } label: {
